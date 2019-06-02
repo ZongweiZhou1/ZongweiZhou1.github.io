@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta name="author" content="董沅鑫, yuanxin.me@gmail.com">
+  
+  
+  
+  <title>阅读笔记-Relation Network for Object Detection | YixiaoZhou&#39;s blog</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="Relation Network,Object Detection,GCN,">
+  
+
+  <script>
+    console.log('\n%c Hexo-theme-bmw v4.0 ' + '%c 🎉 https://github.com/dongyuanxin/theme-bmw 🎉\n' + '\n%c View demo online ' + '%c 🔍 https://godbmw.com/ 🔍  \n' , 'color: #fadfa3; background: #030307; padding:3px 0;', '', 'color: #fadfa3; background: #030307; padding:3px 0;', '');
+  </script>
+
+  
+    <meta name="description" content="海阔全是浪，天高皆是霾。">
+  
+
+  
+
+  
+    <link rel="icon" href="/images/fvatar2.png">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/icon/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+  <script src="/js/util.js"></script>
+<script src="/js/valine.min.js"></script>
+
+  
+
+  
+    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
+  
+
+  
+    <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
+  
+  
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js" async></script>
+  
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.0/dist/av-min.js"></script>
+  
+
+</head>
+
+  <body>
+
+    
+
+    <div id="app">
+
+      <div class="header-wrap">
+  <header>
+    <div class="site-brand">
+      <div class="site-title">
+        <a href="/">YiXiaoZhou</a>
+      </div>
+    </div>
+    <nav class="site-navigation">
+      <ul class="nav-menu">
+      
+        <li class="nav-item" data-path="/">
+          
+            <a href="/" target="_self">
+              主页
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          
+            <a href="/archives/" target="_self">
+              归档
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          
+            <a href="/friends/" target="_self">
+              友链
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          
+            <a href="/about/" target="_self">
+              关于
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path>
+          
+            <a href="javascript:void(0);" v-else>抓到我</a>
+            <ul class="nav-menu--dropdown">
+              
+                <li>
+                  <a href="https://github.com/ZongweiZhou1" target="_blank">
+                    Github
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://www.facebook.com/duncon.chou" target="_blank">
+                    Facebook
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://weibo.com/u/3231820650/home?wvr=5" target="_self">
+                    weibo
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+      </ul>
+    </nav>
+    <i class="iconfont icon-menu"></i>
+  </header>
+</div>
+
+<script>
+  let links = document.querySelectorAll('.nav-item');
+  for(let link of links){
+    let childrenLink = link.querySelector('ul');
+    link.addEventListener('mouseenter', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown active";
+      }
+    })
+    link.addEventListener('mouseleave', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown";
+      }
+    })
+  }
+  let rootRealPath = getRealPath(window.location.pathname, true);
+  for(let link of links) {
+    let linkPath = link.getAttribute("data-path");
+    if(linkPath && getRealPath(linkPath, true) === rootRealPath) {
+      link.className = "nav-item hover";
+    }
+  }
+
+  let iconMenu = document.querySelector("i.iconfont.icon-menu"),
+    iconMenuClicked = false;
+  let navDOM = document.querySelector("nav.site-navigation");
+  iconMenu.addEventListener("click", () => {
+    iconMenuClicked 
+      ? navDOM.className = "site-navigation active"
+      : navDOM.className = "site-navigation";
+    iconMenuClicked = !iconMenuClicked;
+  })
+</script>
+
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
+  
+
+<div class="post">
+  <h1 class="article-title">
+    <span>阅读笔记-Relation Network for Object Detection</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2019-05-22
+    </span>
+    
+    
+      <span>
+        浏览 : <span class="article-timer" data-identity="relationNetwork"></span>
+      </span>
+    
+  </div>
+
+  
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p>我们都知道在目标检测领域，深度学习(RCNN系列，YOLO系列，SSD系列)方法取得了很大的成功，但是这些检测方法考虑的仅仅是目标的个体，而没有考虑一帧图像中目标之间的相互影响，所以本文提出一种<strong>object relation module</strong> ,通过考虑目标集合中个体的交互关系来辅助目标的检测。该模块参数很少能够很方便的嵌入到已有的网络中，提高目标检测性能，另外本文使用该模块实现duplicate removal（NMS实现的功能），从而能够实现网络的end-to-end学习。</p>
+<p><strong>思考_</strong> : 在多目标跟踪问题中，一般的计算两个目标之间是否匹配的策略还是类似于ReID的方法，仅考虑两者之间的相似度，但是在跟踪的时空图中，两个观测的关系不仅仅取决于两者之间的关系，还取决于同时存在的其他目标之间的关系，所以多目标的匹配策略同样可以使用类似的relation module。</p>
+<h3 id="Object-Relation-Module-ORM"><a href="#Object-Relation-Module-ORM" class="headerlink" title="Object Relation Module (ORM)"></a>Object Relation Module (ORM)</h3><p><img src="/2019/05/22/relationNetwork/pipeline.png" alt="pipeline"></p>
+<p>文章在处理object之间关系时主要借鉴和继承了google的关于attention的开山之作</p>
+<blockquote>
+<p>Attention is all your need</p>
+</blockquote>
+<p>具体而言，假设经过特征抽取网络，比如RPN层结果，获得了$N$个候选目标的表观特征$f_A$和几何特征$f_G$，也就是bounding box特征。 $N$个特征表示为${(f_A^n, f_G^n）}_{n=1}^N$, 那么经过relation module之后的特征$f_R(n)$如下计算<br>$$<br>f_R(n) = \sum_mw^{mn}\cdot(W_v\cdot f_A^m)<br>$$<br>可以看到$W_v$其实是对表观特征先进行一次embedding，然后使用一组与目标$n$有关的权重进行加权求和作为第$n$个样本新的特征，所以这是一种Attention的操作。</p>
+<p>而权重的计算结合了空间几何特征和表观特征，其模块计算图如下：</p>
+<p>![relation module](relationNetwork/relation module.png)</p>
+<p>具体公式如下：<br>$$<br>\begin{align}<br>w_A^{mn}&amp;=\frac{\text{dot}(W_kf_A^m, W_Qf_A^n)}{\sqrt{d_k}}\<br>w_G^{mn} &amp;= \max {0, W_G\cdot \Epsilon_G(f_G^m, f_G^n)}\<br>w^{mn} &amp;= \frac{w_G^{mn}\cdot \exp{(w_A^{mn})}}{\sum_k w_G^{kn}\cdot \exp{(w_A^{kn})}}<br>\end{align}<br>$$<br>其中$W_A, W_V, W_Q, W_k$都是需要学习的参数，$\Epsilon(\cdot,\cdot)$是特征融合函数，可以使用网络实现，论文中类似于’Attention is all your need’的做法，使用cosine和sine functions融合位置参数$f_G=(\log(\frac{|x_m-x_n|}{w_m}),\log(\frac{|y_m-y_n|}{h_m}),\log(\frac{w_n}{w_m}),\log(\frac{h_n}{m_m}))$</p>
+<p>由于空间中目标个数也是不定的，所以其实就是在图上进行一种attention， 可以参考论文Graph Attention Network（GAT）, 同样的类似于GAT方法，文章中也使用了multi-head attention的一种方式，如Figure 2所示，每一个relation模块是一种attention， 多个attention 模块同时作用， 文中取16个这种模块。 另外attention之后的特征和原始特征进行相加，这类似于Graph Convolution Network中邻接矩阵的归一化加上单位阵的操作。<br>$$<br>f_A^n = f_A^n + \text{Concat}[f_R^1(n), \cdots , f_R^{N_r}(n)], \text{for all}\quad n<br>$$<br>如果将所有attention的结果等长加在一起会导致计算量太大，所以这里将所有的attention结果concat在一起和原始的特征加在一起减小运算量，但文章没有实验对比性能有什么差异。<strong>注意</strong>每一个attention模块的输出大小应该特殊设置，以使得最后concat之后特征与原始特征等长从而能够进行相加操作。 </p>
+<hr>
+<h3 id="Relation-Networks-for-Object-Detection"><a href="#Relation-Networks-for-Object-Detection" class="headerlink" title="Relation Networks for Object Detection"></a>Relation Networks for Object Detection</h3><p>相对于已有的object detection框架而言，简单的增加了两个模块，如下图所示。(a)用于刻画Instance之间的关系，(b)用于去除重复的Instances，下面会介绍两个模块。</p>
+<p><img src="/2019/05/22/relationNetwork/illustration.png" alt="illustration"></p>
+<p>第一个模块是用于从每个目标所处的空间关系出发，融合目标的context信息从而提取更好地特征， 第二个模块是希望利用目标之间的位置关系将NMS的过程融合到网络里面从而避免阈值的选取。<strong>注意</strong>(b)图中$s_0, s_1$是乘法操作。</p>
+<h4 id="Relation-for-Instance-Recognition"><a href="#Relation-for-Instance-Recognition" class="headerlink" title="Relation for Instance Recognition"></a>Relation for Instance Recognition</h4><p>以RCNN为basenet，RCNN在ROI pooling之后过程如下:<br>$$<br>\begin{align}<br>ROI_Feat_n &amp;\xrightarrow{FC} \quad \quad 1024 \<br>&amp;\xrightarrow{FC} \quad \quad 1024\<br> &amp;\xrightarrow{LINEAR}(score_n, bbox_n)<br>\end{align}<br>$$<br>加上relation module，即Figure 2模块在FC之后得到计算过程如下：<br>$$<br>\begin{align}<br>{ROI_Feat_n}<em>{n=1}^N &amp;\xrightarrow{FC} \quad \quad 1024\cdot N \xrightarrow{（RM）^{r_1}} 1024 \cdot N\<br>&amp;\xrightarrow{FC} \quad \quad 1024 \cdot N \xrightarrow{（RM）^{r_2}} 1024 \cdot N\<br> &amp;\xrightarrow{LINEAR}(score_n, bbox_n)</em>{n=1}^N<br>\end{align}<br>$$<br>这里$r_1, r_2$分别表示每个RM模块中head的个数，可以选择不同的数值。</p>
+<h4 id="Relation-for-Duplicate-Removal"><a href="#Relation-for-Duplicate-Removal" class="headerlink" title="Relation for Duplicate Removal"></a>Relation for Duplicate Removal</h4><p>作者把duplicate removal归结成一个二分类问题，对于每一个gt box，只有一个detected box是正确的，其他的都是所谓duplicate。作者的duplicate removal network是接在classifier的输出后面。该模块的输入包括object proposal的 score vector（属于各个类别的概率）, bbox，以及proposal的特征（典型的1024维）。对于某一个object proposal的某一个类别，假设属于这个类别的概率为$score^n$，首先经过一个rank embed模块，即拿出其他object proposal属于该类别的score，进行排序，得到第n个object proposal在排序中的下标（rank），作者特别说明了，使用rank值而不是直接score的值非常重要。然后将rank值映射到128维向量，同时将该proposal的特征也映射到128维，将两种128维的特征相加之后作为新的appearance feature，然后和bbox作为relation module的输入，得到新的128维的输出，和$W_s$做内积之后通过sigmoid得到$s_1$，最终的correct的概率$s=s_0 * s_1$</p>
+<p>我觉得这部分选择rank而不是score作为特征的原因在于rank是一种序列特征，其与score的具体数值无关。</p>
+<h4 id="End-to-End-Object-Detection"><a href="#End-to-End-Object-Detection" class="headerlink" title="End-to-End Object Detection"></a>End-to-End Object Detection</h4><p>这一部分我觉得挺有意思的。</p>
+<p>end2end training就是把两部分损失叠加起来，但是直观上而言会存在一些问题。</p>
+<ul>
+<li><p>首先， instance recognition step和duplicate removal step目标是相反的， instance recognition step是将所有可能是目标的区域都尽可能的获得较高的置信度，而duplicate removal step却要求部分可能是真值得候选区域只选一个其余的置信度要尽可能的低。这个问题实际上不冲突的关键就在于duplicate removal模块中$s_0, s_1$乘积作用， $s_0$可以保留instance recognition step的作用，$s_1$用来达到duplicate removal step的目标。</p>
+</li>
+<li><p>duplicate removal 模块并没有确切的标签，其标签是通过instance recognition 模块输出与真实标签的覆盖程度确定的，因此训练过程标签中是会发生变化的。这种变化会不会导致训练不稳定？文章指出实验中并没有出现不稳定的现象.</p>
+<blockquote>
+<p>While there is no theoretical evidence yet, our guess is that the duplicate removal network is relatively easy to train and the instable label may serve as a means of regularization.</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h3><p>文章中所有的实验都是在COCO数据集上完成</p>
+<h4 id="Relation-for-Instance-Recognition-1"><a href="#Relation-for-Instance-Recognition-1" class="headerlink" title="Relation for Instance Recognition"></a>Relation for Instance Recognition</h4><p>对比试验中NMS的阈值设为0.6，(a)中none表示不使用几何信息,$w_g=1$, unary表示使用的是[1]中的embedding方法，(b)中是attention head的个数，(c)中是每个阶段使用relation module的个数</p>
+<p><img src="/2019/05/22/relationNetwork/ablation.png" alt="ablation"></p>
+<p>结论：</p>
+<ul>
+<li>relation attention 能够提升检测性能</li>
+<li>几何特征能够提升检测性能</li>
+<li>attention head的个数增多能够提升检测性能，文中实验在16时达到饱和</li>
+<li>relation module的模块个数能够提升检测性能</li>
+</ul>
+<h4 id="Does-the-improvement-come-from-more-parameters-of-depths"><a href="#Does-the-improvement-come-from-more-parameters-of-depths" class="headerlink" title="Does the improvement come from more parameters of depths?"></a>Does the improvement come from more parameters of depths?</h4><p>我觉得这个对比实验做的很好，引入attention后相当于网络多加了一些参数和层，那么到底是attention机制有效还是参数更多了有效？</p>
+<p><img src="/2019/05/22/relationNetwork/201806_003_07.png" alt="various heads"></p>
+<p>table 2 表明相同深度下使用和不使用relation module的性能已经不同的heads的性能对比。</p>
+<ul>
+<li>A wider 2fc head (1432-d, b) only introduces small improvement (+0.1 mAP).</li>
+<li>A deeper 3fc head (c) deteriorates the accuracy (-0.6 mAP), probably due to the difficulty of training. </li>
+<li>To make the training easier, residual blocks are used5 (d), but only moderate improvement is observed (+0.3 mAP). </li>
+<li>global context is used (e, 2048-d global average pooled features are concatenated with the second 1024-d instance feature before classification), no improvement is observed. </li>
+<li>our approach (f) significantly   improves the accuracy (+2.3 mAP). </li>
+<li>nother baseline which concatenates the original pooled features with the ones from a 2× larger RoI (g), the performance is improved from 29.6 to 30.4 mAP, indicating a better way of utilizing context cues.</li>
+<li>we combine this new head with relation modules, that is, replacing the 2fc with {r1, r2}={1, 1} (h). We get 32.5 mAP, which is 0.6 better than setting (f) (31.9 mAP). This indicates that using a larger window context and relation modules are mostly complementary.</li>
+<li>When more residual blocks are used and the head network becomes deeper (i), accuracy no longer increases. </li>
+<li>accuracy is continually improved when more relation modules are used (j). </li>
+</ul>
+<p>对比实验从各个角度证明了文章提出的RM的有效性。</p>
+<h4 id="Relation-for-duplicate-removal"><a href="#Relation-for-duplicate-removal" class="headerlink" title="Relation for duplicate removal"></a>Relation for duplicate removal</h4><p>backbone-network : Faster RCNN</p>
+<p>前面我们提到在for duplicate removal模块是，输入特征是bbox和rank与appearance embedding之后的特征和。那么不同的输入会有什么影响。</p>
+<p><img src="/2019/05/22/relationNetwork/201806_003_09.png" alt="ablatopn_study_dup_removal"></p>
+<p>单独使用NMS， 阈值0.5的时候AP是29.6， 第二列正是算法最终使用的特征，即rank对应的特征，表观特征和bbox特征，第三列表示当不使用rank特征时，AP=26.6下降严重，说明rank特征有用。第三列的第二子列表示将rank特征用score特征取代，发现性能也会下降。第四列表示不使用表观特征，这时候可以发现只利用rank和box特征相对于NMS性能也是提升的。第五列的第一子列表示不使用bbox信息，第二子列表示计算bbox的attention 权重时方式不同，是将$f_G$映射到高维空间然后加到$f_A$上作为新的特征，发现这两种方式性能都下降了。</p>
+<p><img src="/2019/05/22/relationNetwork/201806_003_08.png" alt="nms"></p>
+<p>对比了不同阈值下NMS和本文relation module进行抑制duplicate的性能。NMS的阈值是IoU的阈值， 本文的阈值是二分类问题的阈值。最下面一行表示end-2-end训练，发现性能提升还是很明显的。</p>
+<p><img src="/2019/05/22/relationNetwork/201806_003_10.png" alt="examples"></p>
+<h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><p>大多数的目标检测算法都仅考虑了目标本身(最后的分类层不纳入考虑，因为分类层是指定类别，与proposal位置无关)， 本文则是考虑了目标之间的相互作用，目标之间的关系对于目标的检测还是有帮助的，比如行人检测时，两个行人交互时一定是存在特殊约束的，而这种约束则可以通过相互关系进行抽象。同时利用目标关系来实现NMS的功能是一个较大的创新点。</p>
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : zhouzongwei <br>
+        
+        原文链接 : <a href>http://yoursite.com/2019/05/22/relationNetwork/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
+    </div>
+  
+  
+  
+    <div class="social-share" style="margin-top: -2rem" data-wechat-qrcode-title="<p>微信扫一扫</p>" data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>" data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter">
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
+</div>
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async></script>
+  
+
+  
+    <div id="reward">
+  
+    <p id="reward-meta">知识 & 情怀 | 赏或者不赏，我都在这，不声不响</p>
+  
+  <button id="reward-btn">
+    
+    <span>打赏</span>
+  </button>
+  <div id="reward-qrcode">
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/wechatimg.jpg" alt="微信扫一扫, 以资鼓励">
+        <p class="qrcode-meta">微信扫一扫, 以资鼓励</p>
+      </div>
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/alipayimg.jpg" alt="支付宝扫一扫, 再接再厉">
+        <p class="qrcode-meta">支付宝扫一扫, 再接再厉</p>
+      </div>
+    
+  </div>
+
+</div>
+
+<script>
+  (() => {
+    let button = document.querySelector('#reward-btn'),
+      qrcode = document.querySelector('#reward-qrcode'),
+      display = false;
+    
+    button.addEventListener('click', () => {
+      qrcode.style.display = display ? 'none' : 'block'
+      display = !display
+    }, false)
+  })()
+</script>
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+          <i class="iconfont icon-06tags"></i>标签: 
+          
+          <span class="span--tag">
+            <a href="/tags/Relation-Network/">
+              #Relation Network
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/Object-Detection/">
+              #Object Detection
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/GCN/">
+              #GCN
+            </a>
+          </span>
+          
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
+    
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2019/05/21/repulsion-loss/" target="_self">阅读笔记-Repulsion loss:Detecting Pedestrians in a Crowd</a>
+      </div>
+    
+    
+      <div class="nav-next">
+        下一篇:
+        <a href="/2019/05/22/FANTrack/" target="_self">阅读笔记-FANTrack：3DMulti-Object Tracking with Feature Association Network</a>
+        <i class="iconfont icon-next"></i>
+      </div>
+    
+  </nav>
+
+  
+    <a href="#comment" class="comment-anchor"></a>
+<div class="comment-title"><i class="iconfont icon-footprint"></i> 留下足迹 <i class="iconfont icon-footprint"></i></div>
+<div id="vcomments"></div>
+
+<script defer>
+  if( true ) {
+    let path = getRealPath()
+    new Valine({
+      el: "#vcomments",
+      appId: "oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz",
+      appKey: "fWABYGLTAoV1LT4LYzh1PNmQ",
+      notify: false,
+      verify: false,
+      avatar: "robohash",
+      placeholder: "正确填写邮箱, 才能及时收到回复哦♪(^∇^*)",
+      path
+    });
+  }
+</script>
+   
+
+  
+    <script defer>
+const valineAPI = (() => {
+  try {
+    AV.init("oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz", "fWABYGLTAoV1LT4LYzh1PNmQ");
+  } catch(error) {}
+  const isExist = (identity) => {
+    identity = identity || getRealPath();
+    let query = new AV.Query('Timer');
+    return new Promise((resolve, reject) => {
+      query.equalTo("identity", identity);
+      query.find().then(results => {
+        resolve(results.length > 0);
+      }, error => reject(error));
+    })
+  }
+
+  const _get = (identity) => {
+    let query = null;
+    if(identity && identity instanceof Array){
+      let querys = [];
+      for(let i = 0; i < identity.length; ++i) {
+        querys[i] = new AV.Query('Timer');
+        querys[i].equalTo('identity', identity[i]);
+      }
+      query = AV.Query.or.apply(null ,querys);
+    } else {
+      identity = identity || getRealPath();
+      query = new AV.Query("Timer");
+      query.equalTo("identity", identity);
+    }
+
+    return new Promise((resolve, reject) => {
+      query.find()
+      .then(results => resolve(results))
+      .catch(error => reject(error))
+    })
+  }
+
+  const create = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let Todo = AV.Object.extend('Timer');
+      let todo = new Todo();
+      todo.set("times", 1);
+      todo.set("identity", identity);
+      todo.save().then(res => resolve(true), error => reject(error));
+    })
+  }
+
+  const update = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let query = new AV.Query('Timer');
+      query.equalTo("identity", identity);
+      query.find().then(todos => {
+        todos.forEach(todo => {
+          todo.set("times", todo.attributes.times + 1);
+        });
+        return AV.Object.saveAll(todos);
+      }).then(todos => resolve(true), error => reject(error));
+    })
+  }
+
+  return {
+    isExist,
+    _get,
+    update,
+    create
+  }
+})()
+
+const calcAndWriteTimes = () => {
+  let isPost = true;
+
+  let timerAllDOM = document.querySelectorAll(".article-timer");
+
+  if(isPost) {
+    let identity = timerAllDOM[0].getAttribute("data-identity");
+    valineAPI.isExist(identity)
+    .then(exist => {
+      if(exist) {
+        return valineAPI.update(identity);
+      }
+      return new Promise(resolve => resolve(true));
+    })
+    .then( succuess => valineAPI._get(identity))
+    .then( result => timerAllDOM[0].innerText = result[0].attributes.times)
+    .catch(error => console.log(error.message))
+    return ;
+  }
+
+  let timerDOMCache = {};
+
+  for(let timerDOM of timerAllDOM) {
+    let identity = timerDOM.getAttribute("data-identity");
+    if(timerDOMCache.hasOwnProperty(identity)){
+      timerDOMCache[identity].dom.push(timerDOM);
+    }else{
+      timerDOMCache[identity] = {
+        dom: [timerDOM],
+        times: undefined
+      };
+    }
+  }
+
+  let identities = Object.keys(timerDOMCache);
+  valineAPI._get(identities).then(results => {
+    for(let result of results) {
+      let {identity, times} = result.attributes;
+      timerDOMCache[identity].times = times;
+      timerDOMCache[identity].dom.map(item => item.innerText = times);
+    }
+    for(let identity of identities) {
+      if(timerDOMCache[identity].times){
+        continue;
+      }
+      timerDOMCache[identity].dom.map(item => item.innerText = 1);
+      valineAPI.create(identity);
+    }
+  }).catch(error => console.log(error.message))
+}
+
+if(true){
+  calcAndWriteTimes();
+}
+</script>
+   
+
+</div>
+
+
+      <footer>
+  <p class="site-info">
+    博客已萌萌哒运行<span id="time-to-now"></span><span class="my-face">(●'◡'●)ﾉ♥</span>
+    <br>
+    Theme - <a href="https://github.com/dongyuanxin/theme-bmw">BMW</a> | Made With 💗 | Powered by <a href="https://godbmw.com/">GodBMW</a>
+    <br>
+    
+  </p>
+</footer>
+
+
+
+<script>
+const timeToNowDOM = document.querySelector("#time-to-now");
+const startTimestamp = new Date(2018, 1, 10).getTime();
+
+const updateTimeStr = () => {
+  let offset = parseInt(
+      (new Date().getTime() - startTimestamp) / 1000,
+      10
+    ),
+    day = Math.floor(offset / 86400),
+    hour = Math.floor((offset % 86400) / 3600),
+    minute = Math.floor(((offset % 86400) % 3600) / 60),
+    second = Math.floor(((offset % 86400) % 3600) % 60);
+  timeToNowDOM.innerHTML =
+    day + "天" + hour + "小时" + minute + "分钟" + second + "秒";
+  setTimeout(updateTimeStr, 500);
+}
+
+setTimeout(updateTimeStr, 500);
+</script>
+
+
+      <div class="back-to-top hidden">
+  <span>
+    <i class="iconfont icon-60"></i><span></span>%
+  </span>
+</div>
+
+<script>
+const updateIconToTop = percent => {
+  let dom = document.querySelector(".back-to-top span span");
+  dom.innerText = percent;
+  if(percent < 1) {
+    document.querySelector(".back-to-top").className = "back-to-top hidden";
+  } else {
+    document.querySelector(".back-to-top").className = "back-to-top";
+  }
+}
+
+const handleScoll = () => {
+  let isRunning = false;
+  return () => {
+    if (isRunning) return;
+    isRunning = true;
+    window.requestAnimationFrame(timestamp => {
+      let scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop,
+        scrollHeight =
+          document.documentElement.scrollHeight ||
+          document.body.scrollHeight,
+        clientHeight =
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+      isRunning = false;
+      if (scrollTop <= 1) {
+        updateIconToTop(0);
+        return;
+      }
+      if (scrollTop + clientHeight >= scrollHeight) {
+        updateIconToTop(100);
+      } else {
+        updateIconToTop(parseInt(
+          100 * scrollTop / (scrollHeight - clientHeight),
+          10
+        ));
+      }
+    });
+  };
+}
+
+const backToTop = () => {
+  let scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop,
+    delay = 10,
+    time = 200;
+  if (scrollTop <= 20) {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    return;
+  }
+  let step = Math.ceil(scrollTop * delay / time);
+  let timer = setInterval(() => {
+    scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollTop - step <= 0) {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      clearInterval(timer);
+    } else {
+      document.documentElement.scrollTop = scrollTop - step;
+      document.body.scrollTop = scrollTop - step;
+    }
+  }, delay);
+}
+
+document.addEventListener("scroll", handleScoll(), false);
+
+document.querySelector(".back-to-top").addEventListener("click", backToTop, false);
+
+</script>
+
+    </div>
+
+    
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+<script>
+  (() => {
+    const mathjaxConfig = {
+      showProcessingMessages: false, //关闭js加载过程信息
+      messageStyle: "none", //不显示信息
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]], //行内公式选择符
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]], //段内公式选择符
+        skipTags: ["script", "noscript", "style", "textarea", "pre", "code", "a"] //避开某些标签
+      },
+      "HTML-CSS": {
+        availableFonts: ["STIX", "TeX"], //可选字体
+        showMathMenu: false //关闭右击菜单显示
+      }
+    }
+
+    let mathjaxInterval = setInterval(() => {
+      if(!window.MathJax){
+        return;
+      }
+      window.MathJax.Hub.Config(mathjaxConfig)
+      window.MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById('app')])
+
+      clearInterval(mathjaxInterval)
+    }, 10)    
+  })()
+</script>
+    
+
+    <script src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script>
+<script async>
+  let fancyTimer = setInterval(function(){
+    if(!window.$){
+      return;
+    }
+    $(document).ready(function() {
+      $(".post img").each(function () {
+        if($(this).parent().get(0).tagName.toLowerCase() === "a") {
+          return;
+        }
+        // $(this).attr("data-fancybox", "gallery"); // if you add 'data-fancybox', img will display after showed
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "gallery");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      });
+      
+      clearInterval(fancyTimer);
+    });
+  }, 10);
+</script>
+
+    
+  </body>
+
+</html>

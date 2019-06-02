@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta name="author" content="董沅鑫, yuanxin.me@gmail.com">
+  
+  
+  
+  <title>阅读笔记-MOT16:A Benchmark for Multi-Object Tracking | YixiaoZhou&#39;s blog</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="MOT,Benchmark,">
+  
+
+  <script>
+    console.log('\n%c Hexo-theme-bmw v4.0 ' + '%c 🎉 https://github.com/dongyuanxin/theme-bmw 🎉\n' + '\n%c View demo online ' + '%c 🔍 https://godbmw.com/ 🔍  \n' , 'color: #fadfa3; background: #030307; padding:3px 0;', '', 'color: #fadfa3; background: #030307; padding:3px 0;', '');
+  </script>
+
+  
+    <meta name="description" content="海阔全是浪，天高皆是霾。">
+  
+
+  
+
+  
+    <link rel="icon" href="/images/fvatar2.png">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/icon/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+  <script src="/js/util.js"></script>
+<script src="/js/valine.min.js"></script>
+
+  
+
+  
+    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
+  
+
+  
+    <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
+  
+  
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js" async></script>
+  
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.0/dist/av-min.js"></script>
+  
+
+</head>
+
+  <body>
+
+    
+
+    <div id="app">
+
+      <div class="header-wrap">
+  <header>
+    <div class="site-brand">
+      <div class="site-title">
+        <a href="/">YiXiaoZhou</a>
+      </div>
+    </div>
+    <nav class="site-navigation">
+      <ul class="nav-menu">
+      
+        <li class="nav-item" data-path="/">
+          
+            <a href="/" target="_self">
+              主页
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          
+            <a href="/archives/" target="_self">
+              归档
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          
+            <a href="/friends/" target="_self">
+              友链
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          
+            <a href="/about/" target="_self">
+              关于
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path>
+          
+            <a href="javascript:void(0);" v-else>抓到我</a>
+            <ul class="nav-menu--dropdown">
+              
+                <li>
+                  <a href="https://github.com/ZongweiZhou1" target="_blank">
+                    Github
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://www.facebook.com/duncon.chou" target="_blank">
+                    Facebook
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://weibo.com/u/3231820650/home?wvr=5" target="_self">
+                    weibo
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+      </ul>
+    </nav>
+    <i class="iconfont icon-menu"></i>
+  </header>
+</div>
+
+<script>
+  let links = document.querySelectorAll('.nav-item');
+  for(let link of links){
+    let childrenLink = link.querySelector('ul');
+    link.addEventListener('mouseenter', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown active";
+      }
+    })
+    link.addEventListener('mouseleave', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown";
+      }
+    })
+  }
+  let rootRealPath = getRealPath(window.location.pathname, true);
+  for(let link of links) {
+    let linkPath = link.getAttribute("data-path");
+    if(linkPath && getRealPath(linkPath, true) === rootRealPath) {
+      link.className = "nav-item hover";
+    }
+  }
+
+  let iconMenu = document.querySelector("i.iconfont.icon-menu"),
+    iconMenuClicked = false;
+  let navDOM = document.querySelector("nav.site-navigation");
+  iconMenu.addEventListener("click", () => {
+    iconMenuClicked 
+      ? navDOM.className = "site-navigation active"
+      : navDOM.className = "site-navigation";
+    iconMenuClicked = !iconMenuClicked;
+  })
+</script>
+
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
+  
+
+<div class="post">
+  <h1 class="article-title">
+    <span>阅读笔记-MOT16:A Benchmark for Multi-Object Tracking</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2019-05-17
+    </span>
+    
+    
+      <span>
+        浏览 : <span class="article-timer" data-identity="MOT16-A-Benchmark-for-Multi-Object-Tracking"></span>
+      </span>
+    
+  </div>
+
+  
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <h4 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h4><p>这篇文章主要介绍了MOT的2016 benchmark库。相对于MOT15的benchmark而言，MOT16 benchmark视频数据标注更加规范严格，除了标注pedestrian之外，还标注了其他部分类别，同时给出了每个标注的可见度。新的benchmark数据也更加多样。</p>
+<h4 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h4><ul>
+<li><p>MOT15 benchmark存在的不足：</p>
+<ul>
+<li>数据来源不同，标注协议也不完全相同。</li>
+<li>测试集和训练集中人群密度分布不均衡。</li>
+<li>部分训练集过于简单，不利用实际训练。如PETS09-S2L1.</li>
+<li>benchmark中提供的检测结果太差，导致跟踪IDs较高。</li>
+</ul>
+</li>
+<li><p>MOT16 benchmark的改进点：</p>
+<ul>
+<li>14段视频数据，分别取自crowed scenarios, different viewpoints, camera motions 和 weather conditions， 训练数据足够复杂。</li>
+<li>所有的序列均采用相同的标注协议进行标注。</li>
+<li>除了pedestrian之外还标注了一些其他类别，提供训练。</li>
+</ul>
+</li>
+<li><p>MOT16 benchmark网站：</p>
+<p>​    <a href="http://www.motchallenge.net" target="_blank" rel="noopener">MOTChallenge</a></p>
+</li>
+</ul>
+<h4 id="MOT16-datasets"><a href="#MOT16-datasets" class="headerlink" title="MOT16 datasets"></a>MOT16 datasets</h4><ul>
+<li><p>数据集overview</p>
+<p><img src="/2019/05/17/MOT16-A-Benchmark-for-Multi-Object-Tracking/datasets_overview.png" alt="dataset overview"></p>
+<p>MOT16 benchmark 数据集示意。上面一行是训练集，下面一行是测试集。</p>
+<p><img src="/2019/05/17/MOT16-A-Benchmark-for-Multi-Object-Tracking/overview_table.png" alt="overview_table"></p>
+</li>
+<li><p>MOT16 benchmark 提供的检测结果</p>
+<p>DPM检测结果。（另外，当前网站提供了FRCNN， SDP等多种检测结果）</p>
+<p>![detection box statistics](MOT16-A-Benchmark-for-Multi-Object-Tracking/detections statistics.png)</p>
+<p><strong>detection 存储格式</strong></p>
+<p>​    示例</p>
+   <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1, -1, 794.2, 47.5, 71.2, 174.8, 67.5, -1, -1</span><br><span class="line">1, -1, 164.1, 19.6, 66.5, 163.2, 29.4, -1, -1</span><br><span class="line">1, -1, 875.4, 39.9, 25.3, 145.0, 19.6, -1, -1</span><br><span class="line">2, -1, 781.7, 25.1, 69.2, 170.2, 58.1, -1, -1</span><br></pre></td></tr></table></figure>
+
+<p><code>det.txt</code>文件的每一行存储一个box信息， 使用逗号隔开的9(实际是10)个数值表示。第一个数值表示box所在的帧号，第二个数值表示当前box对应的target id，对于detection而言，target id未知，都标注为-1；第三到六个值表示box的坐标，即<code>(topleft_x, topleft_y, width, height)</code>,<strong>标注从1开始</strong>；第七个值表示detections的置信度， 剩下三个值占位，全为 $-1$ 。</p>
+</li>
+</ul>
+<h4 id="MOT16-annotation"><a href="#MOT16-annotation" class="headerlink" title="MOT16 annotation"></a>MOT16 annotation</h4><ul>
+<li><p>target class</p>
+<p>MOT16 benchmark标注可以分为三类</p>
+<blockquote>
+<p>(i) moving or standing pedestrians;<br>(ii) people that are not in an upright position or artificial representations of humans; and<br>(iii) vehicles and occluders.</p>
+</blockquote>
+<p>第一类的目标是希望跟踪的目标，包括所有的moving或者upright standing的行人，以及骑车或者滑板的也算。另外弯腰捡东西或者弯腰和孩童谈话的目标在评估时也会纳入考虑。</p>
+<p>第二类目标没办法确切分类。比如非upright姿态的人，以及海报，倒影，镜像等，还用在玻璃之后的人都属于distractors。这类目标在评估时既不惩罚也不奖励，也就是说跟踪算法对这类数据的处理效果不影响最终评估性能。</p>
+<p>第三类目标是各种车辆等遮挡物，这类目标在评估时也不考虑，标注的主要目的是提供额外信息用于估计遮挡程度等。</p>
+</li>
+<li><p>bounding box alignment</p>
+<ul>
+<li>box是目标的外接矩形框，所有的目标区域都在box内，所以对于行人而言，其宽度变化较剧烈。</li>
+<li>对于遮挡目标，或者超出视野的目标，根据可见部分，估计整个目标的box。</li>
+<li>如果遮挡的目标没法用一个box准确标注，那么可能用多个box标注。这主要针对于tree的大目标。</li>
+<li>运输工具上的行人，只有充分可见时才会标注。比如汽车中的人不标注，自行车或者摩托上的人标注。</li>
+</ul>
+</li>
+<li><p>start and end of trajectories</p>
+<ul>
+<li>轨迹尽可能的长。the annotation starts as early and ends as late as possible such that the accuracy is not forfeited</li>
+<li>离开视野的目标再次出现时被赋予新的轨迹编号。</li>
+</ul>
+</li>
+<li><p>minimal size 和 occlusions</p>
+<ul>
+<li>标注时对于size没有限制，多小的目标都会标注。</li>
+<li>遮挡程度是计算出来的，不是显式指定的。</li>
+<li>当目标被完全遮挡且不再可见时，认为该目标终止。</li>
+<li>如果一个目标长时间遮挡后再次出现，但是位置变化很大，那么赋予新的轨迹id。</li>
+</ul>
+</li>
+<li><p><code>gt.txt</code>存储格式</p>
+<p>和<code>det.txt</code>类似，每一行存储10个数值表示当前box的跟踪结果。每个值的意义对应于下表</p>
+<p><img src="/2019/05/17/MOT16-A-Benchmark-for-Multi-Object-Tracking/data_format.png" alt="data_format"></p>
+<p>target所属类别编号如下：</p>
+<p><img src="/2019/05/17/MOT16-A-Benchmark-for-Multi-Object-Tracking/class_map.png" alt="class map"></p>
+</li>
+</ul>
+<h4 id="MOT16-evaluation"><a href="#MOT16-evaluation" class="headerlink" title="MOT16 evaluation"></a>MOT16 evaluation</h4><ul>
+<li><p>tracker-to-target assignment</p>
+<p>这部分主要包括指标FN, FP, FAF,用来评估检测目标和真实目标的匹配程度，<strong>注意，只是box的匹配程度，而没有考虑label是否一致</strong> </p>
+<p>FN: False Negative,  所有的gt中没有匹配到检测的个数</p>
+<p>FP: False Positive, 所有检测中没有匹配到gt的个数</p>
+<p>FAF: the number of false alarms per frame, 也称为 FPPI: false positives per image</p>
+</li>
+<li><p>匹配的一致性</p>
+<p>使用IDS指标，评估跟踪的一致性。IDS表示一条跟踪轨迹和真实轨迹在第$i$帧关联成功，但之前最近的时刻没有关联，则认为发生了一次ID switch。</p>
+<p><strong>值得注意的是， 检测和gt是否关联取决于两者之间的距离，比如IoU等，而当多个IoU符合条件时选择最大的IoU关联。但是在MOT中为了尽可能保持轨迹跟踪的一致性，如果$t-1$时刻truth object $i$ 和假设$j$ 匹配，但是$t$时刻虽然匹配，但不是最优匹配，这时候我们仍然选择$i,j$匹配。</strong></p>
+<p>为了让IDS与recovered targets无关，最终选择IDS/Recall度量一致性。</p>
+</li>
+<li><p>Distance measure</p>
+<blockquote>
+<p>the intersection over union (a.k.a. the Jaccard index) is usually employed as the similarity criterion, while the threshold td is set to 0.5 or 50%.</p>
+</blockquote>
+</li>
+<li><p>Target-like annotations</p>
+<p>计算evaluations之前，关联假设与gt的步骤：</p>
+<blockquote>
+<p>1) At each frame, all bounding boxes of the result file are matched to the ground truth via the Hungarian algorithm. (使用匈牙利算法根据IoU关联）<br>2) All result boxes that overlap &gt; 50% with one of these classes (distractor, static person, reflection, person on vehicle) are removed from the solution.（类似于NMS，先把distractor匹配的假设删除）<br>3) During the final evaluation, only those boxes that are annotated as pedestrians are used. (剩下的在计算性能)</p>
+</blockquote>
+<p><img src="/2019/05/17/MOT16-A-Benchmark-for-Multi-Object-Tracking/assignment_examples.png" alt="annotations_examples"></p>
+</li>
+<li><p><strong>Multiple Object Tracking Accuracy</strong><br>$$<br>MOTA = 1- \frac{\sum_t(FN_t+FP_t+IDS_t)}{\sum_t GT_t}<br>$$<br>MOTA取值范围为$(-\infty, 100)$</p>
+</li>
+<li><p>Multiple Object Tracking Precision<br>$$<br>MOTP = \frac{\sum_{t,i} d_{t,i}}{\sum_{t}c_t}<br>$$<br>MOTP取值范围$(50, 100)$。这里只计算匹配成功的平均匹配度，而匹配成功的阈值是$50$.</p>
+</li>
+<li><p>Track quality measures</p>
+<ul>
+<li>mostly tracked (MT): 至少$80%$ 关联跟踪</li>
+<li>mostly lost (ML): 至少$80%$关联失败</li>
+<li>partially tracked (PT): 少于$20%$关联成功</li>
+</ul>
+<p><strong>注意我这里说关联，而没说跟踪是因为不论跟踪的trackid是否相同，只要gt匹配到假设就认为关联成功</strong></p>
+<p>MT， ML最终计算的是相对于ground truth trajectories的总数。</p>
+<ul>
+<li>track fragmentation(FM): 表示gt trajectory中的某个时刻没有关联成功，但前面存在关联成功，后续也关联成功，则认为是一次Frag，如上图中(b),(d)示意。与IDS类似，FM最终计算为FM/Recall</li>
+</ul>
+</li>
+</ul>
+<h4 id="Baseline-methods"><a href="#Baseline-methods" class="headerlink" title="Baseline methods"></a>Baseline methods</h4><p>这部分提供的baseline都太陈旧，性能很容易超越，所以需要新的baseline。</p>
+<ul>
+<li>DP_NMS</li>
+<li>CEM</li>
+<li>SMOT</li>
+<li>TBD</li>
+<li>JPDA_M</li>
+</ul>
+<h4 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h4><blockquote>
+<p>We have presented a new challenging set of sequences within the MOTChallenge benchmark. The 2016 sequences contain 3 times more targets to be tracked when compared to the initial 2015 version. Furthermore, more accurate annotations were carried out following a strict protocol, and extra classes such as vehicles, sitting people, reflections or distractors were also annotated to provide further information to the community. We believe that the MOT16 release within the already established MOTChallenge benchmark provides a fairer comparison of state-of-the-art tracking methods, and challenges researchers to develop more generic methods that perform well in unconstrained environments and on unseen data. In the future, we plan to continue our workshops and challenges series, and also introduce various other (sub-)benchmarks for targeted applications, e.g. sport analysis, or biomedical cell tracking.</p>
+</blockquote>
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : zhouzongwei <br>
+        
+        原文链接 : <a href>http://yoursite.com/2019/05/17/MOT16-A-Benchmark-for-Multi-Object-Tracking/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
+    </div>
+  
+  
+  
+    <div class="social-share" style="margin-top: -2rem" data-wechat-qrcode-title="<p>微信扫一扫</p>" data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>" data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter">
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
+</div>
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async></script>
+  
+
+  
+    <div id="reward">
+  
+    <p id="reward-meta">知识 & 情怀 | 赏或者不赏，我都在这，不声不响</p>
+  
+  <button id="reward-btn">
+    
+    <span>打赏</span>
+  </button>
+  <div id="reward-qrcode">
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/wechatimg.jpg" alt="微信扫一扫, 以资鼓励">
+        <p class="qrcode-meta">微信扫一扫, 以资鼓励</p>
+      </div>
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/alipayimg.jpg" alt="支付宝扫一扫, 再接再厉">
+        <p class="qrcode-meta">支付宝扫一扫, 再接再厉</p>
+      </div>
+    
+  </div>
+
+</div>
+
+<script>
+  (() => {
+    let button = document.querySelector('#reward-btn'),
+      qrcode = document.querySelector('#reward-qrcode'),
+      display = false;
+    
+    button.addEventListener('click', () => {
+      qrcode.style.display = display ? 'none' : 'block'
+      display = !display
+    }, false)
+  })()
+</script>
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+          <i class="iconfont icon-06tags"></i>标签: 
+          
+          <span class="span--tag">
+            <a href="/tags/MOT/">
+              #MOT
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/Benchmark/">
+              #Benchmark
+            </a>
+          </span>
+          
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
+    
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2019/05/17/hello-world/" target="_self">hello world</a>
+      </div>
+    
+    
+      <div class="nav-next">
+        下一篇:
+        <a href="/2019/05/17/Frame-wise-Motion-and-Appearance-for-Real-time-Multiple-Object-Tracking/" target="_self">阅读笔记-Frame-wise Motion and Appearance for Real-time Multiple Object Tracking</a>
+        <i class="iconfont icon-next"></i>
+      </div>
+    
+  </nav>
+
+  
+    <a href="#comment" class="comment-anchor"></a>
+<div class="comment-title"><i class="iconfont icon-footprint"></i> 留下足迹 <i class="iconfont icon-footprint"></i></div>
+<div id="vcomments"></div>
+
+<script defer>
+  if( true ) {
+    let path = getRealPath()
+    new Valine({
+      el: "#vcomments",
+      appId: "oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz",
+      appKey: "fWABYGLTAoV1LT4LYzh1PNmQ",
+      notify: false,
+      verify: false,
+      avatar: "robohash",
+      placeholder: "正确填写邮箱, 才能及时收到回复哦♪(^∇^*)",
+      path
+    });
+  }
+</script>
+   
+
+  
+    <script defer>
+const valineAPI = (() => {
+  try {
+    AV.init("oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz", "fWABYGLTAoV1LT4LYzh1PNmQ");
+  } catch(error) {}
+  const isExist = (identity) => {
+    identity = identity || getRealPath();
+    let query = new AV.Query('Timer');
+    return new Promise((resolve, reject) => {
+      query.equalTo("identity", identity);
+      query.find().then(results => {
+        resolve(results.length > 0);
+      }, error => reject(error));
+    })
+  }
+
+  const _get = (identity) => {
+    let query = null;
+    if(identity && identity instanceof Array){
+      let querys = [];
+      for(let i = 0; i < identity.length; ++i) {
+        querys[i] = new AV.Query('Timer');
+        querys[i].equalTo('identity', identity[i]);
+      }
+      query = AV.Query.or.apply(null ,querys);
+    } else {
+      identity = identity || getRealPath();
+      query = new AV.Query("Timer");
+      query.equalTo("identity", identity);
+    }
+
+    return new Promise((resolve, reject) => {
+      query.find()
+      .then(results => resolve(results))
+      .catch(error => reject(error))
+    })
+  }
+
+  const create = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let Todo = AV.Object.extend('Timer');
+      let todo = new Todo();
+      todo.set("times", 1);
+      todo.set("identity", identity);
+      todo.save().then(res => resolve(true), error => reject(error));
+    })
+  }
+
+  const update = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let query = new AV.Query('Timer');
+      query.equalTo("identity", identity);
+      query.find().then(todos => {
+        todos.forEach(todo => {
+          todo.set("times", todo.attributes.times + 1);
+        });
+        return AV.Object.saveAll(todos);
+      }).then(todos => resolve(true), error => reject(error));
+    })
+  }
+
+  return {
+    isExist,
+    _get,
+    update,
+    create
+  }
+})()
+
+const calcAndWriteTimes = () => {
+  let isPost = true;
+
+  let timerAllDOM = document.querySelectorAll(".article-timer");
+
+  if(isPost) {
+    let identity = timerAllDOM[0].getAttribute("data-identity");
+    valineAPI.isExist(identity)
+    .then(exist => {
+      if(exist) {
+        return valineAPI.update(identity);
+      }
+      return new Promise(resolve => resolve(true));
+    })
+    .then( succuess => valineAPI._get(identity))
+    .then( result => timerAllDOM[0].innerText = result[0].attributes.times)
+    .catch(error => console.log(error.message))
+    return ;
+  }
+
+  let timerDOMCache = {};
+
+  for(let timerDOM of timerAllDOM) {
+    let identity = timerDOM.getAttribute("data-identity");
+    if(timerDOMCache.hasOwnProperty(identity)){
+      timerDOMCache[identity].dom.push(timerDOM);
+    }else{
+      timerDOMCache[identity] = {
+        dom: [timerDOM],
+        times: undefined
+      };
+    }
+  }
+
+  let identities = Object.keys(timerDOMCache);
+  valineAPI._get(identities).then(results => {
+    for(let result of results) {
+      let {identity, times} = result.attributes;
+      timerDOMCache[identity].times = times;
+      timerDOMCache[identity].dom.map(item => item.innerText = times);
+    }
+    for(let identity of identities) {
+      if(timerDOMCache[identity].times){
+        continue;
+      }
+      timerDOMCache[identity].dom.map(item => item.innerText = 1);
+      valineAPI.create(identity);
+    }
+  }).catch(error => console.log(error.message))
+}
+
+if(true){
+  calcAndWriteTimes();
+}
+</script>
+   
+
+</div>
+
+
+      <footer>
+  <p class="site-info">
+    博客已萌萌哒运行<span id="time-to-now"></span><span class="my-face">(●'◡'●)ﾉ♥</span>
+    <br>
+    Theme - <a href="https://github.com/dongyuanxin/theme-bmw">BMW</a> | Made With 💗 | Powered by <a href="https://godbmw.com/">GodBMW</a>
+    <br>
+    
+  </p>
+</footer>
+
+
+
+<script>
+const timeToNowDOM = document.querySelector("#time-to-now");
+const startTimestamp = new Date(2018, 1, 10).getTime();
+
+const updateTimeStr = () => {
+  let offset = parseInt(
+      (new Date().getTime() - startTimestamp) / 1000,
+      10
+    ),
+    day = Math.floor(offset / 86400),
+    hour = Math.floor((offset % 86400) / 3600),
+    minute = Math.floor(((offset % 86400) % 3600) / 60),
+    second = Math.floor(((offset % 86400) % 3600) % 60);
+  timeToNowDOM.innerHTML =
+    day + "天" + hour + "小时" + minute + "分钟" + second + "秒";
+  setTimeout(updateTimeStr, 500);
+}
+
+setTimeout(updateTimeStr, 500);
+</script>
+
+
+      <div class="back-to-top hidden">
+  <span>
+    <i class="iconfont icon-60"></i><span></span>%
+  </span>
+</div>
+
+<script>
+const updateIconToTop = percent => {
+  let dom = document.querySelector(".back-to-top span span");
+  dom.innerText = percent;
+  if(percent < 1) {
+    document.querySelector(".back-to-top").className = "back-to-top hidden";
+  } else {
+    document.querySelector(".back-to-top").className = "back-to-top";
+  }
+}
+
+const handleScoll = () => {
+  let isRunning = false;
+  return () => {
+    if (isRunning) return;
+    isRunning = true;
+    window.requestAnimationFrame(timestamp => {
+      let scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop,
+        scrollHeight =
+          document.documentElement.scrollHeight ||
+          document.body.scrollHeight,
+        clientHeight =
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+      isRunning = false;
+      if (scrollTop <= 1) {
+        updateIconToTop(0);
+        return;
+      }
+      if (scrollTop + clientHeight >= scrollHeight) {
+        updateIconToTop(100);
+      } else {
+        updateIconToTop(parseInt(
+          100 * scrollTop / (scrollHeight - clientHeight),
+          10
+        ));
+      }
+    });
+  };
+}
+
+const backToTop = () => {
+  let scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop,
+    delay = 10,
+    time = 200;
+  if (scrollTop <= 20) {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    return;
+  }
+  let step = Math.ceil(scrollTop * delay / time);
+  let timer = setInterval(() => {
+    scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollTop - step <= 0) {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      clearInterval(timer);
+    } else {
+      document.documentElement.scrollTop = scrollTop - step;
+      document.body.scrollTop = scrollTop - step;
+    }
+  }, delay);
+}
+
+document.addEventListener("scroll", handleScoll(), false);
+
+document.querySelector(".back-to-top").addEventListener("click", backToTop, false);
+
+</script>
+
+    </div>
+
+    
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+<script>
+  (() => {
+    const mathjaxConfig = {
+      showProcessingMessages: false, //关闭js加载过程信息
+      messageStyle: "none", //不显示信息
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]], //行内公式选择符
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]], //段内公式选择符
+        skipTags: ["script", "noscript", "style", "textarea", "pre", "code", "a"] //避开某些标签
+      },
+      "HTML-CSS": {
+        availableFonts: ["STIX", "TeX"], //可选字体
+        showMathMenu: false //关闭右击菜单显示
+      }
+    }
+
+    let mathjaxInterval = setInterval(() => {
+      if(!window.MathJax){
+        return;
+      }
+      window.MathJax.Hub.Config(mathjaxConfig)
+      window.MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById('app')])
+
+      clearInterval(mathjaxInterval)
+    }, 10)    
+  })()
+</script>
+    
+
+    <script src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script>
+<script async>
+  let fancyTimer = setInterval(function(){
+    if(!window.$){
+      return;
+    }
+    $(document).ready(function() {
+      $(".post img").each(function () {
+        if($(this).parent().get(0).tagName.toLowerCase() === "a") {
+          return;
+        }
+        // $(this).attr("data-fancybox", "gallery"); // if you add 'data-fancybox', img will display after showed
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "gallery");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      });
+      
+      clearInterval(fancyTimer);
+    });
+  }, 10);
+</script>
+
+    
+  </body>
+
+</html>

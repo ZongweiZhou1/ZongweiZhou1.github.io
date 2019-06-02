@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta name="author" content="董沅鑫, yuanxin.me@gmail.com">
+  
+  
+  
+  <title>阅读笔记-Deep Affinity Network for Multiple Object Tracking | YixiaoZhou&#39;s blog</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="MOT,Affinity Network,">
+  
+
+  <script>
+    console.log('\n%c Hexo-theme-bmw v4.0 ' + '%c 🎉 https://github.com/dongyuanxin/theme-bmw 🎉\n' + '\n%c View demo online ' + '%c 🔍 https://godbmw.com/ 🔍  \n' , 'color: #fadfa3; background: #030307; padding:3px 0;', '', 'color: #fadfa3; background: #030307; padding:3px 0;', '');
+  </script>
+
+  
+    <meta name="description" content="海阔全是浪，天高皆是霾。">
+  
+
+  
+
+  
+    <link rel="icon" href="/images/fvatar2.png">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/icon/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+  <script src="/js/util.js"></script>
+<script src="/js/valine.min.js"></script>
+
+  
+
+  
+    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
+  
+
+  
+    <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
+  
+  
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js" async></script>
+  
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.0/dist/av-min.js"></script>
+  
+
+</head>
+
+  <body>
+
+    
+
+    <div id="app">
+
+      <div class="header-wrap">
+  <header>
+    <div class="site-brand">
+      <div class="site-title">
+        <a href="/">YiXiaoZhou</a>
+      </div>
+    </div>
+    <nav class="site-navigation">
+      <ul class="nav-menu">
+      
+        <li class="nav-item" data-path="/">
+          
+            <a href="/" target="_self">
+              主页
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          
+            <a href="/archives/" target="_self">
+              归档
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          
+            <a href="/friends/" target="_self">
+              友链
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          
+            <a href="/about/" target="_self">
+              关于
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path>
+          
+            <a href="javascript:void(0);" v-else>抓到我</a>
+            <ul class="nav-menu--dropdown">
+              
+                <li>
+                  <a href="https://github.com/ZongweiZhou1" target="_blank">
+                    Github
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://www.facebook.com/duncon.chou" target="_blank">
+                    Facebook
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://weibo.com/u/3231820650/home?wvr=5" target="_self">
+                    weibo
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+      </ul>
+    </nav>
+    <i class="iconfont icon-menu"></i>
+  </header>
+</div>
+
+<script>
+  let links = document.querySelectorAll('.nav-item');
+  for(let link of links){
+    let childrenLink = link.querySelector('ul');
+    link.addEventListener('mouseenter', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown active";
+      }
+    })
+    link.addEventListener('mouseleave', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown";
+      }
+    })
+  }
+  let rootRealPath = getRealPath(window.location.pathname, true);
+  for(let link of links) {
+    let linkPath = link.getAttribute("data-path");
+    if(linkPath && getRealPath(linkPath, true) === rootRealPath) {
+      link.className = "nav-item hover";
+    }
+  }
+
+  let iconMenu = document.querySelector("i.iconfont.icon-menu"),
+    iconMenuClicked = false;
+  let navDOM = document.querySelector("nav.site-navigation");
+  iconMenu.addEventListener("click", () => {
+    iconMenuClicked 
+      ? navDOM.className = "site-navigation active"
+      : navDOM.className = "site-navigation";
+    iconMenuClicked = !iconMenuClicked;
+  })
+</script>
+
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
+  
+
+<div class="post">
+  <h1 class="article-title">
+    <span>阅读笔记-Deep Affinity Network for Multiple Object Tracking</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2019-05-22
+    </span>
+    
+    
+      <span>
+        浏览 : <span class="article-timer" data-identity="SST-DAN"></span>
+      </span>
+    
+  </div>
+
+  
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p><img src="/2019/05/22/SST-DAN/DAN.png" alt="DAN"></p>
+<p>MOT方法一般包含两个步骤:目标检测和数据关联。 目标检测这两年随着深度学习的发展而迅速发展，但是数据关联绝大多数还是采用hand crafted的方式将表观特征，运动信息，空间关系，group关系等进行结合。 这篇文章则是利用深度网络实现端到端的表观特征抽取和数据关联。 Deep Affinity Network(DAN)还实现了轨迹的初始化和终止等操作。在MOT15和MOT17，以及UA-DETRAC数据集上验证了有效性。这篇文章和上篇笔记FANTrack的出发点类似。</p>
+<p>项目地址： <a href="https://github.com/shijieS/SST.git" target="_blank" rel="noopener">https://github.com/shijieS/SST.git</a></p>
+<h3 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h3><ul>
+<li><p><strong>符号定义：</strong></p>
+<ul>
+<li>$I_t$ 视频的第$t$帧</li>
+<li>$t-n:t$ 从$t-n$ 到$t$的时间间隔</li>
+<li>下标 $t-n, t$ 表示元素是对$I_{t-n}, I_t$计算得到</li>
+<li>$\mathcal{C}_t$ 第$t$帧中目标的中心坐标的集合， $\mathcal{C}_t^i$表示集合的第$i$个元素</li>
+<li>$F_t$第$t$中目标的特征集合， $F_t^i$表示$t$帧中第$i$个目标的特征</li>
+<li>$\Psi_{t-n,t}$是一个$N\times N\times 2M$的tensor，其中N表示目标的个数， $M$表示每个目标特征向量的维度，$N\times N$表示的任意两个来自于不同帧的目标配对，相当于global association。</li>
+<li>$L_{t-n, t}$二值关联矩阵， 1表示关联， 0表示不关联， 表示来自于两张图片中目标的关联矩阵。这里包含了终止和起始状态。</li>
+<li>$A_{t-n, t}$相似度矩阵， 由$\Psi$到$A$进而得到$L$</li>
+<li>$\Tau_t$ 直至第$t$帧时的轨迹的集合。轨迹使用二元组的集合表示,$\Tau_t^i={(0,1),(1,2)}$表示轨迹中的关联是第0帧的第一个目标和第1帧的第2个目标。</li>
+<li>$\mathcal{Z}(\cdot)$算子用来计算集合或者矩阵中的元素</li>
+<li>$\Lambda_t\in R^{\mathcal{Z}(\Tau_{t-1})\times(\mathcal{Z}(\mathcal{C_t})+1)}$ 是一个accumulator matrix，其元素表示目标与轨迹的相似度</li>
+<li>$N_m$表示每一帧中最大允许的目标个数， $B$是batchsize</li>
+</ul>
+</li>
+<li><p><strong>Deep Affinity Network （DAN）</strong></p>
+<p>如图1所示， DAN包含了两部分：特征抽取模块(feature extractor)和相似度估计模块(Affinity estimator), 整体的训练是end-to-end方式的。</p>
+<p>DAN的输入是两幅图像$I_t, I_{t-n}$以及每幅图像中对应目标的中心点坐标$\mathcal{C}<em>t, \mathcal{C}</em>{t-n}$, 这里不要求两幅图像连续， 时间间隔$N\in\mathbb{N}^{rand}\sim [1, N_V]$. </p>
+<p>DAN的输出应该是两幅图像中目标的关联矩阵$L_{t-n, t}$</p>
+<p>其主要过程：</p>
+<ul>
+<li><p>输入时序上的两帧图像$I_{t-n}, I_t$(非必须连续)及其对应检测的中心点集$C_{t-n}, C_t$， 将两幅图像送入VGG-like的共享参数Siamese网络，从网络中选择了9层feature maps， 然后从其中利用中心点集和$1\times 1$的卷积核对每个目标构建了$520$特征向量集合$F_t, F_{t-n}$。</p>
+</li>
+<li><p>来自于$F_{t-n}, F_t$的特征进行完全的两两匹配，形成张量$\Psi_{t-n,t}\in R^{1024\times N_m\times N_m}$, 该3D张量经过5层卷积将通道数降维1， $M\in R^{N_m \times N_m}$， 该矩阵其实表示的任意两个目标之间关联的可能性。</p>
+</li>
+<li><p>同时为了刻画轨迹的起点和终点，在矩阵$M$上分别添加augmented行和列， 然后通过按行或者列softmax或者关联矩阵$A, A_1, A_2$计算损失函数进行训练。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>Data Preparation</strong></p>
+<ul>
+<li>Photometric distortions: 像素值尺度变化$[0.7, 1.5]$, 转换成HSV空间， 饱和度的尺度变化$[0.7, 1.5]$, 然后再转回到RGB中，同样尺度[0.7, 1.5]的变化</li>
+<li>使用图像像素均值expand frame， 尺度变化范围$[1, 1.2]$</li>
+<li>图像裁剪， 尺度范围$[0.8, 1]$， 同时需要包含所有检测目标的中心点</li>
+</ul>
+<p>以0.3的概率按上述方法扩展样本对。然后图像固定大小$H\times W\times 3$, 图像水平翻转的概率$0.5$</p>
+</li>
+<li><p>MOT中每一帧存活的轨迹个数不是固定的，给网络的训练带来难度。因此文章给出了一个轨迹个数的上限值$N_m=80$ , Fig.2 给出了关联矩阵的构建示意图。这里为了清晰演示，取$N_m=5$. 第1帧和第30帧图像各检测到4个目标， 总共有$5$个人。 Fig.2c展示了包含dummy row和column的中间矩阵$L_{1, 30}’$的构建, dummy row或者column用来表示dummy bounding box，从而让关联矩阵大小一致，不随目标个数变化而变化。 Fig.2d中关联矩阵进一步augmented引入新的row和column，表示新出现的目标和终止的轨迹。最终使用Fig.2d的矩阵作为训练目标。最后一行或者列中包含多个1则表示多个目标终止或出现。</p>
+<p><img src="/2019/05/22/SST-DAN/1552789627289.png" alt="association matrix"></p>
+<p>这里dummy行或者列与augmented行列是不同的， dummy是用来保证总体的匹配个数相同，需要服从每一行或者列最多只能有1个非零元素，augmented则是用来刻画轨迹的终止和起始，对其非零元素的个数没有约束。允许多条轨迹同时结束， 多个目标同时作为多条新轨迹的起点。</p>
+<p>####Feature extractor</p>
+<p>在VGG16上进行了修改， 将VGG16后面的全连接层和softmax层都换成了卷积层，这么做主要是卷积层能够更好地encoding目标的空间特征并且可以从空间上抽取每个目标的特征。另外这里的输入数据也更大$3\times 900 \times 900$, 从而修改后的VGG16最后一层的输出还有$56\times 56$大小。 VGG16最后输出的$56\times 56$的feature map采用表2上半部分的结构进一步缩小到$3\times 3$</p>
+<p>特征抽取和估计affinity的网络参数如下表：</p>
+<p><img src="/2019/05/22/SST-DAN/1552791780072.png" alt="architecture details"></p>
+<p>修改后的feature extractor网络具有33层卷积层，然后从中选择了9层作为最终提取特征的层，其选择的层数索引，以及如何从该层降维获得表观特征参数如下</p>
+<p><img src="/2019/05/22/SST-DAN/1552792173244.png" alt="feature dimension"></p>
+<p>利用目标的中心坐标$\mathcal{C}_t$在channel上选择特征，降维采用的$1\times 1$的卷积核， 特征进行concatenate。最终每一个目标形成$520$维的特征向量。对于那些dummy的目标，其特征表示为全零向量。</p>
+<ul>
+<li><p><strong>Affinity estimator</strong></p>
+<p>feature extractor之后每幅图像抽取的特征$F_t\in R^{N_m\times 520}$，然后将两幅图像目标的特征任意的组合就形成了tensor $\Psi\in R^{(520\times 2)\times N_m\times N_m}$, 然后在利用5层卷积核为$1\times 1$的卷积层压缩维度形成相似度矩阵$M\in R^{N_m\times N_m}$,压缩网络的模型如Table 2的下半部分所示。</p>
+<p>这里的M对应于真实的Label，即两个目标是否关联。但是没有解释新出现的轨迹和离开的轨迹。因此文章对相似度矩阵$M$进行了扩充。为了让模型更好训练以及loss更好定义，这里$M$分开进行行列扩充，扩充的向量$\textbf{v}=\gamma \textbf{1}$ , $\gamma$是超参。</p>
+</li>
+<li><p><strong>Network Loss</strong></p>
+<p>$M_1\in R^{N_m\times(N_m+1)}$列扩展矩阵每一行表示第$m$个目标关联情况或者是否结束。 $M_2\in R^{(N_m+1)\times N_m}$行扩展矩阵对应了反向匹配时第二幅图像中目标的关联情况或者是否是新出现的轨迹。对行，列扩展矩阵$M_1, M_2$分别进行行，列softmax得到$A_1, A_2$表示的是概率。</p>
+<p>因此DAN网络损失包含4部分：前向损失，后向损失，一致性损失和组合损失<br>$$<br>\begin{aligned}<br>\mathcal{L}<em>f(L_1, A_1) &amp;= \frac{\sum(L_1\odot(-\log A_1))}{\sum L_1}\<br>\mathcal{L}_b(L_2, A_2) &amp;= \frac{\sum(L_2\odot(-\log A_2))}{\sum L_2}\<br>\mathcal{L_c}(\widehat{A_1}, \widehat{A_2}) &amp;= \Vert\widehat{A_1}-\widehat{A_2} \Vert_1\<br>\mathcal{L_a}(L_3, \widehat{A_1}, \widehat{A_2}) &amp;= \frac{\sum (L_3\odot (-\log(max(\widehat{A_1}, \widehat{A_2}))))}{\sum (L_3)}\<br>\mathcal{L} &amp;= \frac{\mathcal{L_f}+\mathcal{L_b}+\mathcal{L_a}+\mathcal{L_c}}{4}<br>\end{aligned}<br>$$<br>其中$L_1, L_2$都是与$M_1, M_2$对应的$L</em>{t-n, t}$的trimmed 版本， $\widehat{A_1}, \widehat{A_2}$是trimmed成$N_m\times N_m$的版本， $L_3$则是同时去掉了最后一行和最后一列。</p>
+<p>四种Loss损失：</p>
+<ul>
+<li>对于前向和后向损失，文章并没有直接使用输出$A_q(q=1,2)$与目标$L_q(q=1,2)$的距离作为损失， 而是采用$A_q$在真实关联位置的相对系数，也就是$-\log(A_q)$作为优化目标，这种方法其实是让关联位置的输出概率更快的接近于1， 而对于其他非真实关联的位置，由于$A_q$采用了行或者softmax，所以就非常接近于0.</li>
+<li>截断后的关联矩阵，即不考虑augmented 行和列后的部分应该是相同的，所以文章使用$L_1$范数约束距离， $L_1$比$L_2$在较小范围内更加紧致。</li>
+<li>$L_a$和$L_q(q=1,2)$类似， 不同的是选择最大$\widehat{A_1}, \widehat{A_2}$作为最终的关联矩阵。</li>
+</ul>
+</li>
+<li><p>*<em>DAN deployment *</em></p>
+<p>因为feature extractor部分是参数共享的，而在计算相似度矩阵的时候只是后面的affinity estimator牵涉到两两相互操作，因此，每张图片其实只进行一次feature extractor的操作，后面的affinity estimator是进行匹配。</p>
+</li>
+<li><p><strong>Deep track association</strong></p>
+<p>这部分很关键。为了匹配当前帧中的目标， 将每一帧的特征矩阵$F$和对应的时间戳保存起来，然后可以计算历史frames与当前frame之间的相似度矩阵。</p>
+<p>关联过程： 首先根据第1帧图像中的目标个数初始化轨迹集合$\Tau_0$，轨迹中每一个元素是一个二元组(时间戳， 轨迹编号)，使用hungrain algorithm对accumulator matrix $\Lambda$分解去grow对应的轨迹， $\Lambda$是当前帧目标与多个历史帧目标的相似度矩阵的累积求和，注意这里累积求和是相同轨迹编号进行求和。</p>
+<p>注意这里有个问题，匈牙利算法是一对一约束，但相似度矩阵中添加的最后一行一列不满足这个要求，于是匈牙利算法只是对去除最后一行和列的矩阵进行分解，然后再把最后的行列加进来。</p>
+<p><img src="/2019/05/22/SST-DAN/1552795008751.png" alt="DAN deployment"></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h3><p>实验部分还是很充分的，在MOT15和MOT17上进行了行人跟踪的实验， 在UA-DETRAC上进行了车辆的跟踪。</p>
+<p><img src="/2019/05/22/SST-DAN/1552795108343.png" alt="MOT17"></p>
+<p><img src="/2019/05/22/SST-DAN/1552795135893.png" alt="MOT17 table"></p>
+<p>这里有个指标有问题$MT$应该是越大越好</p>
+<p><img src="/2019/05/22/SST-DAN/1552795189925.png" alt="UA-DETRAC"></p>
+<h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><p>实验没有给出在MOT16上DPM检测器下的跟踪性能，我跑了下代码发现性能很差。在MOT17库上性能好是因为MOT17库上的检测相对准确。也就是说该方法其实对于检测的精度还是非常依赖的。因为网络的输入是目标的中心点坐标，并且在抽取特征阶段是利用中心点位置channel 作为特征，检测误差必定导致特征的不准确，从而影响性能。</p>
+<p>另外值得一提的是，这篇文章也只利用的表观信息，如何更好地利用空间信息也是个研究方向。</p>
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : zhouzongwei <br>
+        
+        原文链接 : <a href>http://yoursite.com/2019/05/22/SST-DAN/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
+    </div>
+  
+  
+  
+    <div class="social-share" style="margin-top: -2rem" data-wechat-qrcode-title="<p>微信扫一扫</p>" data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>" data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter">
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
+</div>
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async></script>
+  
+
+  
+    <div id="reward">
+  
+    <p id="reward-meta">知识 & 情怀 | 赏或者不赏，我都在这，不声不响</p>
+  
+  <button id="reward-btn">
+    
+    <span>打赏</span>
+  </button>
+  <div id="reward-qrcode">
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/wechatimg.jpg" alt="微信扫一扫, 以资鼓励">
+        <p class="qrcode-meta">微信扫一扫, 以资鼓励</p>
+      </div>
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/alipayimg.jpg" alt="支付宝扫一扫, 再接再厉">
+        <p class="qrcode-meta">支付宝扫一扫, 再接再厉</p>
+      </div>
+    
+  </div>
+
+</div>
+
+<script>
+  (() => {
+    let button = document.querySelector('#reward-btn'),
+      qrcode = document.querySelector('#reward-qrcode'),
+      display = false;
+    
+    button.addEventListener('click', () => {
+      qrcode.style.display = display ? 'none' : 'block'
+      display = !display
+    }, false)
+  })()
+</script>
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+          <i class="iconfont icon-06tags"></i>标签: 
+          
+          <span class="span--tag">
+            <a href="/tags/MOT/">
+              #MOT
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/Affinity-Network/">
+              #Affinity Network
+            </a>
+          </span>
+          
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
+    
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2019/05/22/FANTrack/" target="_self">阅读笔记-FANTrack：3DMulti-Object Tracking with Feature Association Network</a>
+      </div>
+    
+    
+      <div class="nav-next">
+        下一篇:
+        <a href="/2019/05/23/MOT-RNN/" target="_self">阅读笔记-Online Multi-Target Tracking Using Recurrent Neural Networks</a>
+        <i class="iconfont icon-next"></i>
+      </div>
+    
+  </nav>
+
+  
+    <a href="#comment" class="comment-anchor"></a>
+<div class="comment-title"><i class="iconfont icon-footprint"></i> 留下足迹 <i class="iconfont icon-footprint"></i></div>
+<div id="vcomments"></div>
+
+<script defer>
+  if( true ) {
+    let path = getRealPath()
+    new Valine({
+      el: "#vcomments",
+      appId: "oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz",
+      appKey: "fWABYGLTAoV1LT4LYzh1PNmQ",
+      notify: false,
+      verify: false,
+      avatar: "robohash",
+      placeholder: "正确填写邮箱, 才能及时收到回复哦♪(^∇^*)",
+      path
+    });
+  }
+</script>
+   
+
+  
+    <script defer>
+const valineAPI = (() => {
+  try {
+    AV.init("oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz", "fWABYGLTAoV1LT4LYzh1PNmQ");
+  } catch(error) {}
+  const isExist = (identity) => {
+    identity = identity || getRealPath();
+    let query = new AV.Query('Timer');
+    return new Promise((resolve, reject) => {
+      query.equalTo("identity", identity);
+      query.find().then(results => {
+        resolve(results.length > 0);
+      }, error => reject(error));
+    })
+  }
+
+  const _get = (identity) => {
+    let query = null;
+    if(identity && identity instanceof Array){
+      let querys = [];
+      for(let i = 0; i < identity.length; ++i) {
+        querys[i] = new AV.Query('Timer');
+        querys[i].equalTo('identity', identity[i]);
+      }
+      query = AV.Query.or.apply(null ,querys);
+    } else {
+      identity = identity || getRealPath();
+      query = new AV.Query("Timer");
+      query.equalTo("identity", identity);
+    }
+
+    return new Promise((resolve, reject) => {
+      query.find()
+      .then(results => resolve(results))
+      .catch(error => reject(error))
+    })
+  }
+
+  const create = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let Todo = AV.Object.extend('Timer');
+      let todo = new Todo();
+      todo.set("times", 1);
+      todo.set("identity", identity);
+      todo.save().then(res => resolve(true), error => reject(error));
+    })
+  }
+
+  const update = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let query = new AV.Query('Timer');
+      query.equalTo("identity", identity);
+      query.find().then(todos => {
+        todos.forEach(todo => {
+          todo.set("times", todo.attributes.times + 1);
+        });
+        return AV.Object.saveAll(todos);
+      }).then(todos => resolve(true), error => reject(error));
+    })
+  }
+
+  return {
+    isExist,
+    _get,
+    update,
+    create
+  }
+})()
+
+const calcAndWriteTimes = () => {
+  let isPost = true;
+
+  let timerAllDOM = document.querySelectorAll(".article-timer");
+
+  if(isPost) {
+    let identity = timerAllDOM[0].getAttribute("data-identity");
+    valineAPI.isExist(identity)
+    .then(exist => {
+      if(exist) {
+        return valineAPI.update(identity);
+      }
+      return new Promise(resolve => resolve(true));
+    })
+    .then( succuess => valineAPI._get(identity))
+    .then( result => timerAllDOM[0].innerText = result[0].attributes.times)
+    .catch(error => console.log(error.message))
+    return ;
+  }
+
+  let timerDOMCache = {};
+
+  for(let timerDOM of timerAllDOM) {
+    let identity = timerDOM.getAttribute("data-identity");
+    if(timerDOMCache.hasOwnProperty(identity)){
+      timerDOMCache[identity].dom.push(timerDOM);
+    }else{
+      timerDOMCache[identity] = {
+        dom: [timerDOM],
+        times: undefined
+      };
+    }
+  }
+
+  let identities = Object.keys(timerDOMCache);
+  valineAPI._get(identities).then(results => {
+    for(let result of results) {
+      let {identity, times} = result.attributes;
+      timerDOMCache[identity].times = times;
+      timerDOMCache[identity].dom.map(item => item.innerText = times);
+    }
+    for(let identity of identities) {
+      if(timerDOMCache[identity].times){
+        continue;
+      }
+      timerDOMCache[identity].dom.map(item => item.innerText = 1);
+      valineAPI.create(identity);
+    }
+  }).catch(error => console.log(error.message))
+}
+
+if(true){
+  calcAndWriteTimes();
+}
+</script>
+   
+
+</div>
+
+
+      <footer>
+  <p class="site-info">
+    博客已萌萌哒运行<span id="time-to-now"></span><span class="my-face">(●'◡'●)ﾉ♥</span>
+    <br>
+    Theme - <a href="https://github.com/dongyuanxin/theme-bmw">BMW</a> | Made With 💗 | Powered by <a href="https://godbmw.com/">GodBMW</a>
+    <br>
+    
+  </p>
+</footer>
+
+
+
+<script>
+const timeToNowDOM = document.querySelector("#time-to-now");
+const startTimestamp = new Date(2018, 1, 10).getTime();
+
+const updateTimeStr = () => {
+  let offset = parseInt(
+      (new Date().getTime() - startTimestamp) / 1000,
+      10
+    ),
+    day = Math.floor(offset / 86400),
+    hour = Math.floor((offset % 86400) / 3600),
+    minute = Math.floor(((offset % 86400) % 3600) / 60),
+    second = Math.floor(((offset % 86400) % 3600) % 60);
+  timeToNowDOM.innerHTML =
+    day + "天" + hour + "小时" + minute + "分钟" + second + "秒";
+  setTimeout(updateTimeStr, 500);
+}
+
+setTimeout(updateTimeStr, 500);
+</script>
+
+
+      <div class="back-to-top hidden">
+  <span>
+    <i class="iconfont icon-60"></i><span></span>%
+  </span>
+</div>
+
+<script>
+const updateIconToTop = percent => {
+  let dom = document.querySelector(".back-to-top span span");
+  dom.innerText = percent;
+  if(percent < 1) {
+    document.querySelector(".back-to-top").className = "back-to-top hidden";
+  } else {
+    document.querySelector(".back-to-top").className = "back-to-top";
+  }
+}
+
+const handleScoll = () => {
+  let isRunning = false;
+  return () => {
+    if (isRunning) return;
+    isRunning = true;
+    window.requestAnimationFrame(timestamp => {
+      let scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop,
+        scrollHeight =
+          document.documentElement.scrollHeight ||
+          document.body.scrollHeight,
+        clientHeight =
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+      isRunning = false;
+      if (scrollTop <= 1) {
+        updateIconToTop(0);
+        return;
+      }
+      if (scrollTop + clientHeight >= scrollHeight) {
+        updateIconToTop(100);
+      } else {
+        updateIconToTop(parseInt(
+          100 * scrollTop / (scrollHeight - clientHeight),
+          10
+        ));
+      }
+    });
+  };
+}
+
+const backToTop = () => {
+  let scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop,
+    delay = 10,
+    time = 200;
+  if (scrollTop <= 20) {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    return;
+  }
+  let step = Math.ceil(scrollTop * delay / time);
+  let timer = setInterval(() => {
+    scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollTop - step <= 0) {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      clearInterval(timer);
+    } else {
+      document.documentElement.scrollTop = scrollTop - step;
+      document.body.scrollTop = scrollTop - step;
+    }
+  }, delay);
+}
+
+document.addEventListener("scroll", handleScoll(), false);
+
+document.querySelector(".back-to-top").addEventListener("click", backToTop, false);
+
+</script>
+
+    </div>
+
+    
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+<script>
+  (() => {
+    const mathjaxConfig = {
+      showProcessingMessages: false, //关闭js加载过程信息
+      messageStyle: "none", //不显示信息
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]], //行内公式选择符
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]], //段内公式选择符
+        skipTags: ["script", "noscript", "style", "textarea", "pre", "code", "a"] //避开某些标签
+      },
+      "HTML-CSS": {
+        availableFonts: ["STIX", "TeX"], //可选字体
+        showMathMenu: false //关闭右击菜单显示
+      }
+    }
+
+    let mathjaxInterval = setInterval(() => {
+      if(!window.MathJax){
+        return;
+      }
+      window.MathJax.Hub.Config(mathjaxConfig)
+      window.MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById('app')])
+
+      clearInterval(mathjaxInterval)
+    }, 10)    
+  })()
+</script>
+    
+
+    <script src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script>
+<script async>
+  let fancyTimer = setInterval(function(){
+    if(!window.$){
+      return;
+    }
+    $(document).ready(function() {
+      $(".post img").each(function () {
+        if($(this).parent().get(0).tagName.toLowerCase() === "a") {
+          return;
+        }
+        // $(this).attr("data-fancybox", "gallery"); // if you add 'data-fancybox', img will display after showed
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "gallery");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      });
+      
+      clearInterval(fancyTimer);
+    });
+  }, 10);
+</script>
+
+    
+  </body>
+
+</html>

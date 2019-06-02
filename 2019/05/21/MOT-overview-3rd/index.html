@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta name="author" content="董沅鑫, yuanxin.me@gmail.com">
+  
+  
+  
+  <title>多目标跟踪总结(下)-资源汇总 | YixiaoZhou&#39;s blog</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="MOT,overview,code and paper,">
+  
+
+  <script>
+    console.log('\n%c Hexo-theme-bmw v4.0 ' + '%c 🎉 https://github.com/dongyuanxin/theme-bmw 🎉\n' + '\n%c View demo online ' + '%c 🔍 https://godbmw.com/ 🔍  \n' , 'color: #fadfa3; background: #030307; padding:3px 0;', '', 'color: #fadfa3; background: #030307; padding:3px 0;', '');
+  </script>
+
+  
+    <meta name="description" content="海阔全是浪，天高皆是霾。">
+  
+
+  
+
+  
+    <link rel="icon" href="/images/fvatar2.png">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/icon/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+  <script src="/js/util.js"></script>
+<script src="/js/valine.min.js"></script>
+
+  
+
+  
+    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
+  
+
+  
+    <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
+  
+  
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js" async></script>
+  
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.0/dist/av-min.js"></script>
+  
+
+</head>
+
+  <body>
+
+    
+
+    <div id="app">
+
+      <div class="header-wrap">
+  <header>
+    <div class="site-brand">
+      <div class="site-title">
+        <a href="/">YiXiaoZhou</a>
+      </div>
+    </div>
+    <nav class="site-navigation">
+      <ul class="nav-menu">
+      
+        <li class="nav-item" data-path="/">
+          
+            <a href="/" target="_self">
+              主页
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          
+            <a href="/archives/" target="_self">
+              归档
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          
+            <a href="/friends/" target="_self">
+              友链
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          
+            <a href="/about/" target="_self">
+              关于
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path>
+          
+            <a href="javascript:void(0);" v-else>抓到我</a>
+            <ul class="nav-menu--dropdown">
+              
+                <li>
+                  <a href="https://github.com/ZongweiZhou1" target="_blank">
+                    Github
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://www.facebook.com/duncon.chou" target="_blank">
+                    Facebook
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://weibo.com/u/3231820650/home?wvr=5" target="_self">
+                    weibo
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+      </ul>
+    </nav>
+    <i class="iconfont icon-menu"></i>
+  </header>
+</div>
+
+<script>
+  let links = document.querySelectorAll('.nav-item');
+  for(let link of links){
+    let childrenLink = link.querySelector('ul');
+    link.addEventListener('mouseenter', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown active";
+      }
+    })
+    link.addEventListener('mouseleave', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown";
+      }
+    })
+  }
+  let rootRealPath = getRealPath(window.location.pathname, true);
+  for(let link of links) {
+    let linkPath = link.getAttribute("data-path");
+    if(linkPath && getRealPath(linkPath, true) === rootRealPath) {
+      link.className = "nav-item hover";
+    }
+  }
+
+  let iconMenu = document.querySelector("i.iconfont.icon-menu"),
+    iconMenuClicked = false;
+  let navDOM = document.querySelector("nav.site-navigation");
+  iconMenu.addEventListener("click", () => {
+    iconMenuClicked 
+      ? navDOM.className = "site-navigation active"
+      : navDOM.className = "site-navigation";
+    iconMenuClicked = !iconMenuClicked;
+  })
+</script>
+
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
+  
+
+<div class="post">
+  <h1 class="article-title">
+    <span>多目标跟踪总结(下)-资源汇总</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2019-05-21
+    </span>
+    
+    
+      <span>
+        浏览 : <span class="article-timer" data-identity="MOT-overview-3rd"></span>
+      </span>
+    
+  </div>
+
+  
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <h3 id="导言"><a href="#导言" class="headerlink" title="导言"></a>导言</h3><p>本文主要收集MOT领域的一些资源， 包括数据集，相关论文以及部分开源代码等。</p>
+<h3 id="Dataset"><a href="#Dataset" class="headerlink" title="Dataset"></a>Dataset</h3><table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th align="center">MultiView</th>
+<th align="center">Groundtruth</th>
+<th>Site</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PETS2006</td>
+<td align="center">$\checkmark$</td>
+<td align="center">$\times$</td>
+<td><a href="www.cvg.rdg.ac.uk/PETS2006/data.html">www.cvg.rdg.ac.uk/PETS2006/data.html</a></td>
+</tr>
+<tr>
+<td>PETS2007</td>
+<td align="center">$\checkmark$</td>
+<td align="center">$\checkmark$</td>
+<td><a href="http://www.cvg.reading.ac.uk/PETS2007/" target="_blank" rel="noopener">http://www.cvg.reading.ac.uk/PETS2007/</a></td>
+</tr>
+<tr>
+<td>PETS2009</td>
+<td align="center">$\checkmark$</td>
+<td align="center">$\checkmark$</td>
+<td><a href="www.cvg.rdg.ac.uk/PETS2009/a.html">www.cvg.rdg.ac.uk/PETS2009/a.html</a></td>
+</tr>
+<tr>
+<td>CAVIAR</td>
+<td align="center">$\checkmark$</td>
+<td align="center">$\checkmark$</td>
+<td><a href="http://groups.inf.ed.ac.uk/vision/CAVIAR/CAVIARDATA1/" target="_blank" rel="noopener">http://groups.inf.ed.ac.uk/vision/CAVIAR/CAVIARDATA1/</a></td>
+</tr>
+<tr>
+<td>TUD</td>
+<td align="center">$\times$</td>
+<td align="center">$\checkmark$</td>
+<td><a href="www.d2.mpi-inf.mpg.de/datasets">www.d2.mpi-inf.mpg.de/datasets</a></td>
+</tr>
+<tr>
+<td>TRECVID</td>
+<td align="center">$\checkmark$</td>
+<td align="center">$\times$</td>
+<td><a href="http://www-nlpir-nist.gov/projects/" target="_blank" rel="noopener">http://www-nlpir-nist.gov/projects/</a></td>
+</tr>
+<tr>
+<td>Caltech Pedestrian</td>
+<td align="center">$\times$</td>
+<td align="center">$\checkmark$</td>
+<td><a href="www.vision.caltech.edu/Image_Datasets/CaltechPedestrians/">www.vision.caltech.edu/Image_Datasets/CaltechPedestrians/</a></td>
+</tr>
+<tr>
+<td>UBC Hockey</td>
+<td align="center">$\times$</td>
+<td align="center">$\times$</td>
+<td><a href="www.cs.ubc.ca/~okumak/research.html">www.cs.ubc.ca/~okumak/research.html</a></td>
+</tr>
+<tr>
+<td>AVSS 2007</td>
+<td align="center">$\times$</td>
+<td align="center">$\checkmark$</td>
+<td><a href="www.eecs.qmul.ac.uk/~andrea/avss2007_d.html">www.eecs.qmul.ac.uk/~andrea/avss2007_d.html</a></td>
+</tr>
+<tr>
+<td>ETH pedestrian</td>
+<td align="center">$\checkmark$</td>
+<td align="center">$\checkmark$</td>
+<td><a href="www.vision.ee.ethz.ch/~aess/dataset/">www.vision.ee.ethz.ch/~aess/dataset/</a></td>
+</tr>
+<tr>
+<td>ETHZ Central</td>
+<td align="center">$\times$</td>
+<td align="center">$\checkmark$</td>
+<td><a href="www.vision.ee.ethz.ch/datasets">www.vision.ee.ethz.ch/datasets</a></td>
+</tr>
+<tr>
+<td>Town Centre</td>
+<td align="center">$\times$</td>
+<td align="center">$\checkmark$</td>
+<td><a href="www.robots.ox.ac.uk/ActiveVision/Research/Projects/2009bbenfold_headpose/project.htnl#datasets">www.robots.ox.ac.uk/ActiveVision/Research/Projects/2009bbenfold_headpose/project.htnl#datasets</a></td>
+</tr>
+<tr>
+<td>Zara</td>
+<td align="center">$\times$</td>
+<td align="center">$\times$</td>
+<td><a href="https://graphics.cs.ucy.ac.cy/research/downloads/crowd-data" target="_blank" rel="noopener">https://graphics.cs.ucy.ac.cy/research/downloads/crowd-data</a></td>
+</tr>
+<tr>
+<td>UCSD</td>
+<td align="center">$\times$</td>
+<td align="center">$\times$</td>
+<td><a href="http://www.svcl.ucsd.edu/projects/anomaly/dataset.htm" target="_blank" rel="noopener">http://www.svcl.ucsd.edu/projects/anomaly/dataset.htm</a></td>
+</tr>
+<tr>
+<td>UCF Crowds</td>
+<td align="center">$\times$</td>
+<td align="center">$\times$</td>
+<td><a href="www.crcv.ucf.edu/data/crowd.php">www.crcv.ucf.edu/data/crowd.php</a></td>
+</tr>
+<tr>
+<td>KITTI</td>
+<td align="center">$\times$</td>
+<td align="center">$\checkmark$</td>
+<td><a href="http://www.cvlibs.net/datasets/kitti/eval_tracking.php" target="_blank" rel="noopener">http://www.cvlibs.net/datasets/kitti/eval_tracking.php</a></td>
+</tr>
+<tr>
+<td>MOT2015</td>
+<td align="center">$\times$</td>
+<td align="center">$\checkmark$</td>
+<td><a href="https://motchallenge.net/data/2D_MOT_2015/" target="_blank" rel="noopener">https://motchallenge.net/data/2D_MOT_2015/</a></td>
+</tr>
+<tr>
+<td>MOT2016</td>
+<td align="center">$\times$</td>
+<td align="center">$\checkmark$</td>
+<td><a href="https://motchallenge.net/data/MOT16/" target="_blank" rel="noopener">https://motchallenge.net/data/MOT16/</a></td>
+</tr>
+<tr>
+<td>MOT2017</td>
+<td align="center">$\times$</td>
+<td align="center">$\checkmark$</td>
+<td><a href="https://motchallenge.net/data/MOT17/" target="_blank" rel="noopener">https://motchallenge.net/data/MOT17/</a></td>
+</tr>
+<tr>
+<td>MOT2019</td>
+<td align="center">$\times$</td>
+<td align="center">$\checkmark$</td>
+<td><a href="https://motchallenge.net/data/CVPR_2019_Tracking_Challenge/" target="_blank" rel="noopener">https://motchallenge.net/data/CVPR_2019_Tracking_Challenge/</a></td>
+</tr>
+</tbody></table>
+<p>目前多目标跟踪主要使用的数据集是MOTChallenge数据集， 包括MOT15， MOT16， MOT17和MOT19.</p>
+<h3 id="Papers"><a href="#Papers" class="headerlink" title="Papers"></a>Papers</h3><blockquote>
+<p> <strong>Evaluation Metric</strong> </p>
+</blockquote>
+<p><strong>CLEAR MOT</strong> :       Bernardin, K. &amp; Stiefelhagen, R. “Evaluating Multiple Object Tracking Performance: The CLEAR MOT Metric”  <a href="https://cvhci.anthropomatik.kit.edu/images/stories/msmmi/papers/eurasip2008.pdf" target="_blank" rel="noopener">paper</a></p>
+<p><strong>IDF1</strong>:                       Ristani, E., Solera, F., Zou, R., Cucchiara, R. &amp; Tomasi, C. “Performance Measures and a Data Set for Multi-Target, Multi-Camera Tracking” <a href="https://users.cs.duke.edu/~ristani/bmtt2016/ristani2016MTMC.pdf" target="_blank" rel="noopener">paper</a>       </p>
+<p><strong>MTMCT</strong>                  Ristani, E., Solera, F., Zou, R. S., Cucchiara, R., &amp; Tomasi, C. (2016). Performance Measures and a Data Set for Multi-Target, Multi-Camera Tracking. <a href="doi.org/10.1007/978-3-319-48881-3_2">paper</a></p>
+<p><strong>MOT15</strong>:                   Leal-Taixé L, Milan A, Reid I, et al. Motchallenge 2015: Towards a benchmark for multi-target tracking . <a href="https://arxiv.org/abs/1504.01942" target="_blank" rel="noopener">paper</a>                   </p>
+<p><strong>MOT16</strong> :                  Milan A, Leal-Taixé L, Reid I, et al. MOT16: A benchmark for multi-object tracking. <a href="https://arxiv.org/pdf/1603.00831" target="_blank" rel="noopener">paper</a></p>
+<p><strong>Evaluation Code</strong>: <a href="https://bitbucket.org/amilan/motchallenge-devkit/" target="_blank" rel="noopener">matlab</a>, <a href="https://github.com/cheind/py-motmetrics" target="_blank" rel="noopener">python</a></p>
+<blockquote>
+<p><strong>Overview</strong> </p>
+</blockquote>
+<p>Emami, P., Pardalos, P. M., Elefteriadou, L., &amp; Ranka, S. (2018). Machine Learning Methods for Solving Assignment Problems in Multi-Target Tracking, 1(1), 1–35. <a href="arxiv.org/abs/1802.06897">paper</a></p>
+<p>Leal-Taixé, L., Milan, A., Schindler, K., Cremers, D., Reid, I., &amp; Roth, S. (2017). Tracking the Trackers: An Analysis of the State of the Art in Multiple Object Tracking. <a href="arxiv.org/abs/1704.0278">paper</a></p>
+<p>Luo, W., Xing, J., Milan, A., Zhang, X., Liu, W., Zhao, X., &amp; Kim, T.-K. (2014). Multiple Object Tracking: A Literature Review, 1–18.  <a href="arxiv.org/abs/1409.7618">paper</a></p>
+<p>Li, X., Hu, W., Shen, C., Zhang, Z., &amp; Dick, A. (2013). A Survey of Appearance Models in Visual Object Tracking, 1–42. <a href="arxiv.org/pdf/1303.4803">paper</a></p>
+<p>Poore, A. B., &amp; Gadaleta, S. (2006). Some assignment problems arising from multiple target tracking, 43, 1074–1091. <a href="doi.org/10.1016/j.mcm.2">paper</a></p>
+<p>Yilmaz, A., &amp; Javed, O. (2006). Object Tracking : A Survey, 38(4).  <a href="doi.org/10.1145/1177352">paper</a></p>
+<p>A 101 slide . <a href="http://vision.stanford.edu/teaching/cs231b_spring1415/slides/greedy_fahim_albert.pdf" target="_blank" rel="noopener">paper</a></p>
+<blockquote>
+<p><strong>2019</strong> </p>
+</blockquote>
+<p><strong>NT</strong>:                 Longyin Wen<em>, Dawei Du</em>, Shengkun Li, Xiao Bian, Siwei Lyu Learning Non-Uniform Hypergraph for Multi-Object Tracking, In AAAI 2019.  [paper](<a href="http://www.cs.albany.edu/~lsw/papers/aaai19a.pdf" target="_blank" rel="noopener">http://www.cs.albany.edu/~lsw/papers/aaai19a.pdf</a>  from  github.com/longyin880815)</p>
+<p><strong>FMA</strong>:           Zhang, J., Zhou, S., Wang, J., &amp; Huang, D. (2019). Frame-wise Motion and Appearance for Real-time Multiple Object Tracking, (1).  <a href="arxiv.org/abs/1905.02292">paper</a></p>
+<p><strong>STRN</strong>:           Xu, J., Cao, Y., Zhang, Z., &amp; Hu, H. (2019). Spatial-Temporal Relation Networks for Multi-Object Tracking.  <a href="arxiv.org/abs/1904.11489">paper</a></p>
+<p><strong>LSST</strong>:             Feng, W., Hu, Z., Wu, W., Yan, J., &amp; Ouyang, W. (2019). Multi-Object Tracking with Multiple Cues and Switcher-Aware Classification.  <a href="arxiv.org/abs/1901.06129">paper</a></p>
+<p><strong>MOTS</strong>:            Voigtlaender, P., Krause, M., Osep, A., Luiten, J., Sekar, B. B. G., Geiger, A., &amp; Leibe, B. (2019). MOTS: Multi-Object Tracking and Segmentation.  <a href="arxiv.org/abs/1902.03604">paper</a></p>
+<p><strong>FAMNet</strong>:     Chu, P., &amp; Ling, H. (2019). FAMNet: Joint Learning of Feature, Affinity and Multi-dimensional Assignment for Online Multiple Object Tracking. <a href="arxiv.org/abs/1904.04989">paper</a></p>
+<p><strong>FANTrack</strong>: Baser, E., Balasubramanian, V., Bhattacharyya, P., &amp; Czarnecki, K. (2019). FANTrack: 3D Multi-Object Tracking with Feature Association Network.  <a href="https://arxiv.org/abs/1905.02843" target="_blank" rel="noopener">paper</a>, <a href="https://git.uwaterloo.ca/wise-lab/fantrack" target="_blank" rel="noopener">code</a></p>
+<p><strong>IATracker</strong>:   Chu, P., Fan, H., Tan, C. C., &amp; Ling, H. (2019). Online Multi-Object Tracking with Instance-Aware Tracker and Dynamic Model Refreshment.  <a href="arxiv.org/abs/1902.08231">paper</a></p>
+<blockquote>
+<p><strong>2018</strong> </p>
+</blockquote>
+<p><strong>SST</strong>:                 Sun. S., Akhtar, N., Song, H., Mian A., &amp; Shah M. (2018). Deep Affinity Network for Multiple Object Tracking.  <a href="https://arxiv.org/abs/1810.11780" target="_blank" rel="noopener">paper</a>, <a href="https://github.com/shijieS/SST" target="_blank" rel="noopener">code</a></p>
+<p><strong>CCC</strong>:                 Keuper, M., Tang, S., Andres, B., Brox, T., &amp; Schiele, B. (2018). Motion Segmentation &amp; Multiple Object Tracking by Correlation Co-Clustering. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, <em>8828</em>(c), 1–13.   <a href="doi.org/10.1109/TPAMI.2018.2876253">paper</a></p>
+<p><strong>HAF</strong>:                 Sheng, H., Zhang, Y., Chen, J., Xiong, Z., &amp; Zhang, J. (2018). Heterogeneous Association Graph Fusion for Target Association in Multiple Object Tracking. IEEE Transactions on Circuits and Systems for Video Technology. <a href="doi.org/10.1109/TCSVT.2018.2882192">paper</a></p>
+<p><strong>TNT</strong>:               Wang, G., Wang, Y., Zhang, H., Gu, R., &amp; Hwang, J.-N. (2018). Exploit the Connectivity: Multi-Object Tracking with TrackletNet.  <a href="arxiv.org/abs/1811.07258">paper</a></p>
+<p><strong>PHD</strong>:              Fang, K., Xiang, Y., Li, X., &amp; Savarese, S. (2018). Recurrent Autoregressive Networks for Online Multi-Object Tracking. <em>WACV</em>.   <a href="yuxng.github.io/fang_wacv18.pdf">paper</a></p>
+<p><strong>DMAN</strong>:            Zhu, Ji and Yang, Hua and Liu, Nian and Kim, Minyoung and Zhang, Wenjun and Yang, Ming-Hsuan “Online Multi-Object Tracking with Dual Matching Attention Networks”   <a href="http://openaccess.thecvf.com/content_ECCV_2018/papers/Ji_Zhu_Online_Multi-Object_Tracking_ECCV_2018_paper.pdf" target="_blank" rel="noopener">paper</a></p>
+<p><strong>C-DRL</strong>:             Ren, Liangliang and Lu, Jiwen and Wang, Zifeng and Tian, Qi and Zhou, Jie “Collaborative Deep Reinforcement Learning for Multi-Object Tracking” <a href="http://openaccess.thecvf.com/content_ECCV_2018/papers/Liangliang_Ren_Collaborative_Deep_Reinforcement_ECCV_2018_paper.pdf" target="_blank" rel="noopener">paper</a></p>
+<p><strong>SADF</strong>:             Yoon, Y., Boragule, A., Song, Y., Yoon, K., &amp; Jeon, M. (2018). Online Multi-Object Tracking with Historical Appearance Matching and Scene Adaptive Detection Filtering.  <a href="ieeexplore.ieee.org/document/8639078">paper</a></p>
+<p><strong>MOTDT</strong>:           Long Chen, Haizhou Ai “Real-time Multiple People Tracking with Deeply Learned Candidate Selection and Person Re-identification” in ICME 2018.     <a href="https://www.researchgate.net/publication/326224594_Real-time_Multiple_People_Tracking_with_Deeply_Learned_Candidate_Selection_and_Person_Re-identification" target="_blank" rel="noopener">paper</a>, <a href="https://github.com/longcw/MOTDT" target="_blank" rel="noopener">code</a></p>
+<p><strong>DeepCC</strong>:          Ristani and C. Tomasi “Features for Multi-Target Multi-Camera Tracking and Re-Identification” In CVPR 2018 <a href="https://arxiv.org/pdf/1803.10859.pdf" target="_blank" rel="noopener">paper</a>,  <a href="https://github.com/ergysr/DeepCC" target="_blank" rel="noopener">code</a></p>
+<p><strong>THOPA-net</strong>:     Fabbri, M., Lanzi, F., Calderara, S., &amp; Vezzani, R. (2018). Learning to Detect and Track Visible and Occluded Body Joints in a Virtual World. <a href="researchgate.net/publication/323957071_Learning_to_Detect_and_Track_Visible_and_Occluded_Body_Joints_in_a_Virtual_World">paper</a></p>
+<p><strong>MHT-bLSTM</strong>:  Kim, Chanho and Li, Fuxin and Rehg, James M “Multi-object Tracking with Neural Gating Using Bilinear LSTM” .  <a href="http://openaccess.thecvf.com/content_ECCV_2018/papers/Chanho_Kim_Multi-object_Tracking_with_ECCV_2018_paper.pdf" target="_blank" rel="noopener">paper</a></p>
+<p><strong>Trajectory Factory</strong>: Cong Ma, Changshui Yang, Fan Yang, Yueqing Zhuang, Ziwei Zhang, Huizhu Jia, Xiaodong Xie “Trajectory Factory: Tracklet Cleaving and Re-connection by Deep Siamese Bi-GRU for Multiple Object Tracking” In ICME 2018.   <a href="https://arxiv.org/abs/1804.04555" target="_blank" rel="noopener">paper</a></p>
+<p><strong>MOTBeyondPixels</strong>: Sarthak Sharma,  Junaid Ahmed Ansari,  J. Krishna Murthy,  and K. Madhava Krishna Beyond Pixels: Leveraging Geometry and Shape Cues for Online Multi-Object Tracking In ICRA 2018 <a href="https://arxiv.org/abs/1802.09298" target="_blank" rel="noopener">paper</a>,  <a href="https://github.com/JunaidCS032/MOTBeyondPixels" target="_blank" rel="noopener">code</a></p>
+<p>Henschel, R., Leal-Taixe, L., Cremers, D., &amp; Rosenhahn, B. (2018). Fusion of head and full-body detectors for multi-object tracking. <em>IEEE Computer Society Conference on Computer Vision and Pattern Recognition Workshops</em>, <em>2018</em>–<em>June</em>, 1509–1518.   <a href="doi.org/10.1109/CVPRW.2018.00192">paper</a></p>
+<p>Tharindu Fernando, Simon Denman, Sridha Sridharan, Clinton Fookes “Tracking by Prediction: A Deep Generative Model for Mutli-Person localisation and Tracking” In WACV 2018. <a href="https://arxiv.org/pdf/1803.03347.pdf" target="_blank" rel="noopener">paper</a></p>
+<blockquote>
+<p><strong>2017</strong></p>
+</blockquote>
+<p><strong>D2T</strong>:                  Feichtenhofer, C., Pinz, A., &amp; Zisserman, A. (2017). Detect to Track and Track to Detect. In ICCV2017.  <a href="doi.org/10.1109/ICCV.2017.330">paper</a>, <a href="github.com/feichtenhofer/Detect-Track">code</a></p>
+<p><strong>IOU</strong>:                  Bochinski, E., Eiselein, V., &amp; Sikora, T. (2017). High-Speed tracking-by-detection without using image information. <em>AVSS 2017</em>. <a href="doi.org/10.1109/AVSS.2017.8078516">paper</a>, <a href="github.com/bochinski/iou-tracker/">code</a></p>
+<p><strong>CIWT</strong>:                Aljosa Osep, Alexander Hermans Combined Image and World-Space Tracking in Traffic Scenes. In ICRA 2017.  <a href="vision.rwth-aachen.de/media/papers/paper_final_compressed.pdf">paper</a>,  <a href="github.com/aljosaosep/ciwt">code</a></p>
+<p><strong>RCMSS</strong>:              Naiel, M. A., Ahmad, M. O., Swamy, M. N. S., Lim, J., &amp; Yang, M. H. (2017). Online multi-object tracking via robust collaborative model and sample selection. In CVIU 2017.  <a href="doi.org/10.1016/j.cviu.2016.07.003">paper</a>, <a href="users.encs.concordia.ca/~rcmss/">code</a></p>
+<p><strong>EAMTT</strong>:              Tang, S., Andriluka, M., Andres, B., &amp; Schiele, B. (2017). Multiple people tracking by lifted multicut and person re-identification.  In CVPR 2017. <a href="doi.org/10.1109/CVPR.2017.394">paper</a></p>
+<p><strong>STAM</strong>:                 Chu, Q., Ouyang, W., Li, H., Wang, X., Liu, B., &amp; Yu, N. (2017). Online Multi-object Tracking Using CNN-Based Single Object Tracker with Spatial-Temporal Attention Mechanism.  In ICCV2017. <a href="doi.org/10.1109/ICCV.2017.518">paper</a></p>
+<p><strong>DeepSORT</strong>:         Wojke, N., Bewley, A., &amp; Paulus, D. (2017). Simple Online and Realtime Tracking with a Deep Association Metric.  In ICIP2017.  <a href="doi.org/10.1109/ICIP.2017.8296962">paper</a>, <a href="github.com/nwojke/deep_sort">code</a> </p>
+<p><strong>Quad-CNN</strong>:         Son, J., Baek, M., Cho, M., &amp; Han, B. (2017). Multi-object tracking with quadruplet convolutional neural networks. In CVPR2017.  <a href="doi.org/10.1109/CVPR.2017.403">paper</a></p>
+<p><strong>Art-Tracker</strong>:       Eldar Insafutdinov, Mykhaylo Andriluka, Leonid Pishchulin, Siyu Tang, Evgeny Levinkov, Bjoern Andres, Bernt Schiele “Art Track: Articulated Multi-Person Tracking in the Wild”  In CVPR2017. <a href="https://arxiv.org/abs/1612.01465" target="_blank" rel="noopener">paper</a></p>
+<p><strong>SOTforMOT</strong>:         He, Q., Wu, J., Yu, G., &amp; Zhang, C. (2017). SOT for MOT.  <a href="arxiv.org/abs/1712.01059">paper</a></p>
+<p><strong>NMGC-MOT</strong>:         Maksai, A., Wang, X., Fleuret, F., &amp; Fua, P. (2017). Non-Markovian Globally Consistent Multi-Object Tracking.  In ICCV2017.  <a href="openaccess.thecvf.com/content_ICCV_2017/papers/Maksai_Non-Markovian_Globally_Consistent_ICCV_2017_paper.pdf">paper</a>  , <a href="github.com/maksay/ptrack_cpp">code</a></p>
+<p><strong>RNN_LSTM</strong>:          Milan, A., Rezatofighi, S. H., Dick, A., Reid, I., &amp; Schindler, K. (2017). Online Multi-Target Tracking Using Recurrent Neural Networks.  AAAI 2017.  <a href="arxiv.org/abs/1604.03635">paper</a>,  <a href="bitbucket.org/amilan/rnntracking">code</a></p>
+<p><strong>ReidTracking</strong>:               Beyer, L., Breuers, S., Kurin, V., &amp; Leibe, B. (2017). Towards a Principled Integration of Multi-Camera Re-Identification and Tracking through Optimal Bayes Filters.  <a href="arxiv.org/abs/1705.04608">paper</a>, <a href="github.com/VisualComputingInstitute/towards-reid-tracking">code</a></p>
+<p><strong>DeepNetworkFlows</strong>:  Schulter, S., Vernaza, P., Choi, W., &amp; Chandraker, M. (2017). Deep network flow for multi-object tracking.  In CVPR 2017.  <a href="doi.org/10.1109/CVPR.2017.292">paper</a></p>
+<p>Sadeghian, A., Alahi, A., &amp; Savarese, S. (2017). Tracking the Untrackable: Learning to Track Multiple Cues with Long-Term Dependencies.  In ICCV2017. <a href="doi.org/10.1109/ICCV.2017.41">paper</a></p>
+<blockquote>
+<p><strong>2016</strong></p>
+</blockquote>
+<p><strong>CPD</strong>:                       Lee, B., Erdenee, E., Jin, S., &amp; Rhee, P. K. (2016). Multi-Class Multi-Object Tracking using Changing Point Detection.  <a href="doi.org/10.1007/978-3-319-48881-3">paper</a></p>
+<p><strong>POI</strong> :                        Yu, F., Li, W., Li, Q., Liu, Y., Shi, X., &amp; Yan, J. (2016). POI: Multiple Object Tracking with High Performance Detection and Appearance Feature.  In BMTT 2016.  <a href="https://arxiv.org/pdf/1610.06136.pdf" target="_blank" rel="noopener">paper</a>,  <a href="https://drive.google.com/open?id=0B5ACiy41McAHMjczS2p0dFg3emM" target="_blank" rel="noopener">detections</a></p>
+<p><strong>SORT</strong>:                      Bewley, A., Ge, Z., Ott, L., Ramos, F., &amp; Upcroft, B. (2016). Simple online and realtime tracking.   In ICIP 2016.  <a href="doi.org/10.1109/ICIP.2016.7533003">paper</a>, <a href="github.com/abewley/sort">code</a></p>
+<p><strong>RCMSS</strong> :                  Mohamed A. Naiel1, M. Omair Ahmad, M.N.S. Swamy, Jongwoo Lim, and Ming-Hsuan Yang “Online Multi-Object Tracking Via Robust Collaborative Model and Sample Selection. In CVIU2016. <a href="https://users.encs.concordia.ca/~rcmss/include/Papers/CVIU2016.pdf" target="_blank" rel="noopener">paper</a>, <a href="https://users.encs.concordia.ca/~rcmss/" target="_blank" rel="noopener">code</a> </p>
+<p><strong>Social-LSTM</strong>:          Goel, K., Fei-Fei, L., Savarese, S., Alahi, A., Robicquet, A., &amp; Ramanathan, V. (2016). Social LSTM: Human Trajectory Prediction in Crowded Spaces.  In CVPR2016.  <a href="doi.org/10.1109/cvpr.2016.110">paper</a>, </p>
+<blockquote>
+<p><strong>2015</strong></p>
+</blockquote>
+<p><strong>MDP</strong>:                      Xiang, Y., Alahi, A., &amp; Savarese, S. (2015). Learning to Track: Online Multi-object Tracking by Decision Making.  In ICCV2015.  <a href="doi.org/10.1109/ICCV.2015.534">paper</a>, <a href="cvgl.stanford.edu/projects/MDP_tracking/">code</a></p>
+<p><strong>CEM</strong>:                       Chari, V., Lacoste-Julien, S., Laptev, I., &amp; Sivic, J. (2014). On Pairwise Costs for Network Flow Multi-Object Tracking.  In CVPR2015.  <a href="arxiv.org/abs/1408.3304">paper</a>, <a href="milanton.de/contracking/">code</a> </p>
+<p><strong>ALFD</strong>:                      Choi, W. (2015). Near-online multi-target tracking with aggregated local flow descriptor. In ICCV2015. <a href="doi.org/10.1109/ICCV.2015.347">paper</a> </p>
+<p><strong>LDCT</strong>:                      Solera, F. (2015). Learning to Divide and Conquer for Online Multi-Target Tracking. In ICCV 2105.  <a href="imagelab.ing.unimore.it/imagelab/researchActivity.asp?idActivity=09">paper</a>, <a href="github.com/francescosolera/LDCT">code</a></p>
+<p><strong>TMPORT</strong>:               Ristani, E., &amp; Tomasi, C. (2015). Tracking multiple people online and in real time. <a href="doi.org/10.1007/978-3-319-16814-2_29">paper</a>, <a href="vision.cs.duke.edu/DukeMTMC/">code</a></p>
+<p><strong>JPDArevisited</strong>:     Rezatofighi, S. H., Milan, A., Zhang, Z., Shi, Q., Dick, A., &amp; Reid, I. (2015). Modified Joint Probabilistic Data Association.  In ICCV2015.  <a href="doi.org/10.1109/ICCV.2015.349">paper</a></p>
+<p><strong>MHTrevisited</strong>:      Vinet, L., &amp; Zhedanov, A. (2015). Multiple Hypothesis Tracking Revisited. In ICCV2015. <a href="doi.org/10.1088/1751-8113/44/8/085201">paper</a>, <a href="rehg.org/mht/">code</a></p>
+<p><strong>headTracking</strong>:     Zhang, S., Wang, J., Wang, Z., Gong, Y., &amp; Liu, Y. (2015). Multi-target tracking by learning local-to-global trajectory models.  In PR, 48(2), 580-590.  <a href="doi.org/10.1016/j.patcog.2014.08.013">paper</a>,  <a href="github.com/gengshan-y/headTracking">code</a></p>
+<blockquote>
+<p><strong>2014</strong></p>
+</blockquote>
+<p><strong>H2T</strong>:                         Wen, L., Li, W., Yan, J., Lei, Z., Yi, D., &amp; Li, S. Z. (2014). Multiple target tracking based on undirected hierarchical relation hypergraph.  In CSC on CVPR2014.  <a href="doi.org/10.1109/CVPR.2014.167">paper</a>,  <a href="cbsr.ia.ac.cn/users/lywen/">code</a></p>
+<p><strong>CMOT</strong>:                     Bae, S. H., &amp; Yoon, K. J. (2014). Robust online multi-object tracking based on tracklet confidence and online discriminative appearance learning.  In CSC on CVPR2014.  <a href="doi.org/10.1109/CVPR.2014.159">paper</a>, <a href="cvl.gist.ac.kr/project/cmot.html">code</a></p>
+<p><strong>OPCNF</strong>:                  Chari, V., Lacoste-Julien, S., Laptev, I., &amp; Sivic, J. (2014). Continuous Energy Minimization for Multi-Target Tracking,  TPAMI 2014.  <a href="milanton.de/files/pami2014/pami2014-anton.pdf">paper</a>,  <a href="di.ens.fr/willow/research/flowtrack/">code</a></p>
+<p>Tang, S., Andriluka, M., &amp; Schiele, B. (2014). Detection and tracking of occluded people. IJCV, <em>110</em>(1), 58–69.   <a href="doi.org/10.1007/s11263-013-0664-6">paper</a></p>
+<p>Yang, B., &amp; Nevatia, R. (2014). Multi-target tracking by online learning a CRF model of appearance and motion patterns.  IJCV, <em>107</em>(2), 203–217.  <a href="doi.org/10.1007/s11263-013-0666-4">paper</a></p>
+<blockquote>
+<p><strong>2013</strong></p>
+</blockquote>
+<p><strong>SMOT</strong>:                      Dicle, C., Camps, O. I., &amp; Sznaier, M. (2013). The way they move: Tracking multiple targets with similar appearance.  In ICCV2013.  <a href="doi.org/10.1109/ICCV.2013.286">paper</a>,, <a href="bitbucket.org/cdicle/smot">code</a></p>
+<p>Milan, A., Schindler, K., &amp; Roth, S. (2013). Detection- and trajectory-level exclusion in multiple object tracking.  In CSC on CVPR2013.  <a href="doi.org/10.1109/CVPR.2013.472">paper</a></p>
+<p>Salvi, D., Waggoner, J., Temlyakov, A., &amp; Wang, S. (2013). A graph-based algorithm for multi-target tracking with occlusion. In WACV 2013. <a href="doi.org/10.1109/WACV.2013.6475059">paper</a></p>
+<blockquote>
+<p><strong>2012</strong></p>
+</blockquote>
+<p><strong>GMCP-Tracker</strong>:          Zamir, A. R., Dehghan, A., &amp; Shah, M. (2012). GMCP-Tracker : Global Multi-object Tracking Using Generalized Minimum Clique Graphs, 343–356. <a href="crcv.ucf.edu/papers/eccv2012/GMCP-Tracker_ECCV12.pdf">paper</a>,  <a href="crcv.ucf.edu/projects/GMCP-Tracker/">code</a></p>
+<p><strong>OMPTTH</strong>:                     Zhang, J., Lo Presti, L., &amp; Sclaroff, S. (2012). Online multi-person tracking by tracker hierarchy. In AVSS 2012. <a href="doi.org/10.1109/AVSS.2012.51">paper</a>, <a href="cs-people.bu.edu/jmzhang/tracker_hierarchy/Tracker_Hierarchy.htm">code</a> </p>
+<p>Yan, X., Wu, X., Kakadiaris, I. A., &amp; Shah, S. K. (2012). To Track or To Detect ? An Ensemble Framework for Optimal Selection, 594–607. <a href="link.springer.com/conter/10.1007%2F978-3-642-33715-4_43">paper</a></p>
+<p>Hu, W., Li, X., Luo, W., Zhang, X., Maybank, S., &amp; Zhang, Z. (2012). Single and multiple object tracking using log-euclidean riemannian subspace and block-division appearance model. PAMI, 34(12), 2420-2440. <a href="doi.org/10.1109/TPAMI.2012.42">paper</a></p>
+<p>Yang, B., &amp; Nevatia, R. (2012). Online learned discriminative part-based appearance models for multi-human tracking. In ECCV 2012. <a href="doi.org/10.1007/978-3-642-33718-5_35">paper</a></p>
+<p>Shu, G., Dehghan, A., Oreifej, O., Hand, E., &amp; Shah, M. (2012). Part-based multiple-person tracking with partial occlusion handling.  In CSC on CVPR2012. <a href="doi.org/10.1109/CVPR.2012.6247879">paper</a></p>
+<blockquote>
+<p><strong>2011 and Before</strong></p>
+</blockquote>
+<p><strong>KSP</strong>:                               Berclaz. (2011). Multiple Object Tracking using K-shortes Paths.  PAMI2011. <a href="cvlab.epfl.ch/files/content/sites/cvlab2/files/publications/publications/2011/BerclazFTF11.pdf">paper</a>, <a href="cvlab.epfl.ch/software/ksp">code</a> </p>
+<p><strong>MTDF</strong>:                           Pedro F. Felzenszwalb, Ross B. Girshick, D. M. and D. R. (2010). Object detection with discriminatively trained part-based models. in TPAMI 2010. <a href="doi.org/10.1109/MC.2014.42">paper</a></p>
+<p>Andriyenko, A., Roth, S., &amp; Schindler, K. (2011). An analytical formulation of global occlusion reasoning for multi-target tracking.  ICCV 2011.  <a href="doi.org/10.1109/ICCVW.2011.6130472">paper</a></p>
+<p>Andriyenko, A., &amp; Schindler, K. (2011). Multi-target tracking by continuous energy minimization.  In CVPR 2011. <a href="doi.org/10.1109/CVPR.2011.5995311">paper</a></p>
+<p>Pirsiavash, H., Ramanan, D., &amp; Fowlkes, C. (2011). Globally-Optimal Greedy Algorithms for Tracking a Variable Number of Objects.  CVPR2011. <a href="people.csail.mit.edu/hpirsiav/papers/tracking_cvpr11.pdf">paper</a></p>
+<p>Mitzel, D., Horbert, E., Ess, A., &amp; Leibe, B. (2010). Multi-person tracking with sparse detection and continuous segmentation.  ECCV2010.  <a href="doi.org/10.1007/978-3-642-15549-9_29">paper</a></p>
+<p>Hu, M., Ali, S., &amp; Shah, M.  Detecting global motion patterns in complex videos. ICPR2008. <a href="doi.org/10.1109/icpr.2008.4760950">paper</a></p>
+<p>Breitenstein, M. D., Reichlin, F., Leibe, B., Koller-Meier, E., &amp; Van Gool, L. (2009). Robust tracking-by-detection using a detector confidence particle filter. ICCV2009.  <a href="doi.org/10.1109/ICCV.2009.5459278">paper</a></p>
+<p>Zhang, L., Li, Y., &amp; Nevatia, R. (2008). Global data association for multi-object tracking using network flows. CVPR2008. <a href="doi.org/10.1109/CVPR.2008.4587584">paper</a></p>
+<h3 id="Other-resources"><a href="#Other-resources" class="headerlink" title="Other resources"></a>Other resources</h3><p><a href="http://bbs.cvmart.net/articles/265/zi-yuan-duo-mu-biao-zhui-zong-zi-yuan-lie-biao-shu-ju-ji-lun-wen-dai-ma-he-niu-ren-zhu-ye-deng" target="_blank" rel="noopener">SpyderXu</a>,  <a href="https://github.com/SpyderXu/multi-object-tracking-paper-list" target="_blank" rel="noopener">github</a> , <a href="github.com/huanglianghua/mot-papers/blob/master/README.md">github</a></p>
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : zhouzongwei <br>
+        
+        原文链接 : <a href>http://yoursite.com/2019/05/21/MOT-overview-3rd/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
+    </div>
+  
+  
+  
+    <div class="social-share" style="margin-top: -2rem" data-wechat-qrcode-title="<p>微信扫一扫</p>" data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>" data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter">
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
+</div>
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async></script>
+  
+
+  
+    <div id="reward">
+  
+    <p id="reward-meta">知识 & 情怀 | 赏或者不赏，我都在这，不声不响</p>
+  
+  <button id="reward-btn">
+    
+    <span>打赏</span>
+  </button>
+  <div id="reward-qrcode">
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/wechatimg.jpg" alt="微信扫一扫, 以资鼓励">
+        <p class="qrcode-meta">微信扫一扫, 以资鼓励</p>
+      </div>
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/alipayimg.jpg" alt="支付宝扫一扫, 再接再厉">
+        <p class="qrcode-meta">支付宝扫一扫, 再接再厉</p>
+      </div>
+    
+  </div>
+
+</div>
+
+<script>
+  (() => {
+    let button = document.querySelector('#reward-btn'),
+      qrcode = document.querySelector('#reward-qrcode'),
+      display = false;
+    
+    button.addEventListener('click', () => {
+      qrcode.style.display = display ? 'none' : 'block'
+      display = !display
+    }, false)
+  })()
+</script>
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+          <i class="iconfont icon-06tags"></i>标签: 
+          
+          <span class="span--tag">
+            <a href="/tags/MOT/">
+              #MOT
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/overview/">
+              #overview
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/code-and-paper/">
+              #code and paper
+            </a>
+          </span>
+          
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
+    
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2019/05/20/MOT-overview-2nd/" target="_self">多目标跟踪总结(中)-深度方法</a>
+      </div>
+    
+    
+      <div class="nav-next">
+        下一篇:
+        <a href="/2019/05/21/repulsion-loss/" target="_self">阅读笔记-Repulsion loss:Detecting Pedestrians in a Crowd</a>
+        <i class="iconfont icon-next"></i>
+      </div>
+    
+  </nav>
+
+  
+    <a href="#comment" class="comment-anchor"></a>
+<div class="comment-title"><i class="iconfont icon-footprint"></i> 留下足迹 <i class="iconfont icon-footprint"></i></div>
+<div id="vcomments"></div>
+
+<script defer>
+  if( true ) {
+    let path = getRealPath()
+    new Valine({
+      el: "#vcomments",
+      appId: "oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz",
+      appKey: "fWABYGLTAoV1LT4LYzh1PNmQ",
+      notify: false,
+      verify: false,
+      avatar: "robohash",
+      placeholder: "正确填写邮箱, 才能及时收到回复哦♪(^∇^*)",
+      path
+    });
+  }
+</script>
+   
+
+  
+    <script defer>
+const valineAPI = (() => {
+  try {
+    AV.init("oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz", "fWABYGLTAoV1LT4LYzh1PNmQ");
+  } catch(error) {}
+  const isExist = (identity) => {
+    identity = identity || getRealPath();
+    let query = new AV.Query('Timer');
+    return new Promise((resolve, reject) => {
+      query.equalTo("identity", identity);
+      query.find().then(results => {
+        resolve(results.length > 0);
+      }, error => reject(error));
+    })
+  }
+
+  const _get = (identity) => {
+    let query = null;
+    if(identity && identity instanceof Array){
+      let querys = [];
+      for(let i = 0; i < identity.length; ++i) {
+        querys[i] = new AV.Query('Timer');
+        querys[i].equalTo('identity', identity[i]);
+      }
+      query = AV.Query.or.apply(null ,querys);
+    } else {
+      identity = identity || getRealPath();
+      query = new AV.Query("Timer");
+      query.equalTo("identity", identity);
+    }
+
+    return new Promise((resolve, reject) => {
+      query.find()
+      .then(results => resolve(results))
+      .catch(error => reject(error))
+    })
+  }
+
+  const create = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let Todo = AV.Object.extend('Timer');
+      let todo = new Todo();
+      todo.set("times", 1);
+      todo.set("identity", identity);
+      todo.save().then(res => resolve(true), error => reject(error));
+    })
+  }
+
+  const update = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let query = new AV.Query('Timer');
+      query.equalTo("identity", identity);
+      query.find().then(todos => {
+        todos.forEach(todo => {
+          todo.set("times", todo.attributes.times + 1);
+        });
+        return AV.Object.saveAll(todos);
+      }).then(todos => resolve(true), error => reject(error));
+    })
+  }
+
+  return {
+    isExist,
+    _get,
+    update,
+    create
+  }
+})()
+
+const calcAndWriteTimes = () => {
+  let isPost = true;
+
+  let timerAllDOM = document.querySelectorAll(".article-timer");
+
+  if(isPost) {
+    let identity = timerAllDOM[0].getAttribute("data-identity");
+    valineAPI.isExist(identity)
+    .then(exist => {
+      if(exist) {
+        return valineAPI.update(identity);
+      }
+      return new Promise(resolve => resolve(true));
+    })
+    .then( succuess => valineAPI._get(identity))
+    .then( result => timerAllDOM[0].innerText = result[0].attributes.times)
+    .catch(error => console.log(error.message))
+    return ;
+  }
+
+  let timerDOMCache = {};
+
+  for(let timerDOM of timerAllDOM) {
+    let identity = timerDOM.getAttribute("data-identity");
+    if(timerDOMCache.hasOwnProperty(identity)){
+      timerDOMCache[identity].dom.push(timerDOM);
+    }else{
+      timerDOMCache[identity] = {
+        dom: [timerDOM],
+        times: undefined
+      };
+    }
+  }
+
+  let identities = Object.keys(timerDOMCache);
+  valineAPI._get(identities).then(results => {
+    for(let result of results) {
+      let {identity, times} = result.attributes;
+      timerDOMCache[identity].times = times;
+      timerDOMCache[identity].dom.map(item => item.innerText = times);
+    }
+    for(let identity of identities) {
+      if(timerDOMCache[identity].times){
+        continue;
+      }
+      timerDOMCache[identity].dom.map(item => item.innerText = 1);
+      valineAPI.create(identity);
+    }
+  }).catch(error => console.log(error.message))
+}
+
+if(true){
+  calcAndWriteTimes();
+}
+</script>
+   
+
+</div>
+
+
+      <footer>
+  <p class="site-info">
+    博客已萌萌哒运行<span id="time-to-now"></span><span class="my-face">(●'◡'●)ﾉ♥</span>
+    <br>
+    Theme - <a href="https://github.com/dongyuanxin/theme-bmw">BMW</a> | Made With 💗 | Powered by <a href="https://godbmw.com/">GodBMW</a>
+    <br>
+    
+  </p>
+</footer>
+
+
+
+<script>
+const timeToNowDOM = document.querySelector("#time-to-now");
+const startTimestamp = new Date(2018, 1, 10).getTime();
+
+const updateTimeStr = () => {
+  let offset = parseInt(
+      (new Date().getTime() - startTimestamp) / 1000,
+      10
+    ),
+    day = Math.floor(offset / 86400),
+    hour = Math.floor((offset % 86400) / 3600),
+    minute = Math.floor(((offset % 86400) % 3600) / 60),
+    second = Math.floor(((offset % 86400) % 3600) % 60);
+  timeToNowDOM.innerHTML =
+    day + "天" + hour + "小时" + minute + "分钟" + second + "秒";
+  setTimeout(updateTimeStr, 500);
+}
+
+setTimeout(updateTimeStr, 500);
+</script>
+
+
+      <div class="back-to-top hidden">
+  <span>
+    <i class="iconfont icon-60"></i><span></span>%
+  </span>
+</div>
+
+<script>
+const updateIconToTop = percent => {
+  let dom = document.querySelector(".back-to-top span span");
+  dom.innerText = percent;
+  if(percent < 1) {
+    document.querySelector(".back-to-top").className = "back-to-top hidden";
+  } else {
+    document.querySelector(".back-to-top").className = "back-to-top";
+  }
+}
+
+const handleScoll = () => {
+  let isRunning = false;
+  return () => {
+    if (isRunning) return;
+    isRunning = true;
+    window.requestAnimationFrame(timestamp => {
+      let scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop,
+        scrollHeight =
+          document.documentElement.scrollHeight ||
+          document.body.scrollHeight,
+        clientHeight =
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+      isRunning = false;
+      if (scrollTop <= 1) {
+        updateIconToTop(0);
+        return;
+      }
+      if (scrollTop + clientHeight >= scrollHeight) {
+        updateIconToTop(100);
+      } else {
+        updateIconToTop(parseInt(
+          100 * scrollTop / (scrollHeight - clientHeight),
+          10
+        ));
+      }
+    });
+  };
+}
+
+const backToTop = () => {
+  let scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop,
+    delay = 10,
+    time = 200;
+  if (scrollTop <= 20) {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    return;
+  }
+  let step = Math.ceil(scrollTop * delay / time);
+  let timer = setInterval(() => {
+    scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollTop - step <= 0) {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      clearInterval(timer);
+    } else {
+      document.documentElement.scrollTop = scrollTop - step;
+      document.body.scrollTop = scrollTop - step;
+    }
+  }, delay);
+}
+
+document.addEventListener("scroll", handleScoll(), false);
+
+document.querySelector(".back-to-top").addEventListener("click", backToTop, false);
+
+</script>
+
+    </div>
+
+    
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+<script>
+  (() => {
+    const mathjaxConfig = {
+      showProcessingMessages: false, //关闭js加载过程信息
+      messageStyle: "none", //不显示信息
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]], //行内公式选择符
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]], //段内公式选择符
+        skipTags: ["script", "noscript", "style", "textarea", "pre", "code", "a"] //避开某些标签
+      },
+      "HTML-CSS": {
+        availableFonts: ["STIX", "TeX"], //可选字体
+        showMathMenu: false //关闭右击菜单显示
+      }
+    }
+
+    let mathjaxInterval = setInterval(() => {
+      if(!window.MathJax){
+        return;
+      }
+      window.MathJax.Hub.Config(mathjaxConfig)
+      window.MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById('app')])
+
+      clearInterval(mathjaxInterval)
+    }, 10)    
+  })()
+</script>
+    
+
+    <script src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script>
+<script async>
+  let fancyTimer = setInterval(function(){
+    if(!window.$){
+      return;
+    }
+    $(document).ready(function() {
+      $(".post img").each(function () {
+        if($(this).parent().get(0).tagName.toLowerCase() === "a") {
+          return;
+        }
+        // $(this).attr("data-fancybox", "gallery"); // if you add 'data-fancybox', img will display after showed
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "gallery");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      });
+      
+      clearInterval(fancyTimer);
+    });
+  }, 10);
+</script>
+
+    
+  </body>
+
+</html>

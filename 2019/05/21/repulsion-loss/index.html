@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta name="author" content="董沅鑫, yuanxin.me@gmail.com">
+  
+  
+  
+  <title>阅读笔记-Repulsion loss:Detecting Pedestrians in a Crowd | YixiaoZhou&#39;s blog</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="Pedestrian Detection,Repulsion Loss,">
+  
+
+  <script>
+    console.log('\n%c Hexo-theme-bmw v4.0 ' + '%c 🎉 https://github.com/dongyuanxin/theme-bmw 🎉\n' + '\n%c View demo online ' + '%c 🔍 https://godbmw.com/ 🔍  \n' , 'color: #fadfa3; background: #030307; padding:3px 0;', '', 'color: #fadfa3; background: #030307; padding:3px 0;', '');
+  </script>
+
+  
+    <meta name="description" content="海阔全是浪，天高皆是霾。">
+  
+
+  
+
+  
+    <link rel="icon" href="/images/fvatar2.png">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/icon/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+  <script src="/js/util.js"></script>
+<script src="/js/valine.min.js"></script>
+
+  
+
+  
+    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
+  
+
+  
+    <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
+  
+  
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js" async></script>
+  
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.0/dist/av-min.js"></script>
+  
+
+</head>
+
+  <body>
+
+    
+
+    <div id="app">
+
+      <div class="header-wrap">
+  <header>
+    <div class="site-brand">
+      <div class="site-title">
+        <a href="/">YiXiaoZhou</a>
+      </div>
+    </div>
+    <nav class="site-navigation">
+      <ul class="nav-menu">
+      
+        <li class="nav-item" data-path="/">
+          
+            <a href="/" target="_self">
+              主页
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          
+            <a href="/archives/" target="_self">
+              归档
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          
+            <a href="/friends/" target="_self">
+              友链
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          
+            <a href="/about/" target="_self">
+              关于
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path>
+          
+            <a href="javascript:void(0);" v-else>抓到我</a>
+            <ul class="nav-menu--dropdown">
+              
+                <li>
+                  <a href="https://github.com/ZongweiZhou1" target="_blank">
+                    Github
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://www.facebook.com/duncon.chou" target="_blank">
+                    Facebook
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://weibo.com/u/3231820650/home?wvr=5" target="_self">
+                    weibo
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+      </ul>
+    </nav>
+    <i class="iconfont icon-menu"></i>
+  </header>
+</div>
+
+<script>
+  let links = document.querySelectorAll('.nav-item');
+  for(let link of links){
+    let childrenLink = link.querySelector('ul');
+    link.addEventListener('mouseenter', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown active";
+      }
+    })
+    link.addEventListener('mouseleave', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown";
+      }
+    })
+  }
+  let rootRealPath = getRealPath(window.location.pathname, true);
+  for(let link of links) {
+    let linkPath = link.getAttribute("data-path");
+    if(linkPath && getRealPath(linkPath, true) === rootRealPath) {
+      link.className = "nav-item hover";
+    }
+  }
+
+  let iconMenu = document.querySelector("i.iconfont.icon-menu"),
+    iconMenuClicked = false;
+  let navDOM = document.querySelector("nav.site-navigation");
+  iconMenu.addEventListener("click", () => {
+    iconMenuClicked 
+      ? navDOM.className = "site-navigation active"
+      : navDOM.className = "site-navigation";
+    iconMenuClicked = !iconMenuClicked;
+  })
+</script>
+
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
+  
+
+<div class="post">
+  <h1 class="article-title">
+    <span>阅读笔记-Repulsion loss:Detecting Pedestrians in a Crowd</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2019-05-21
+    </span>
+    
+    
+      <span>
+        浏览 : <span class="article-timer" data-identity="repulsion-loss"></span>
+      </span>
+    
+  </div>
+
+  
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p>尽管目标检测目前已经取得了非常好的性能，但是针对于特定领域内的跟踪方法还可以进一步探讨。本篇文章的研究重点在于更好的检测拥挤场景下的行人。</p>
+<p>文章首先分析了拥挤场景下SOTA检测方法存在的问题，然后提出了一种针对于拥挤场景专门设计的回归损失。该损失函数的启发源主要有两点：预测框应该尽可能和目标接近；同时预测框应尽可能地与surrounding目标区分。</p>
+<p>实验证明本文提出的损失函数能够在拥挤场景中很大提升SOTA方法的性能。</p>
+<hr>
+<h3 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h3><p>一般情形下，遮挡可以分为两种： 类间遮挡(inter-class occlusion)和类内遮挡(intra-class occlusion). 在行人检测任务上， inter-class occlusion例如行人被汽车，树木等他类遮挡；intra-class occlusion 如人与人之间的遮挡。</p>
+<p>crowd occlusion对行人检测的影响主要体现在增加了pedestrian定位的难度。例如两个目标$T,B$发生了遮挡， 那么检测器就会因为这两个target overlap部分的特征相同而出现较大的误差。导致$T$的预测窗口可能更偏向于$B$ 或者相反。更糟糕的是，一般detection之后的结果需要进行NMS操作，NMS操作可能凭IOU将发生shift的预测框直接剔除，导致miss detection的产生。所以crowd occlusion环境对于NMS的阈值较敏感。 阈值较高剔除的框越少可能产生的false positive越多， 阈值较小剔除较多导致miss detections很多。</p>
+<p>传统的检测方法使用box regression技术localized 目标，具体而言就是让proposals和ground-truth之间的距离尽可能地接近，距离度量可以使用$\text{Smooth}_{L1}$ 或者IoU等。但是这种约束只是让predict尽可能地和target接近，而并没有考虑到target周围的影响。如下图所示， 一般检测方法只越是红色虚线框与棕色框尽可能接近，而对于和蓝色框的关系不加约束。本文解决的正是这个问题。</p>
+<p><img src="/2019/05/21/repulsion-loss/illustration.png" alt="illustration"></p>
+<p>本文的贡献点：</p>
+<ul>
+<li>实验分析了crowd occlusion对于行人检测的影响。在CityPersons benchmark上定量的分析了因crowd occlusion导致的false positives和miss detections的变化。</li>
+<li>提出了两种repulsion loss处理crowd occlusion 问题： RepGT Loss和RepBox Loss。 RepGT loss惩罚的是预测框偏向其他的ground truth的程度， RepBox是为了让预测的box之间尽可能地分开，以削弱对NMS阈值的依赖。</li>
+<li>利用提出的repulsion losses，训练了一个crowd-robust的端到端网络，并在CityPerson和Caltech-USA上验证了模型性能。另外PASCAL VOC数据集表明提出的repulsion loss对于通用目标的检测同样有积极作用。</li>
+</ul>
+<hr>
+<h3 id="拥挤遮挡分析"><a href="#拥挤遮挡分析" class="headerlink" title="拥挤遮挡分析"></a>拥挤遮挡分析</h3><p><strong>数据集合度量</strong>   CityPersons是语义分割数据集CityScapes上新创建的行人检测数据集。35000个人以及附加的13000左右的ignored regions， 提供了行人的bounding box和可见部分的标注。本文的实验都是在CityPerson的reasonable 的train/validation子集上进行的。评估使用FPPI(False Positives Per Image)的对数值.($MR^{-2}$) 该指标越小越好。</p>
+<p><strong>Detector</strong> 检测器使用的还是Faster RCNN框架。不同点在于将backbone由VGG-16替换成ResNet-50.<strong>注意</strong> ResNet-50很少在行人检测中使用，主要是因为ResNet-50下采样的倍数太大，最终得到的特征太少。所以文章中使用了膨胀卷积(dilated convolution)使最后输出的特征大小事输入图像的1/8.ResNet-based 检测器在验证集上取得了$14.6 MR^{-2}$</p>
+<p><strong>检测失败原因分析</strong> </p>
+<ul>
+<li><p>Miss detections.</p>
+<p>数据集中样本的可见部分也使用box标注，所以样本的遮挡率可以得到  $occ = 1 - \frac{area(BBox_{visible})}{area(BBox)}$ </p>
+<p>在ground-truth上定义不同的子集。</p>
+<p>​        <em>occlusion case</em>:    $occ \ge 0.1$;</p>
+<p>​        <em>crowd occlusion case</em>: $occ \ge 0.1$ 且存在至少一个gt box与其$IoU\ge 0.1$ .</p>
+<p>按照上述定义， reasonable 验证集中1579个标注行人中，有$810(51.3)$的遮挡样本，称为reasonable-occ子集， $479(30.3%)$个crowd occlusion样本，称为reasonable-crowd子集。</p>
+<p>下图分析了在reasonable, reasonable-occ, reasonable-crowd三种子集上miss detection的统计情况。</p>
+<p><img src="/2019/05/21/repulsion-loss/miss_detection.png" alt="miss_detection"></p>
+<p>横轴的label表示在指定false positive数目条条件下，miss detection的数目， 比如#Miss@20fp表示调节参数使得保留20个false positive下的miss detection数目。可以看到在所有的miss detections中，源于reasonable-crowd的大约占了60%，表明crowd occlusion是影响detector性能的主要因素。另外通过降低NMS的阈值，如false positive从100到500， 因crowd occlusion引起的miss detections比例从60.7%上升到了69.2%， 表明<strong>NMS降低阈值并不能解决因crowd occlusion引起的漏检问题</strong>。</p>
+<p>在下图(a)中，给出了miss detection 随着检测器置信度阈值增大的变化曲线。可以发现baseline方法在置信度较高时会产生更多的漏检，这部分主要是由于detections之间的重叠导致的。同时该图表明了RepGT对于miss detection和False positive的作用</p>
+<p>![miss_detections_det_score](repulsion-loss/miss detection_det_score.png)![proportion of crowed error](repulsion-loss\proportion of crowed error.png)</p>
+</li>
+<li><p>False Positives</p>
+<p>false positives可以分为三类：</p>
+<ul>
+<li>background error: 预测框和任意的target $IoU \le 0.1$; </li>
+<li>localization error: 与一个且只有一个target的$IoU \ge 0.1$ ，注意这里是指没有匹配上，但依然与某些目标存在IOU; </li>
+<li>Crowd error: predictions 与至少两个ground-truth的$IoU\ge 0.1$ </li>
+</ul>
+<p>上图中的(b)图表示crowed errors随着false positives的变化所占的比例。可以发现其几乎稳定在$20%$左右。</p>
+<p>也表明在相同的False positive 数中RepGT loss中Crowd error的占比一直低于baseline中产生的Crowd error占比。</p>
+<p>下图一些crowd error的例子。</p>
+<p><img src="/2019/05/21/repulsion-loss/crowd error1.png" style="zoom:10"><img src="/2019/05/21/repulsion-loss/crowd error2.png" style="zoom:10"></p>
+<p>其中绿色表示正确的匹配，红色表示crowd error。错误一般是由于向临近的目标偏移导致的。</p>
+</li>
+<li><p>Conclusion</p>
+<blockquote>
+<p>The analysis on failure cases validates our observation: <strong>pedestrian detectors are surprisingly tainted by crowd occlusion, as it constitutes the majority of missed detections and results in more false positives by increasing the difficulty in localization</strong>.</p>
+</blockquote>
+</li>
+</ul>
+<hr>
+<h3 id="Repulsion-Loss"><a href="#Repulsion-Loss" class="headerlink" title="Repulsion Loss"></a>Repulsion Loss</h3><p>总的损失 $L = L_{Attr} + \alpha * L_{RepGT} + \beta * L_{RepBox}$ </p>
+<p>其中attraction term $L_{Attr}$表示预测框和真实框之间的相似度， $L_{RepGT}$表示的预测框与其它真实框尽可能地远离， $L_{RepBox}$表示预测框与其他target的预测框尽可能地远离。 </p>
+<p>$P = (l_p, t_p, w_p, h_p), G=(l_G, t_G, w_G, h_G)$ 分别表示提取的框和真实的框， $P_+={P}$  表示所有正样本组成的集合 (存在至少一个ground-truth背景 $IoU \ge 0.5$ ), $\mathcal{G} = {G}$表示所有的ground-truth </p>
+<p><strong>Attraction Term</strong><br>$$<br>L_{Attr} = \frac{\sum_{P\in P_+}Smooth_{L_1}(B^P, G_{Attr}^P)}{|P_+|}<br>$$<br>其中 $G_{Attr}^P = arg max_{G\in \mathcal{G}} IoU(G, P)$ </p>
+<p> *<em>Repulsion Term (RepGT) *</em><br>$$<br>G_{Rep}^P = arg max_{G\in\mathcal{G\setminus{G_{Attr}^P}}}IoU(G, P)<br>$$<br>表示的是与预测框的IoU第二大的ground truth<br>$$<br>L_{Attr} = \frac{\sum_{P\in P_+}Smooth_{ln}(IoG(B^P, G_{Rep}^P))}{|P_+|}<br>$$<br>其中$IoG(B, G) = \frac{area(B\and G)}{area(G)}$<br>$$<br>Smooth_{ln} = \begin{cases}<br>-ln(1-x), <del>x\le \sigma \<br>\frac{x-\sigma}{1-\sigma} - ln(1-\sigma), ~</del>x\gt \sigma<br>\end{cases}<br>$$<br>$\sigma \in [0, 1)$是光滑参数。</p>
+<p><strong>RepulsionTerm（RepBox）</strong></p>
+<p>为了让检测结果对NMS尽可能地鲁棒， RepBox Loss的目的是让predict与其他目标的target的尽可能地远离。将$P_+$ 根据IoU分配到$|\mathcal{G}|$ 中，$P_+ = P_1 \and P_2 \and \cdots \and P_{|\mathcal{G}|}$. 那么对于任意两个来自于不同子集的proposals，希望他们的重叠度尽可能的小<br>$$<br>L_{RepBox} = \frac{\sum_{i\neq j}Smooth_{ln}(IoU(B^{P_i}, B^{P_j}))}{\sum_{i\neq j}\bold{1}[IoU(B^{P_i}, B^{P_j}) &gt; 0] + \epsilon}<br>$$<br>其中$\bold{1}$ 表示identity 函数， $\epsilon$ 是很小的常量防止除零操作。</p>
+<p><strong>Discussion</strong> </p>
+<ul>
+<li><p>Distance metric。 在计算repulsion term时， 使用IoG, IoU而不是$Smooth_{L1}$ 是由于 IoG, IoU 取值[0,1]，而SmoothL1无界， 使用SmoothL1会要求predicted box与repulsion ground-truth越远越好， 而IoG只是要求overlap越小越好，所以后者与我们设计思想更搭。另外在RepGT中使用IoG而不是IoU是因为，IoU-based loss可能导致enlarge bounding box增大union area来降低IoU，而IoG的降低则必须是overlap的降低.</p>
+</li>
+<li><p>Smooth Parameter $\sigma$ . 如下图. 所示$\sigma$ 可以调节repulsion loss对outliers的鲁棒性。</p>
+<p><img src="/2019/05/21/repulsion-loss/sigma.png" alt="sigma"></p>
+</li>
+</ul>
+<hr>
+<h3 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h3><p><strong>Dataset</strong></p>
+<ul>
+<li>CityPersons</li>
+<li>Caltech-USA 2.5小时的视频，划分为训练集(42500帧)和测试集(4024帧)</li>
+</ul>
+<p><strong>Training Details</strong></p>
+<ul>
+<li>CityPersons: 80k iterations, init_lr = 0.016, 60k之后lr下降10倍</li>
+<li>Caltech-USA：160k iterations, init_lr = 0.016, 120k 之后lr下降10倍</li>
+<li>SGD</li>
+<li>4 GPU</li>
+<li>minibatch=4</li>
+<li>weight decay=0.0001， momentum=0.9</li>
+<li>No multi-scale training/testing set used</li>
+<li>For caltech-USA, 10x set(~42k frames) is used for training</li>
+<li>Online Hard Example Mining (OHEM) is used to accelerate covergence</li>
+</ul>
+<p><strong>Ablation Study</strong></p>
+<ul>
+<li><p>RepGT Loss</p>
+<p>Table 1中比较了不同的$\sigma$ 对SmoothL1loss的影响， $\sigma=0$ 意味着直接将 $-ln(1-IoG)$相加。</p>
+<p><img src="/2019/05/21/repulsion-loss/ablation.png" alt="ablation"></p>
+<p><img src="/2019/05/21/repulsion-loss/repulsion-loss%5Cparameters.png" alt="parameters"></p>
+</li>
+<li><p>RepBox Loss</p>
+<p>由table1可以发现在$\sigma=0$的时候RepBox Loss的性能最好， $\sigma=0$时相当于对IoU进行求和。这个可能是因为 RepGT处理的是预测和ground truth之间的重叠，这种情形下outliers其实很少，所以对outliers的抑制较大， 而RepBox处理的框更多，显然outliers也更多，这时候因为都是predict所以不知道之间哪个更可靠，就惩罚的少一点。</p>
+<p>下图左给出了NMS在FPPI=0.01时不同阈值下，对应Miss Rate的变化，发现RepBox Loss 相对于baseline 对NMS的阈值更加鲁棒。下图右给的例子中显示的是在Crowd中也很少有predict处于两个ground-truth box之间，这样对NMS的阈值依赖更低.</p>
+<p><img src="/2019/05/21/repulsion-loss/RepBoxLoss.png" alt="repboxloss"><img src="/2019/05/21/repulsion-loss/visualize.png" alt></p>
+</li>
+<li><p>Balance of RepGT and RepBox</p>
+<p>Table 2给出了不同的$\alpha, \beta$下RepGT和RepBox Loss的作用，实验表明$\alpha=0.5, \beta=0.5$时性能做好</p>
+</li>
+</ul>
+<p><strong>Comparisons with state-of-the-art methods</strong></p>
+<p><img src="/2019/05/21/repulsion-loss/table3.png" alt="table3"></p>
+<p>其中Reasonable set： $occlusion\le 35%$;   Partial set: $10% \lt occlusion \le 35%$; Bare set: $occlusion \le 10%$ Heavy set: $occlusion\gt 35%$  。图8给出了具体的MR和FPPI的曲线图， 右上角的label对应IoU=0.5下的MR</p>
+<p><img src="/2019/05/21/repulsion-loss/table4.png" alt></p>
+<p><img src="/2019/05/21/repulsion-loss/repulsion-loss%5Ctable5.png" alt></p>
+<p><img src="/2019/05/21/repulsion-loss/fig8.png" alt> </p>
+<hr>
+<h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><p>本文提出的loss其本质上创新性并不是很强，但作者针对于特定的问题提出了解决办法，并实验证明了算法有效。这点还是值得借鉴的。</p>
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : zhouzongwei <br>
+        
+        原文链接 : <a href>http://yoursite.com/2019/05/21/repulsion-loss/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
+    </div>
+  
+  
+  
+    <div class="social-share" style="margin-top: -2rem" data-wechat-qrcode-title="<p>微信扫一扫</p>" data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>" data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter">
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
+</div>
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async></script>
+  
+
+  
+    <div id="reward">
+  
+    <p id="reward-meta">知识 & 情怀 | 赏或者不赏，我都在这，不声不响</p>
+  
+  <button id="reward-btn">
+    
+    <span>打赏</span>
+  </button>
+  <div id="reward-qrcode">
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/wechatimg.jpg" alt="微信扫一扫, 以资鼓励">
+        <p class="qrcode-meta">微信扫一扫, 以资鼓励</p>
+      </div>
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/alipayimg.jpg" alt="支付宝扫一扫, 再接再厉">
+        <p class="qrcode-meta">支付宝扫一扫, 再接再厉</p>
+      </div>
+    
+  </div>
+
+</div>
+
+<script>
+  (() => {
+    let button = document.querySelector('#reward-btn'),
+      qrcode = document.querySelector('#reward-qrcode'),
+      display = false;
+    
+    button.addEventListener('click', () => {
+      qrcode.style.display = display ? 'none' : 'block'
+      display = !display
+    }, false)
+  })()
+</script>
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+          <i class="iconfont icon-06tags"></i>标签: 
+          
+          <span class="span--tag">
+            <a href="/tags/Pedestrian-Detection/">
+              #Pedestrian Detection
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/Repulsion-Loss/">
+              #Repulsion Loss
+            </a>
+          </span>
+          
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
+    
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2019/05/21/MOT-overview-3rd/" target="_self">多目标跟踪总结(下)-资源汇总</a>
+      </div>
+    
+    
+      <div class="nav-next">
+        下一篇:
+        <a href="/2019/05/22/relationNetwork/" target="_self">阅读笔记-Relation Network for Object Detection</a>
+        <i class="iconfont icon-next"></i>
+      </div>
+    
+  </nav>
+
+  
+    <a href="#comment" class="comment-anchor"></a>
+<div class="comment-title"><i class="iconfont icon-footprint"></i> 留下足迹 <i class="iconfont icon-footprint"></i></div>
+<div id="vcomments"></div>
+
+<script defer>
+  if( true ) {
+    let path = getRealPath()
+    new Valine({
+      el: "#vcomments",
+      appId: "oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz",
+      appKey: "fWABYGLTAoV1LT4LYzh1PNmQ",
+      notify: false,
+      verify: false,
+      avatar: "robohash",
+      placeholder: "正确填写邮箱, 才能及时收到回复哦♪(^∇^*)",
+      path
+    });
+  }
+</script>
+   
+
+  
+    <script defer>
+const valineAPI = (() => {
+  try {
+    AV.init("oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz", "fWABYGLTAoV1LT4LYzh1PNmQ");
+  } catch(error) {}
+  const isExist = (identity) => {
+    identity = identity || getRealPath();
+    let query = new AV.Query('Timer');
+    return new Promise((resolve, reject) => {
+      query.equalTo("identity", identity);
+      query.find().then(results => {
+        resolve(results.length > 0);
+      }, error => reject(error));
+    })
+  }
+
+  const _get = (identity) => {
+    let query = null;
+    if(identity && identity instanceof Array){
+      let querys = [];
+      for(let i = 0; i < identity.length; ++i) {
+        querys[i] = new AV.Query('Timer');
+        querys[i].equalTo('identity', identity[i]);
+      }
+      query = AV.Query.or.apply(null ,querys);
+    } else {
+      identity = identity || getRealPath();
+      query = new AV.Query("Timer");
+      query.equalTo("identity", identity);
+    }
+
+    return new Promise((resolve, reject) => {
+      query.find()
+      .then(results => resolve(results))
+      .catch(error => reject(error))
+    })
+  }
+
+  const create = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let Todo = AV.Object.extend('Timer');
+      let todo = new Todo();
+      todo.set("times", 1);
+      todo.set("identity", identity);
+      todo.save().then(res => resolve(true), error => reject(error));
+    })
+  }
+
+  const update = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let query = new AV.Query('Timer');
+      query.equalTo("identity", identity);
+      query.find().then(todos => {
+        todos.forEach(todo => {
+          todo.set("times", todo.attributes.times + 1);
+        });
+        return AV.Object.saveAll(todos);
+      }).then(todos => resolve(true), error => reject(error));
+    })
+  }
+
+  return {
+    isExist,
+    _get,
+    update,
+    create
+  }
+})()
+
+const calcAndWriteTimes = () => {
+  let isPost = true;
+
+  let timerAllDOM = document.querySelectorAll(".article-timer");
+
+  if(isPost) {
+    let identity = timerAllDOM[0].getAttribute("data-identity");
+    valineAPI.isExist(identity)
+    .then(exist => {
+      if(exist) {
+        return valineAPI.update(identity);
+      }
+      return new Promise(resolve => resolve(true));
+    })
+    .then( succuess => valineAPI._get(identity))
+    .then( result => timerAllDOM[0].innerText = result[0].attributes.times)
+    .catch(error => console.log(error.message))
+    return ;
+  }
+
+  let timerDOMCache = {};
+
+  for(let timerDOM of timerAllDOM) {
+    let identity = timerDOM.getAttribute("data-identity");
+    if(timerDOMCache.hasOwnProperty(identity)){
+      timerDOMCache[identity].dom.push(timerDOM);
+    }else{
+      timerDOMCache[identity] = {
+        dom: [timerDOM],
+        times: undefined
+      };
+    }
+  }
+
+  let identities = Object.keys(timerDOMCache);
+  valineAPI._get(identities).then(results => {
+    for(let result of results) {
+      let {identity, times} = result.attributes;
+      timerDOMCache[identity].times = times;
+      timerDOMCache[identity].dom.map(item => item.innerText = times);
+    }
+    for(let identity of identities) {
+      if(timerDOMCache[identity].times){
+        continue;
+      }
+      timerDOMCache[identity].dom.map(item => item.innerText = 1);
+      valineAPI.create(identity);
+    }
+  }).catch(error => console.log(error.message))
+}
+
+if(true){
+  calcAndWriteTimes();
+}
+</script>
+   
+
+</div>
+
+
+      <footer>
+  <p class="site-info">
+    博客已萌萌哒运行<span id="time-to-now"></span><span class="my-face">(●'◡'●)ﾉ♥</span>
+    <br>
+    Theme - <a href="https://github.com/dongyuanxin/theme-bmw">BMW</a> | Made With 💗 | Powered by <a href="https://godbmw.com/">GodBMW</a>
+    <br>
+    
+  </p>
+</footer>
+
+
+
+<script>
+const timeToNowDOM = document.querySelector("#time-to-now");
+const startTimestamp = new Date(2018, 1, 10).getTime();
+
+const updateTimeStr = () => {
+  let offset = parseInt(
+      (new Date().getTime() - startTimestamp) / 1000,
+      10
+    ),
+    day = Math.floor(offset / 86400),
+    hour = Math.floor((offset % 86400) / 3600),
+    minute = Math.floor(((offset % 86400) % 3600) / 60),
+    second = Math.floor(((offset % 86400) % 3600) % 60);
+  timeToNowDOM.innerHTML =
+    day + "天" + hour + "小时" + minute + "分钟" + second + "秒";
+  setTimeout(updateTimeStr, 500);
+}
+
+setTimeout(updateTimeStr, 500);
+</script>
+
+
+      <div class="back-to-top hidden">
+  <span>
+    <i class="iconfont icon-60"></i><span></span>%
+  </span>
+</div>
+
+<script>
+const updateIconToTop = percent => {
+  let dom = document.querySelector(".back-to-top span span");
+  dom.innerText = percent;
+  if(percent < 1) {
+    document.querySelector(".back-to-top").className = "back-to-top hidden";
+  } else {
+    document.querySelector(".back-to-top").className = "back-to-top";
+  }
+}
+
+const handleScoll = () => {
+  let isRunning = false;
+  return () => {
+    if (isRunning) return;
+    isRunning = true;
+    window.requestAnimationFrame(timestamp => {
+      let scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop,
+        scrollHeight =
+          document.documentElement.scrollHeight ||
+          document.body.scrollHeight,
+        clientHeight =
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+      isRunning = false;
+      if (scrollTop <= 1) {
+        updateIconToTop(0);
+        return;
+      }
+      if (scrollTop + clientHeight >= scrollHeight) {
+        updateIconToTop(100);
+      } else {
+        updateIconToTop(parseInt(
+          100 * scrollTop / (scrollHeight - clientHeight),
+          10
+        ));
+      }
+    });
+  };
+}
+
+const backToTop = () => {
+  let scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop,
+    delay = 10,
+    time = 200;
+  if (scrollTop <= 20) {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    return;
+  }
+  let step = Math.ceil(scrollTop * delay / time);
+  let timer = setInterval(() => {
+    scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollTop - step <= 0) {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      clearInterval(timer);
+    } else {
+      document.documentElement.scrollTop = scrollTop - step;
+      document.body.scrollTop = scrollTop - step;
+    }
+  }, delay);
+}
+
+document.addEventListener("scroll", handleScoll(), false);
+
+document.querySelector(".back-to-top").addEventListener("click", backToTop, false);
+
+</script>
+
+    </div>
+
+    
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+<script>
+  (() => {
+    const mathjaxConfig = {
+      showProcessingMessages: false, //关闭js加载过程信息
+      messageStyle: "none", //不显示信息
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]], //行内公式选择符
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]], //段内公式选择符
+        skipTags: ["script", "noscript", "style", "textarea", "pre", "code", "a"] //避开某些标签
+      },
+      "HTML-CSS": {
+        availableFonts: ["STIX", "TeX"], //可选字体
+        showMathMenu: false //关闭右击菜单显示
+      }
+    }
+
+    let mathjaxInterval = setInterval(() => {
+      if(!window.MathJax){
+        return;
+      }
+      window.MathJax.Hub.Config(mathjaxConfig)
+      window.MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById('app')])
+
+      clearInterval(mathjaxInterval)
+    }, 10)    
+  })()
+</script>
+    
+
+    <script src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script>
+<script async>
+  let fancyTimer = setInterval(function(){
+    if(!window.$){
+      return;
+    }
+    $(document).ready(function() {
+      $(".post img").each(function () {
+        if($(this).parent().get(0).tagName.toLowerCase() === "a") {
+          return;
+        }
+        // $(this).attr("data-fancybox", "gallery"); // if you add 'data-fancybox', img will display after showed
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "gallery");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      });
+      
+      clearInterval(fancyTimer);
+    });
+  }, 10);
+</script>
+
+    
+  </body>
+
+</html>

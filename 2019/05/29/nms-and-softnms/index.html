@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta name="author" content="董沅鑫, yuanxin.me@gmail.com">
+  
+  
+  
+  <title>深度学习-nms 和 softnms [代码] | YixiaoZhou&#39;s blog</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="nms,softnms,">
+  
+
+  <script>
+    console.log('\n%c Hexo-theme-bmw v4.0 ' + '%c 🎉 https://github.com/dongyuanxin/theme-bmw 🎉\n' + '\n%c View demo online ' + '%c 🔍 https://godbmw.com/ 🔍  \n' , 'color: #fadfa3; background: #030307; padding:3px 0;', '', 'color: #fadfa3; background: #030307; padding:3px 0;', '');
+  </script>
+
+  
+    <meta name="description" content="海阔全是浪，天高皆是霾。">
+  
+
+  
+
+  
+    <link rel="icon" href="/images/fvatar2.png">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/icon/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+  <script src="/js/util.js"></script>
+<script src="/js/valine.min.js"></script>
+
+  
+
+  
+    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
+  
+
+  
+    <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
+  
+  
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js" async></script>
+  
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.0/dist/av-min.js"></script>
+  
+
+</head>
+
+  <body>
+
+    
+
+    <div id="app">
+
+      <div class="header-wrap">
+  <header>
+    <div class="site-brand">
+      <div class="site-title">
+        <a href="/">YiXiaoZhou</a>
+      </div>
+    </div>
+    <nav class="site-navigation">
+      <ul class="nav-menu">
+      
+        <li class="nav-item" data-path="/">
+          
+            <a href="/" target="_self">
+              主页
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          
+            <a href="/archives/" target="_self">
+              归档
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          
+            <a href="/friends/" target="_self">
+              友链
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          
+            <a href="/about/" target="_self">
+              关于
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path>
+          
+            <a href="javascript:void(0);" v-else>抓到我</a>
+            <ul class="nav-menu--dropdown">
+              
+                <li>
+                  <a href="https://github.com/ZongweiZhou1" target="_blank">
+                    Github
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://www.facebook.com/duncon.chou" target="_blank">
+                    Facebook
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://weibo.com/u/3231820650/home?wvr=5" target="_self">
+                    weibo
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+      </ul>
+    </nav>
+    <i class="iconfont icon-menu"></i>
+  </header>
+</div>
+
+<script>
+  let links = document.querySelectorAll('.nav-item');
+  for(let link of links){
+    let childrenLink = link.querySelector('ul');
+    link.addEventListener('mouseenter', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown active";
+      }
+    })
+    link.addEventListener('mouseleave', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown";
+      }
+    })
+  }
+  let rootRealPath = getRealPath(window.location.pathname, true);
+  for(let link of links) {
+    let linkPath = link.getAttribute("data-path");
+    if(linkPath && getRealPath(linkPath, true) === rootRealPath) {
+      link.className = "nav-item hover";
+    }
+  }
+
+  let iconMenu = document.querySelector("i.iconfont.icon-menu"),
+    iconMenuClicked = false;
+  let navDOM = document.querySelector("nav.site-navigation");
+  iconMenu.addEventListener("click", () => {
+    iconMenuClicked 
+      ? navDOM.className = "site-navigation active"
+      : navDOM.className = "site-navigation";
+    iconMenuClicked = !iconMenuClicked;
+  })
+</script>
+
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
+  
+
+<div class="post">
+  <h1 class="article-title">
+    <span>深度学习-nms 和 softnms [代码]</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2019-05-29
+    </span>
+    
+    
+      <span>
+        浏览 : <span class="article-timer" data-identity="nms-and-softnms"></span>
+      </span>
+    
+  </div>
+
+  
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <p>NMS ( Non-Maximum Suppression), 非极大值抑制算法，在目标检测领域内非常常见。而SoftNMS是针对于NMS提出的进一步改进。本文主要阐述NMS和SoftNMS算法并分享其代码实现。</p>
+<h3 id="NMS"><a href="#NMS" class="headerlink" title="NMS"></a>NMS</h3><p>NMS的大致思想是对于发生重叠的候选框通过选择最大置信度的候选作为最终候选的同时，抑制与该候选重叠度较大的其他候选框。这种做法的motivation在于，如检测器这种模型，对于一个目标可能检测出多个重叠度的响应，而这些相应置信度都挺高，不能简单的通过阈值处理，毕竟阈值是全局的很难统筹各种情形，这时候就希望从多个中选择一个然后将其他候选抑制掉。</p>
+<p>其实按照这个思想，不同的问题可能有不同的变种， 比如非最小值抑制、非中值抑制等等，</p>
+<p>NMS的具体步骤：</p>
+<blockquote>
+<p>S1. 将所有的候选框按照置信度降序排列。选择置信度最高的候选框，认为是正确的检测框。</p>
+<p>S2. 遍历剩下的所有候选框，将那些与最高置信度检测框的重叠度大于阈值的候选框删除。</p>
+<p>S3. 从未处理的候选框中重新选一个最高置信度的候选框，认为是正确检测框。</p>
+<p>S4. 重复S2-S3, 直到所有的候选框都被处理过，保留下来的检测框就是最终的检测结果。</p>
+</blockquote>
+<p>python代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">py_cpu_nms</span><span class="params">(dets, thresh)</span>:</span></span><br><span class="line">    <span class="string">""" nms </span></span><br><span class="line"><span class="string">    params dets: 	array, detections, N x 5</span></span><br><span class="line"><span class="string">    thresh: 		float, iou thresh</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    x1, y1, x2, y2 = dets[:, <span class="number">0</span>], dets[:, <span class="number">1</span>], dets[:, <span class="number">2</span>], dets[:, <span class="number">3</span>]</span><br><span class="line">    scores 	= dets[:, <span class="number">4</span>]</span><br><span class="line">    </span><br><span class="line">    areas 	= (x2 - x1 + <span class="number">1</span>) * (y2 - y1 + <span class="number">1</span>)  <span class="comment"># 每一个box的面积，用于后续IoU计算</span></span><br><span class="line">    order 	= np.argsort(-score)  <span class="comment"># 所有的候选框按置信度降序排列</span></span><br><span class="line">    keep 	= []  <span class="comment"># 保存最终留下来的候选框的索引</span></span><br><span class="line">    <span class="keyword">while</span> order.size &gt; <span class="number">0</span>:</span><br><span class="line">        ind = order[<span class="number">0</span>]  <span class="comment"># 当前最大置信度的候选框的索引</span></span><br><span class="line">        keep.append(ind)</span><br><span class="line">        <span class="comment"># 接下来计算其余的未处理候选框与当前最可信候选框的iou</span></span><br><span class="line">        ref = dets[ind]</span><br><span class="line">        can = dets[order[<span class="number">1</span>:]]</span><br><span class="line">        xx1 = np.maximum(ref[<span class="number">0</span>], can[:, <span class="number">0</span>])</span><br><span class="line">        xx2 = np.minimum(ref[<span class="number">2</span>], can[:, <span class="number">2</span>])</span><br><span class="line">        yy1 = np.maximum(ref[<span class="number">1</span>], can[:, <span class="number">1</span>])</span><br><span class="line">        yy2 = np.minimum(ref[<span class="number">3</span>], can[:, <span class="number">3</span>])</span><br><span class="line">        </span><br><span class="line">        w 	= np.maximum(<span class="number">0.</span>, xx2 - xx1 + <span class="number">1</span>)</span><br><span class="line">        h 	= np.maximum(<span class="number">0.</span>, yy2 - yy1 + <span class="number">1</span>)</span><br><span class="line">        inter = w * h</span><br><span class="line">        union = areas[ind] + areas[order[<span class="number">1</span>:]] - inter</span><br><span class="line">        iou = inter / union</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 剔除与当前候选框的重叠度大于阈值的框</span></span><br><span class="line">        inds = np.where(iou &lt;= thresh)[<span class="number">0</span>]</span><br><span class="line">        order = order[inds + <span class="number">1</span>]  <span class="comment"># 剩下未处理的候选结果，依然是降序排列的</span></span><br><span class="line">        <span class="comment"># 注意这里在gather order时，inds需要加1是因为 iou计算是计算个数比order个数少1， 也就是order中的第一个没有参与运算， 如果上面计算iou时，使用的是can = dets[order], 那么这里不需要加1，那样的话极限条件比如thresh=1.1时就会死循环</span></span><br><span class="line">    <span class="keyword">return</span> keep</span><br></pre></td></tr></table></figure>
+
+<h3 id="Soft-NMS"><a href="#Soft-NMS" class="headerlink" title="Soft NMS"></a>Soft NMS</h3><p>NMS的贪心算法存在一些问题。如下图所示， 黑色框和绿色框都是当前候选框，置信度分别为0.9和0.8， 按照NMS操作肯定会选择红色框，然后红色框会把绿色框抑制。但是绿色框其实对应着其他的目标，只是两个真实的目标重叠度较大。另外NMS的阈值也不好确定，因为可能处于不同区域，不同遮挡程度的场景中对应的阈值也不同，很难设置一个较好的全局的阈值。</p>
+<p><img src="/2019/05/29/nms-and-softnms/candidates.png" alt="candiates"></p>
+<p>来源：<a href="https://blog.csdn.net/shuzfan/article/details/71036040" target="_blank" rel="noopener">https://blog.csdn.net/shuzfan/article/details/71036040</a></p>
+<p>基于以上原因， SoftNMS被提出来。 SoftNMS认为NMS过于暴力，只要是与高置信度的候选重叠度大就直接被抑制掉没有回旋空间。 所以SoftNMS不是硬性的抑制非最大值，而是给非最大值一定的衰减空间。其伪代码如下：</p>
+<p><img src="/2019/05/29/nms-and-softnms/softnms.png" alt="softnms"></p>
+<p>可以发现softnms 和NMS的区别只是在于选择了一个高置信度候选之后剩下的框怎么办？</p>
+<p>NMS是将IoU大于阈值的剔除， 而SoftNMS则是给剩下的候选框一个和iou相关的衰减系数。<br>$$<br>s_i = \begin{cases}<br>s_i &amp; \text{iou} (\mathcal{M}, b_i) \le N_t,\<br>s_i(1-\text{iou}(\mathcal{M}, b_i)), &amp;\text{else}<br>\end{cases}<br>$$<br>或者衰减系数也可以是高斯加权<br>$$<br>f(\text{iou} (\mathcal{M}, b_i)) = e^{-\frac{\text{iou} (\mathcal{M}, b_i)^2}{\sigma}}<br>$$<br>python代码, 这里我们模仿nms的代码实现， 原始的代码是包含了排序在里面，我们这里直接调用numpy中的函数， 想看源码的见<a href="https://github.com/bharatsingh430/soft-nms" target="_blank" rel="noopener">softnms github</a></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">soft_nms</span><span class="params">(dets, sigma=<span class="number">0.5</span>, Nt=<span class="number">0.1</span>, threshold=<span class="number">0.001</span>, method=<span class="number">1</span>)</span>:</span></span><br><span class="line">    areas = (dets[:, <span class="number">2</span>] - dets[:, <span class="number">0</span>] + <span class="number">1</span>) * (dets[:, <span class="number">3</span>] - dets[:, <span class="number">1</span>] + <span class="number">1</span>)</span><br><span class="line">    keep  = []</span><br><span class="line">    score = dets[:, <span class="number">4</span>]</span><br><span class="line">    ind = range(len(dets))</span><br><span class="line">    <span class="keyword">while</span> len(ind) &gt; <span class="number">0</span>:</span><br><span class="line">        ind_array = np.array(ind)</span><br><span class="line">        tscore = score[ind_array]</span><br><span class="line">        i = np.argmax(tscore)</span><br><span class="line">        keep.append(ind_array[i])</span><br><span class="line">        <span class="comment"># 计算与当前候选的iou</span></span><br><span class="line">        ind = ind.remove(i)</span><br><span class="line">        left_ind_array = np.array(ind)</span><br><span class="line">        tmp = dets[left_ind_array]</span><br><span class="line">        xx1 = np.maximum(dets[ind_array[i], <span class="number">0</span>], tmp[:, <span class="number">0</span>])</span><br><span class="line">        xx2 = np.minimum(dets[ind_array[i], <span class="number">2</span>], tmp[:, <span class="number">2</span>])</span><br><span class="line">        yy1 = np.maximum(dets[ind_array[i], <span class="number">1</span>], tmp[:, <span class="number">1</span>])</span><br><span class="line">        yy2 = np.maximum(dets[ind_array[i], <span class="number">3</span>], tmp[:, <span class="number">3</span>])</span><br><span class="line">        </span><br><span class="line">        w = np.maximum(<span class="number">0.0</span>, xx2 - xx1 + <span class="number">1</span>)</span><br><span class="line">        h = np.maximum(<span class="number">0.0</span>, yy2 - yy1 + <span class="number">1</span>)</span><br><span class="line">        inter = w * h</span><br><span class="line">        union = areas[ind_array[i]] + areas[left_ind_array] - inter</span><br><span class="line">        iou = inter / union</span><br><span class="line">        </span><br><span class="line">        decay_ind = np.where(iou&gt;Nt)[<span class="number">0</span>]</span><br><span class="line">        <span class="keyword">if</span> method == <span class="number">1</span>:  <span class="comment"># 线性</span></span><br><span class="line">            score[left_ind_array[decay_ind]] *= (<span class="number">1</span> - iou[decay_ind])</span><br><span class="line">        <span class="keyword">elif</span> method == <span class="number">2</span>:  <span class="comment"># 高斯</span></span><br><span class="line">            ov = iou[decay_ind]</span><br><span class="line">            score[left_ind_array[decay_ind]] *= np.exp((-ov * ov)/ sigma)</span><br><span class="line">        <span class="keyword">else</span>: 		<span class="comment"># original NMS</span></span><br><span class="line">            score[left_ind_array[decay_ind]] *= <span class="number">0</span></span><br><span class="line">         ind = [i <span class="keyword">for</span> i <span class="keyword">in</span> ind <span class="keyword">if</span> score[i] &gt;= thresh]</span><br><span class="line">    <span class="keyword">return</span> keep</span><br></pre></td></tr></table></figure>
+
+<p>虽然实验证明了softnms效果比nms效果好一些，但是softnms同样需要阈值，以确定哪些重叠框需要乘上衰减系数。</p>
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : zhouzongwei <br>
+        
+        原文链接 : <a href>http://yoursite.com/2019/05/29/nms-and-softnms/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
+    </div>
+  
+  
+  
+    <div class="social-share" style="margin-top: -2rem" data-wechat-qrcode-title="<p>微信扫一扫</p>" data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>" data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter">
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
+</div>
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async></script>
+  
+
+  
+    <div id="reward">
+  
+    <p id="reward-meta">知识 & 情怀 | 赏或者不赏，我都在这，不声不响</p>
+  
+  <button id="reward-btn">
+    
+    <span>打赏</span>
+  </button>
+  <div id="reward-qrcode">
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/wechatimg.jpg" alt="微信扫一扫, 以资鼓励">
+        <p class="qrcode-meta">微信扫一扫, 以资鼓励</p>
+      </div>
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/alipayimg.jpg" alt="支付宝扫一扫, 再接再厉">
+        <p class="qrcode-meta">支付宝扫一扫, 再接再厉</p>
+      </div>
+    
+  </div>
+
+</div>
+
+<script>
+  (() => {
+    let button = document.querySelector('#reward-btn'),
+      qrcode = document.querySelector('#reward-qrcode'),
+      display = false;
+    
+    button.addEventListener('click', () => {
+      qrcode.style.display = display ? 'none' : 'block'
+      display = !display
+    }, false)
+  })()
+</script>
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+          <i class="iconfont icon-06tags"></i>标签: 
+          
+          <span class="span--tag">
+            <a href="/tags/nms/">
+              #nms
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/softnms/">
+              #softnms
+            </a>
+          </span>
+          
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
+    
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2019/05/28/mAP/" target="_self">深度学习-检测器的评价指标 mAP [代码]</a>
+      </div>
+    
+    
+  </nav>
+
+  
+    <a href="#comment" class="comment-anchor"></a>
+<div class="comment-title"><i class="iconfont icon-footprint"></i> 留下足迹 <i class="iconfont icon-footprint"></i></div>
+<div id="vcomments"></div>
+
+<script defer>
+  if( true ) {
+    let path = getRealPath()
+    new Valine({
+      el: "#vcomments",
+      appId: "oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz",
+      appKey: "fWABYGLTAoV1LT4LYzh1PNmQ",
+      notify: false,
+      verify: false,
+      avatar: "robohash",
+      placeholder: "正确填写邮箱, 才能及时收到回复哦♪(^∇^*)",
+      path
+    });
+  }
+</script>
+   
+
+  
+    <script defer>
+const valineAPI = (() => {
+  try {
+    AV.init("oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz", "fWABYGLTAoV1LT4LYzh1PNmQ");
+  } catch(error) {}
+  const isExist = (identity) => {
+    identity = identity || getRealPath();
+    let query = new AV.Query('Timer');
+    return new Promise((resolve, reject) => {
+      query.equalTo("identity", identity);
+      query.find().then(results => {
+        resolve(results.length > 0);
+      }, error => reject(error));
+    })
+  }
+
+  const _get = (identity) => {
+    let query = null;
+    if(identity && identity instanceof Array){
+      let querys = [];
+      for(let i = 0; i < identity.length; ++i) {
+        querys[i] = new AV.Query('Timer');
+        querys[i].equalTo('identity', identity[i]);
+      }
+      query = AV.Query.or.apply(null ,querys);
+    } else {
+      identity = identity || getRealPath();
+      query = new AV.Query("Timer");
+      query.equalTo("identity", identity);
+    }
+
+    return new Promise((resolve, reject) => {
+      query.find()
+      .then(results => resolve(results))
+      .catch(error => reject(error))
+    })
+  }
+
+  const create = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let Todo = AV.Object.extend('Timer');
+      let todo = new Todo();
+      todo.set("times", 1);
+      todo.set("identity", identity);
+      todo.save().then(res => resolve(true), error => reject(error));
+    })
+  }
+
+  const update = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let query = new AV.Query('Timer');
+      query.equalTo("identity", identity);
+      query.find().then(todos => {
+        todos.forEach(todo => {
+          todo.set("times", todo.attributes.times + 1);
+        });
+        return AV.Object.saveAll(todos);
+      }).then(todos => resolve(true), error => reject(error));
+    })
+  }
+
+  return {
+    isExist,
+    _get,
+    update,
+    create
+  }
+})()
+
+const calcAndWriteTimes = () => {
+  let isPost = true;
+
+  let timerAllDOM = document.querySelectorAll(".article-timer");
+
+  if(isPost) {
+    let identity = timerAllDOM[0].getAttribute("data-identity");
+    valineAPI.isExist(identity)
+    .then(exist => {
+      if(exist) {
+        return valineAPI.update(identity);
+      }
+      return new Promise(resolve => resolve(true));
+    })
+    .then( succuess => valineAPI._get(identity))
+    .then( result => timerAllDOM[0].innerText = result[0].attributes.times)
+    .catch(error => console.log(error.message))
+    return ;
+  }
+
+  let timerDOMCache = {};
+
+  for(let timerDOM of timerAllDOM) {
+    let identity = timerDOM.getAttribute("data-identity");
+    if(timerDOMCache.hasOwnProperty(identity)){
+      timerDOMCache[identity].dom.push(timerDOM);
+    }else{
+      timerDOMCache[identity] = {
+        dom: [timerDOM],
+        times: undefined
+      };
+    }
+  }
+
+  let identities = Object.keys(timerDOMCache);
+  valineAPI._get(identities).then(results => {
+    for(let result of results) {
+      let {identity, times} = result.attributes;
+      timerDOMCache[identity].times = times;
+      timerDOMCache[identity].dom.map(item => item.innerText = times);
+    }
+    for(let identity of identities) {
+      if(timerDOMCache[identity].times){
+        continue;
+      }
+      timerDOMCache[identity].dom.map(item => item.innerText = 1);
+      valineAPI.create(identity);
+    }
+  }).catch(error => console.log(error.message))
+}
+
+if(true){
+  calcAndWriteTimes();
+}
+</script>
+   
+
+</div>
+
+
+      <footer>
+  <p class="site-info">
+    博客已萌萌哒运行<span id="time-to-now"></span><span class="my-face">(●'◡'●)ﾉ♥</span>
+    <br>
+    Theme - <a href="https://github.com/dongyuanxin/theme-bmw">BMW</a> | Made With 💗 | Powered by <a href="https://godbmw.com/">GodBMW</a>
+    <br>
+    
+  </p>
+</footer>
+
+
+
+<script>
+const timeToNowDOM = document.querySelector("#time-to-now");
+const startTimestamp = new Date(2018, 1, 10).getTime();
+
+const updateTimeStr = () => {
+  let offset = parseInt(
+      (new Date().getTime() - startTimestamp) / 1000,
+      10
+    ),
+    day = Math.floor(offset / 86400),
+    hour = Math.floor((offset % 86400) / 3600),
+    minute = Math.floor(((offset % 86400) % 3600) / 60),
+    second = Math.floor(((offset % 86400) % 3600) % 60);
+  timeToNowDOM.innerHTML =
+    day + "天" + hour + "小时" + minute + "分钟" + second + "秒";
+  setTimeout(updateTimeStr, 500);
+}
+
+setTimeout(updateTimeStr, 500);
+</script>
+
+
+      <div class="back-to-top hidden">
+  <span>
+    <i class="iconfont icon-60"></i><span></span>%
+  </span>
+</div>
+
+<script>
+const updateIconToTop = percent => {
+  let dom = document.querySelector(".back-to-top span span");
+  dom.innerText = percent;
+  if(percent < 1) {
+    document.querySelector(".back-to-top").className = "back-to-top hidden";
+  } else {
+    document.querySelector(".back-to-top").className = "back-to-top";
+  }
+}
+
+const handleScoll = () => {
+  let isRunning = false;
+  return () => {
+    if (isRunning) return;
+    isRunning = true;
+    window.requestAnimationFrame(timestamp => {
+      let scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop,
+        scrollHeight =
+          document.documentElement.scrollHeight ||
+          document.body.scrollHeight,
+        clientHeight =
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+      isRunning = false;
+      if (scrollTop <= 1) {
+        updateIconToTop(0);
+        return;
+      }
+      if (scrollTop + clientHeight >= scrollHeight) {
+        updateIconToTop(100);
+      } else {
+        updateIconToTop(parseInt(
+          100 * scrollTop / (scrollHeight - clientHeight),
+          10
+        ));
+      }
+    });
+  };
+}
+
+const backToTop = () => {
+  let scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop,
+    delay = 10,
+    time = 200;
+  if (scrollTop <= 20) {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    return;
+  }
+  let step = Math.ceil(scrollTop * delay / time);
+  let timer = setInterval(() => {
+    scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollTop - step <= 0) {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      clearInterval(timer);
+    } else {
+      document.documentElement.scrollTop = scrollTop - step;
+      document.body.scrollTop = scrollTop - step;
+    }
+  }, delay);
+}
+
+document.addEventListener("scroll", handleScoll(), false);
+
+document.querySelector(".back-to-top").addEventListener("click", backToTop, false);
+
+</script>
+
+    </div>
+
+    
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+<script>
+  (() => {
+    const mathjaxConfig = {
+      showProcessingMessages: false, //关闭js加载过程信息
+      messageStyle: "none", //不显示信息
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]], //行内公式选择符
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]], //段内公式选择符
+        skipTags: ["script", "noscript", "style", "textarea", "pre", "code", "a"] //避开某些标签
+      },
+      "HTML-CSS": {
+        availableFonts: ["STIX", "TeX"], //可选字体
+        showMathMenu: false //关闭右击菜单显示
+      }
+    }
+
+    let mathjaxInterval = setInterval(() => {
+      if(!window.MathJax){
+        return;
+      }
+      window.MathJax.Hub.Config(mathjaxConfig)
+      window.MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById('app')])
+
+      clearInterval(mathjaxInterval)
+    }, 10)    
+  })()
+</script>
+    
+
+    <script src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script>
+<script async>
+  let fancyTimer = setInterval(function(){
+    if(!window.$){
+      return;
+    }
+    $(document).ready(function() {
+      $(".post img").each(function () {
+        if($(this).parent().get(0).tagName.toLowerCase() === "a") {
+          return;
+        }
+        // $(this).attr("data-fancybox", "gallery"); // if you add 'data-fancybox', img will display after showed
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "gallery");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      });
+      
+      clearInterval(fancyTimer);
+    });
+  }, 10);
+</script>
+
+    
+  </body>
+
+</html>

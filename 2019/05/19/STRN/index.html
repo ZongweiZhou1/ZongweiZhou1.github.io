@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta name="author" content="董沅鑫, yuanxin.me@gmail.com">
+  
+  
+  
+  <title>阅读笔记-Spatial-Temporal Relation Networks for Multi-Object Tracking | YixiaoZhou&#39;s blog</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="MOT,Spatial-Temporal Relational Network,">
+  
+
+  <script>
+    console.log('\n%c Hexo-theme-bmw v4.0 ' + '%c 🎉 https://github.com/dongyuanxin/theme-bmw 🎉\n' + '\n%c View demo online ' + '%c 🔍 https://godbmw.com/ 🔍  \n' , 'color: #fadfa3; background: #030307; padding:3px 0;', '', 'color: #fadfa3; background: #030307; padding:3px 0;', '');
+  </script>
+
+  
+    <meta name="description" content="海阔全是浪，天高皆是霾。">
+  
+
+  
+
+  
+    <link rel="icon" href="/images/fvatar2.png">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/icon/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+  <script src="/js/util.js"></script>
+<script src="/js/valine.min.js"></script>
+
+  
+
+  
+    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
+  
+
+  
+    <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
+  
+  
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js" async></script>
+  
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.0/dist/av-min.js"></script>
+  
+
+</head>
+
+  <body>
+
+    
+
+    <div id="app">
+
+      <div class="header-wrap">
+  <header>
+    <div class="site-brand">
+      <div class="site-title">
+        <a href="/">YiXiaoZhou</a>
+      </div>
+    </div>
+    <nav class="site-navigation">
+      <ul class="nav-menu">
+      
+        <li class="nav-item" data-path="/">
+          
+            <a href="/" target="_self">
+              主页
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          
+            <a href="/archives/" target="_self">
+              归档
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          
+            <a href="/friends/" target="_self">
+              友链
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          
+            <a href="/about/" target="_self">
+              关于
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path>
+          
+            <a href="javascript:void(0);" v-else>抓到我</a>
+            <ul class="nav-menu--dropdown">
+              
+                <li>
+                  <a href="https://github.com/ZongweiZhou1" target="_blank">
+                    Github
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://www.facebook.com/duncon.chou" target="_blank">
+                    Facebook
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://weibo.com/u/3231820650/home?wvr=5" target="_self">
+                    weibo
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+      </ul>
+    </nav>
+    <i class="iconfont icon-menu"></i>
+  </header>
+</div>
+
+<script>
+  let links = document.querySelectorAll('.nav-item');
+  for(let link of links){
+    let childrenLink = link.querySelector('ul');
+    link.addEventListener('mouseenter', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown active";
+      }
+    })
+    link.addEventListener('mouseleave', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown";
+      }
+    })
+  }
+  let rootRealPath = getRealPath(window.location.pathname, true);
+  for(let link of links) {
+    let linkPath = link.getAttribute("data-path");
+    if(linkPath && getRealPath(linkPath, true) === rootRealPath) {
+      link.className = "nav-item hover";
+    }
+  }
+
+  let iconMenu = document.querySelector("i.iconfont.icon-menu"),
+    iconMenuClicked = false;
+  let navDOM = document.querySelector("nav.site-navigation");
+  iconMenu.addEventListener("click", () => {
+    iconMenuClicked 
+      ? navDOM.className = "site-navigation active"
+      : navDOM.className = "site-navigation";
+    iconMenuClicked = !iconMenuClicked;
+  })
+</script>
+
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
+  
+
+<div class="post">
+  <h1 class="article-title">
+    <span>阅读笔记-Spatial-Temporal Relation Networks for Multi-Object Tracking</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2019-05-19
+    </span>
+    
+    
+      <span>
+        浏览 : <span class="article-timer" data-identity="STRN"></span>
+      </span>
+    
+  </div>
+
+  
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p>鲁棒的相似度度量是MOT取得较好性能的一个关键。而鲁棒的相似度度量应该能够变现表观、位置、时间和空间信息。由于这些线索差异性较大，不能直接组合在一起，一般的MOT方法会分别使用网络处理这些特征。</p>
+<p>本文提出了一种Spatial-Temporal Relation network能够同时encode多种线索，并从时空关系中推理轨迹和检测的匹配关系。该网络能够端到端的训练并在MOT15-17benchmark上都取得了SOTA的性能。</p>
+<p><img src="/2019/05/19/STRN/STRN.png" alt="STRN"></p>
+<h3 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h3><p>相似度指标对于数据关联的影响很大。大多数方法都只利用表观计算相似度。这种方法有两点劣势。</p>
+<ul>
+<li>像MOT benchmark这类数据集中，往往跟踪的目标来自于同一类，因此他们的表观很难区分，尤其是在比赛场景中，同队队员服装相同就更难区分。</li>
+<li>多目标跟踪任务中经常出现遮挡比较严重，或者姿态变化较大的情况，都很难利用表观获得较好的匹配。</li>
+</ul>
+<p>因此目前一些较好的方法也利用多线索融合的方式计算目标的相似度，比如表观，时间，空间等，代表性方法</p>
+<blockquote>
+<p>A. Sadeghian, A. Alahi, and S. Savarese. Tracking the untrackable: Learning to track multiple cues with long-term dependencies. In ICCV2017, p300-311.</p>
+</blockquote>
+<p>但是由于来自于不同线索的特征是异质的，不能简单的串接在一起，所以需要为每一个特征设计复杂的网络结果，上面那篇文章中分别使用LSTM刻画了表观特征，时间位置特征和空间拓扑特征。表观特征使用CNN抽取基本特征然后再放入到LSTM中计算检测与轨迹的相似特征向量， 时间位置特征类似，放入的是位置信息抽取特征向量，空间拓扑则是在每一个目标周围选取grid区域，然后将临近点的2D分布送入LSTM中抽取空间特征，最后再将三种特征并在一起进行相似度度量学习。</p>
+<p>这篇文章提出了一个统一框架用于融合多线索进行相似性度量。其主要思想是在空间和时间上同时利用relation network刻画目标之间关系，包括位置和表观。</p>
+<p>如Figure 1.所示， 现在每一帧中利用关系网络进一步strengthen 每一个目标的表观特征，然后再与存在的tracklets的strengthen的表观特征利用时域的关系网络进行串联并学习相似度。</p>
+<hr>
+<h3 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h3><h4 id="Notation"><a href="#Notation" class="headerlink" title="Notation"></a>Notation</h4><p>${T_i}_{i=1}^N$                                      表示$N$条轨迹</p>
+<p>$T_i={b_i^t}_{t=1}^T$                             表示第$i$条轨迹中的$T$帧中匹配到的位置， bounding box。</p>
+<p>$b_i^t = [x_i^t, y_i^t, w_i^t, h_i^t]$                  中心点的坐标和目标的宽度与高度</p>
+<p>$D_t={b_j^t}_{j=1}^{N_t}$                           时刻$t$中的所有检测响应                       </p>
+<h4 id="跟踪流程"><a href="#跟踪流程" class="headerlink" title="跟踪流程"></a>跟踪流程</h4><p><img src="/2019/05/19/STRN/pipeline.png" alt="pipeline"></p>
+<p>本文方法依然在tracking-by-detection框架下，因此给定图像序列，首先使用检测器对目标进行检测。然后将以跟踪的轨迹与当前帧的检测配对放入到Spatial-Temporal Relation Networks (STRN)中计算每一个点对的相似度。于是轨迹和检测就行了二部图，采用匈牙利算法进行数据关联将检测分配给不同的轨迹。</p>
+<p>Spatial-Temporal Relation Networks的框架如下图所示：</p>
+<p><img src="/2019/05/19/STRN/strn_architecture.png" alt="strn_architecture"></p>
+<p>首先采用ResNet50网络提取当前帧中检测的特征以及历史轨迹中每个目标的特征，然后分别计算每个目标在关系网络中的特征和每条轨迹在时域中加权的特征，分别记为$\phi_{s,j}^t, \phi_{ST, i}^{t-k}$ , 然后将特征进行配对，送入到feature module中计算四种embedded特征，再将四种特征concat成最终特征用于计算相似度. 下面分别介绍spatial-temporal relation module和feature module。</p>
+<h4 id="spatial-temporal-relation-module"><a href="#spatial-temporal-relation-module" class="headerlink" title="spatial-temporal relation module"></a>spatial-temporal relation module</h4><ol>
+<li>空域的object relation module （ORM)</li>
+</ol>
+<p>这部分的内容应该是受下面这篇文章的启发，利用GCN网络进行目标检测</p>
+<blockquote>
+<p>H. Hu, J. Gu, Z. Zhang, J. Dai, and Y. Wei. Relation networks for object detection. 2018.</p>
+</blockquote>
+<p>每一个目标可以使用$o_i = (\phi_i, b_i)$表示，分别表示表观特征和位置信息。那么refined 特征相当于GCN网络抽取的特征。<br>$$<br>\phi_i’ = \phi_i + \sum_j w_{ij} \cdot (W_V\cdot \phi_j)<br>$$<br>$j$取同一帧中所有目标， 所以上式表示新的特征等于本身特征和其他目标的影响的结合。$W_V$是学习参数，表示对特征的进一步抽象。$w_ij$表示$j$样本对当前$i$样本的贡献量，是一种attention权重。<br>$$<br>w_{ij} = \frac{w_{ij}^G\exp(w_{ij}^A)}{\sum_k^Nw_{ik}^G\exp(w_{ik}^A)}<br>$$<br>$w_{ij}^A$表示的是projected后的表观特征的scaled的内积。这个scale主要是让attention更加平稳。<br>$$<br>w_{ij}^A = \frac{&lt;W_Q\phi_i, W_K\phi_j&gt;}{\sqrt{d}}<br>$$<br>$W_Q, W_K$分别表示project矩阵， $d$表示投影特征的维度， $w_{ij}^G$表示的是相对位置关系。$w_{ij}^G = \log\big( \frac{|x_i-x_j|}{w_j}, \frac{|y_i-y_j}{h_j}, \frac{w_i}{w_j}, \frac{h_i}{h_j}\big )$</p>
+<ol start="2">
+<li>时域的关系网络</li>
+</ol>
+<p>时域的关系网络可直接通过节点域有单帧图像扩大到多帧图像处理，但这种方式存在两个缺陷。</p>
+<p>首先，计算量急剧增大；其次，空间特征和时间特征本质上是不同的信息。</p>
+<p>所以，这这篇文章中的时域关系网络本质上是时域上的attention机制，即加权平均值。</p>
+<p>空间关系网络输出特征表示为$\phi_{S,i}$ 时间关系网络在空间关系网络的输出特征上进行操作。​<br>$$<br>\phi_{ST,i}^t = \sum_{k}^{\tau_1-1} w_i^{t-k}\cdot \phi_{s,i}^{t-k}<br>$$<br>这里值得注意的是，计算时间关系特征的时候只计算轨迹的特征，而当前帧中的检测不参与计算。<br>$$<br>w_i^t = \frac{\exp(&lt;w_T, \phi_{S,i}^t&gt;)}{\sum_k\exp(&lt;w_T, \phi_{S,i}^k&gt;)}<br>$$<br>$w_T$是待学习参数。</p>
+<p>![spatial attention](STRN/spatial attention.png)</p>
+<p>![temporal attention](STRN/temporal attention.png)</p>
+<h4 id="Feature-representation"><a href="#Feature-representation" class="headerlink" title="Feature representation"></a>Feature representation</h4><p>这个模块主要用于集成不同的线索，最终计算相似度。<br>$$<br>s_{ij}^t = \text{sigmod}(W_{s2}\cdot ReLU(W_{s1}\cdot [\phi_R; \phi_C; \phi_L;\phi_M]))<br>$$<br>下面介绍四种特征$\phi_R, \phi_C, \phi_L, \phi_M$.</p>
+<ol>
+<li><p>Relation features</p>
+<p>最直接的方式是将每个待关联的轨迹最后一帧的特征和待检测目标的特征串联起来作为新的特征然后将新的特征送入网络进一步抽象。<br>$$<br>\phi_R = W_R \cdot [\phi_{ST,i}^{t-k}; \phi_{S,j}^t], 1\le k \le \tau_2<br>$$<br>作者认为这个特征是把双刃剑，既可以直接用来计算相似度，也给学习紧致的目标特征带来了难度。因此作者又在关系特征$\phi_{ST,i}^{t-k}, \phi_{S,j}^t$上直接显示的计算了余弦相似度。<br>$$<br>\phi_C = \cos (W_C\cdot \phi_{ST,i}^{t-k}, W_C\cdot \phi_{S,j}^t), 1\le k \le \tau_2<br>$$<br><strong>分析</strong>：</p>
+<blockquote>
+<p>In general, cosine value could take effect only in the scenarios where two input features are compatible in representation.</p>
+</blockquote>
+<p>即一般而言，cosine距离最好直接度量来自于相同空间向量的相似度，但这里的特征来自于检测和轨迹。看起来似乎不同空间。但是经过分析可以发现轨迹的特征其实是在时间域上的加权平均值，而每一个元素都是每帧图像检测的空间特征，因此特，他们其实分布在临近空间，所以可以使用cosine距离刻画。</p>
+</li>
+<li><p>location features</p>
+<p>位置关系和运动信息是另外两种常用的匹配信息。文章选择每个跟踪轨迹的最后出现目标的位置的大小作为参考目标，embedding 当前检测的位置和大小信息。<br>$$<br>\phi_* = W_* \cdot \varepsilon_<em>(f_</em>(b_i^{t-k}, b_j^t))<br>$$<br>其中$*\in {L, M}$分别表示位置和运动信息。</p>
+<p>位置信息是4维特征。<br>$$<br>f_L’(b_j^t) = \big(\frac{x_j^t}{I_w^t}, \frac{y_j^t}{I_h^t}, \frac{w_j^t}{I_w^t}, \frac{h_j^t}{I_h^t}\big)<br>$$<br>其中$I_w^t, I_h^t$表示第$t$帧图像的宽和高。  $f_L(b_i^{t-k}, b_j^t) = [f_L’(b_i^{t-k}); f_L’(b_j^t)]$ </p>
+<p>运动信息则是刻画的目标之间的相互位置和大小关系。<br>$$<br>f_M((b_i^{t-k}, b_j^t) = \log\big( \frac{|x_i^{t-k}-x_j^t|}{kw_i^{t-k}}, \frac{|y_i^{t-k}-y_j^t|}{kh_i^{t-k}}, \frac{w_j^t}{kw_i^{t-k}}, \frac{h_j^t}{kh_i^{t-k}}\big)<br>$$<br><strong>这部分我觉得设计存在一定问题。前面两项都是计算的变化速度，但后面两项其实不应该计算相对比例的变化速度，直接使用比值，或者平均差值或者会更好</strong></p>
+<hr>
+</li>
+</ol>
+<h3 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h3><h4 id="Datasets-and-Evaluation-Metrics"><a href="#Datasets-and-Evaluation-Metrics" class="headerlink" title="Datasets and Evaluation Metrics"></a>Datasets and Evaluation Metrics</h4><p>dataset: 2D MOT2015, MOT16, MOT17</p>
+<p>metrics:  CLEAR and IDF1 Score</p>
+<h4 id="Implementation-Details"><a href="#Implementation-Details" class="headerlink" title="Implementation Details"></a>Implementation Details</h4><ul>
+<li>backbone network是在ImageNet预训练的ResNet50网络， 并在MOT训练集上finetune</li>
+<li>每个目标是经过crop之后再rescale到$128\times 64$之后放入特征抽取网络。</li>
+<li>计算temporal relation时使用了最近的$9$帧图像。</li>
+<li>网络的其他参数见原文。</li>
+</ul>
+<h4 id="跟踪器参数"><a href="#跟踪器参数" class="headerlink" title="跟踪器参数"></a>跟踪器参数</h4><p>若视频序列的帧率为$F$， 如果一条轨迹在初始化之后的$F$帧内匹配成功的次数低于$0.3F$则认为是错误的初始化，剔除。 </p>
+<p>当轨迹在最近的$1.25F$内都没出现成功匹配则认为该轨迹结束。</p>
+<h4 id="Ablation-Study"><a href="#Ablation-Study" class="headerlink" title="Ablation Study"></a>Ablation Study</h4><p>分解实验是在MOT15上进行的。</p>
+<p><img src="/2019/05/19/STRN/ablationstudy.png" alt="ablation study"></p>
+<p>Table 1的上三行 表示没有使用关系网络的性能。$A_u$表示只利用resnet50抽取的特征学习相似度，这部分其实是一种度量学习的方式。$A_c$表示只计算cosine距离而没有利用unary appearance， 这部分则相当于feature embedding的过程，$A$则是同时利用了两种信息，可以发现两种信息都利用的效果最好。</p>
+<p>Table1 的下三行表示结合了location特征的性能， $L_u$表示仅利用了位置信息， $L_m$表示仅利用运动信息，可以发现两种location特征融合时，性能最好。同时加入位置信息相对于仅利用表观表观信息性能得到很大提升。这主要归功于IDS的下降。</p>
+<p>Table 2 上三行对比了时间和空间关系网络对性能的影响。可以发现单独加入spatial 关系网络，性能既有较大提升，但是此时IDS反而变大了。FP的降低表明空间关系网络对检测是有用的，但是可能由于目标特征的融合会导致部分较近目标难以区分，从而导致IDS增大。 而加上时间attention之后性能进一步提升，表明时间上的attention能够更好的刻画历史信息。此时IDS下降。 </p>
+<p>Table 2 下两行是将时间attention机制之间用池化方式去做，发现性能下降了，当然相对于baseline还是有所提升的，证明temporal 信息有助于跟踪，但attention主动调整权重的方式比预设的均值或者最大值方式更加有效。</p>
+<h4 id="MOT-Benchmarks"><a href="#MOT-Benchmarks" class="headerlink" title="MOT Benchmarks"></a>MOT Benchmarks</h4><p><img src="/2019/05/19/STRN/MOT15.png" alt="MOT15"></p>
+<p><img src="/2019/05/19/STRN/MOT16.png" alt="MOT16"></p>
+<p><img src="/2019/05/19/STRN/MOT17.png" alt="MOT17"></p>
+<p>实验证明了方法的有效性，但其实这篇文章对比的baseline目前性能并不是最好的。只能说该方法性能还不错。</p>
+<hr>
+<h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><p>该文章STRN说是提出了一种时空关系网络同时处理多种线索，其本质上空间关系利用的是gcn的思想，时间上利用的attention的思想，然后再将位置信息与表观信息融合来进行度量学习。</p>
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : zhouzongwei <br>
+        
+        原文链接 : <a href>http://yoursite.com/2019/05/19/STRN/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
+    </div>
+  
+  
+  
+    <div class="social-share" style="margin-top: -2rem" data-wechat-qrcode-title="<p>微信扫一扫</p>" data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>" data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter">
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
+</div>
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async></script>
+  
+
+  
+    <div id="reward">
+  
+    <p id="reward-meta">知识 & 情怀 | 赏或者不赏，我都在这，不声不响</p>
+  
+  <button id="reward-btn">
+    
+    <span>打赏</span>
+  </button>
+  <div id="reward-qrcode">
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/wechatimg.jpg" alt="微信扫一扫, 以资鼓励">
+        <p class="qrcode-meta">微信扫一扫, 以资鼓励</p>
+      </div>
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/alipayimg.jpg" alt="支付宝扫一扫, 再接再厉">
+        <p class="qrcode-meta">支付宝扫一扫, 再接再厉</p>
+      </div>
+    
+  </div>
+
+</div>
+
+<script>
+  (() => {
+    let button = document.querySelector('#reward-btn'),
+      qrcode = document.querySelector('#reward-qrcode'),
+      display = false;
+    
+    button.addEventListener('click', () => {
+      qrcode.style.display = display ? 'none' : 'block'
+      display = !display
+    }, false)
+  })()
+</script>
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+          <i class="iconfont icon-06tags"></i>标签: 
+          
+          <span class="span--tag">
+            <a href="/tags/MOT/">
+              #MOT
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/Spatial-Temporal-Relational-Network/">
+              #Spatial-Temporal Relational Network
+            </a>
+          </span>
+          
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
+    
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2019/05/18/High-speed-tracking-with-kernelized-correlation-filters/" target="_self">阅读笔记-High-speed tracking with kernelized correlation filters</a>
+      </div>
+    
+    
+      <div class="nav-next">
+        下一篇:
+        <a href="/2019/05/19/CLEAR/" target="_self">阅读笔记-Evaluation Multiple Object Tracking Performance-The CLEAR MOT Metrics</a>
+        <i class="iconfont icon-next"></i>
+      </div>
+    
+  </nav>
+
+  
+    <a href="#comment" class="comment-anchor"></a>
+<div class="comment-title"><i class="iconfont icon-footprint"></i> 留下足迹 <i class="iconfont icon-footprint"></i></div>
+<div id="vcomments"></div>
+
+<script defer>
+  if( true ) {
+    let path = getRealPath()
+    new Valine({
+      el: "#vcomments",
+      appId: "oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz",
+      appKey: "fWABYGLTAoV1LT4LYzh1PNmQ",
+      notify: false,
+      verify: false,
+      avatar: "robohash",
+      placeholder: "正确填写邮箱, 才能及时收到回复哦♪(^∇^*)",
+      path
+    });
+  }
+</script>
+   
+
+  
+    <script defer>
+const valineAPI = (() => {
+  try {
+    AV.init("oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz", "fWABYGLTAoV1LT4LYzh1PNmQ");
+  } catch(error) {}
+  const isExist = (identity) => {
+    identity = identity || getRealPath();
+    let query = new AV.Query('Timer');
+    return new Promise((resolve, reject) => {
+      query.equalTo("identity", identity);
+      query.find().then(results => {
+        resolve(results.length > 0);
+      }, error => reject(error));
+    })
+  }
+
+  const _get = (identity) => {
+    let query = null;
+    if(identity && identity instanceof Array){
+      let querys = [];
+      for(let i = 0; i < identity.length; ++i) {
+        querys[i] = new AV.Query('Timer');
+        querys[i].equalTo('identity', identity[i]);
+      }
+      query = AV.Query.or.apply(null ,querys);
+    } else {
+      identity = identity || getRealPath();
+      query = new AV.Query("Timer");
+      query.equalTo("identity", identity);
+    }
+
+    return new Promise((resolve, reject) => {
+      query.find()
+      .then(results => resolve(results))
+      .catch(error => reject(error))
+    })
+  }
+
+  const create = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let Todo = AV.Object.extend('Timer');
+      let todo = new Todo();
+      todo.set("times", 1);
+      todo.set("identity", identity);
+      todo.save().then(res => resolve(true), error => reject(error));
+    })
+  }
+
+  const update = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let query = new AV.Query('Timer');
+      query.equalTo("identity", identity);
+      query.find().then(todos => {
+        todos.forEach(todo => {
+          todo.set("times", todo.attributes.times + 1);
+        });
+        return AV.Object.saveAll(todos);
+      }).then(todos => resolve(true), error => reject(error));
+    })
+  }
+
+  return {
+    isExist,
+    _get,
+    update,
+    create
+  }
+})()
+
+const calcAndWriteTimes = () => {
+  let isPost = true;
+
+  let timerAllDOM = document.querySelectorAll(".article-timer");
+
+  if(isPost) {
+    let identity = timerAllDOM[0].getAttribute("data-identity");
+    valineAPI.isExist(identity)
+    .then(exist => {
+      if(exist) {
+        return valineAPI.update(identity);
+      }
+      return new Promise(resolve => resolve(true));
+    })
+    .then( succuess => valineAPI._get(identity))
+    .then( result => timerAllDOM[0].innerText = result[0].attributes.times)
+    .catch(error => console.log(error.message))
+    return ;
+  }
+
+  let timerDOMCache = {};
+
+  for(let timerDOM of timerAllDOM) {
+    let identity = timerDOM.getAttribute("data-identity");
+    if(timerDOMCache.hasOwnProperty(identity)){
+      timerDOMCache[identity].dom.push(timerDOM);
+    }else{
+      timerDOMCache[identity] = {
+        dom: [timerDOM],
+        times: undefined
+      };
+    }
+  }
+
+  let identities = Object.keys(timerDOMCache);
+  valineAPI._get(identities).then(results => {
+    for(let result of results) {
+      let {identity, times} = result.attributes;
+      timerDOMCache[identity].times = times;
+      timerDOMCache[identity].dom.map(item => item.innerText = times);
+    }
+    for(let identity of identities) {
+      if(timerDOMCache[identity].times){
+        continue;
+      }
+      timerDOMCache[identity].dom.map(item => item.innerText = 1);
+      valineAPI.create(identity);
+    }
+  }).catch(error => console.log(error.message))
+}
+
+if(true){
+  calcAndWriteTimes();
+}
+</script>
+   
+
+</div>
+
+
+      <footer>
+  <p class="site-info">
+    博客已萌萌哒运行<span id="time-to-now"></span><span class="my-face">(●'◡'●)ﾉ♥</span>
+    <br>
+    Theme - <a href="https://github.com/dongyuanxin/theme-bmw">BMW</a> | Made With 💗 | Powered by <a href="https://godbmw.com/">GodBMW</a>
+    <br>
+    
+  </p>
+</footer>
+
+
+
+<script>
+const timeToNowDOM = document.querySelector("#time-to-now");
+const startTimestamp = new Date(2018, 1, 10).getTime();
+
+const updateTimeStr = () => {
+  let offset = parseInt(
+      (new Date().getTime() - startTimestamp) / 1000,
+      10
+    ),
+    day = Math.floor(offset / 86400),
+    hour = Math.floor((offset % 86400) / 3600),
+    minute = Math.floor(((offset % 86400) % 3600) / 60),
+    second = Math.floor(((offset % 86400) % 3600) % 60);
+  timeToNowDOM.innerHTML =
+    day + "天" + hour + "小时" + minute + "分钟" + second + "秒";
+  setTimeout(updateTimeStr, 500);
+}
+
+setTimeout(updateTimeStr, 500);
+</script>
+
+
+      <div class="back-to-top hidden">
+  <span>
+    <i class="iconfont icon-60"></i><span></span>%
+  </span>
+</div>
+
+<script>
+const updateIconToTop = percent => {
+  let dom = document.querySelector(".back-to-top span span");
+  dom.innerText = percent;
+  if(percent < 1) {
+    document.querySelector(".back-to-top").className = "back-to-top hidden";
+  } else {
+    document.querySelector(".back-to-top").className = "back-to-top";
+  }
+}
+
+const handleScoll = () => {
+  let isRunning = false;
+  return () => {
+    if (isRunning) return;
+    isRunning = true;
+    window.requestAnimationFrame(timestamp => {
+      let scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop,
+        scrollHeight =
+          document.documentElement.scrollHeight ||
+          document.body.scrollHeight,
+        clientHeight =
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+      isRunning = false;
+      if (scrollTop <= 1) {
+        updateIconToTop(0);
+        return;
+      }
+      if (scrollTop + clientHeight >= scrollHeight) {
+        updateIconToTop(100);
+      } else {
+        updateIconToTop(parseInt(
+          100 * scrollTop / (scrollHeight - clientHeight),
+          10
+        ));
+      }
+    });
+  };
+}
+
+const backToTop = () => {
+  let scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop,
+    delay = 10,
+    time = 200;
+  if (scrollTop <= 20) {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    return;
+  }
+  let step = Math.ceil(scrollTop * delay / time);
+  let timer = setInterval(() => {
+    scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollTop - step <= 0) {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      clearInterval(timer);
+    } else {
+      document.documentElement.scrollTop = scrollTop - step;
+      document.body.scrollTop = scrollTop - step;
+    }
+  }, delay);
+}
+
+document.addEventListener("scroll", handleScoll(), false);
+
+document.querySelector(".back-to-top").addEventListener("click", backToTop, false);
+
+</script>
+
+    </div>
+
+    
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+<script>
+  (() => {
+    const mathjaxConfig = {
+      showProcessingMessages: false, //关闭js加载过程信息
+      messageStyle: "none", //不显示信息
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]], //行内公式选择符
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]], //段内公式选择符
+        skipTags: ["script", "noscript", "style", "textarea", "pre", "code", "a"] //避开某些标签
+      },
+      "HTML-CSS": {
+        availableFonts: ["STIX", "TeX"], //可选字体
+        showMathMenu: false //关闭右击菜单显示
+      }
+    }
+
+    let mathjaxInterval = setInterval(() => {
+      if(!window.MathJax){
+        return;
+      }
+      window.MathJax.Hub.Config(mathjaxConfig)
+      window.MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById('app')])
+
+      clearInterval(mathjaxInterval)
+    }, 10)    
+  })()
+</script>
+    
+
+    <script src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script>
+<script async>
+  let fancyTimer = setInterval(function(){
+    if(!window.$){
+      return;
+    }
+    $(document).ready(function() {
+      $(".post img").each(function () {
+        if($(this).parent().get(0).tagName.toLowerCase() === "a") {
+          return;
+        }
+        // $(this).attr("data-fancybox", "gallery"); // if you add 'data-fancybox', img will display after showed
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "gallery");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      });
+      
+      clearInterval(fancyTimer);
+    });
+  }, 10);
+</script>
+
+    
+  </body>
+
+</html>
