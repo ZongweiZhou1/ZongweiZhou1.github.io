@@ -249,7 +249,12 @@
 </ol>
 <p>一般而言，MOT的不同分类是存在重叠的。MOT的分类只是提供了不同角度理解跟踪算法，对算法本身并没有多大影响。MOT算法中起决定作用的是检测，鉴别特征和数据关联。</p>
 <hr>
-<h3 id="经典多目标跟踪算法介绍"><a href="#经典多目标跟踪算法介绍" class="headerlink" title="经典多目标跟踪算法介绍"></a>经典多目标跟踪算法介绍</h3><h4 id="多假设跟踪-MHT"><a href="#多假设跟踪-MHT" class="headerlink" title="多假设跟踪(MHT)"></a>多假设跟踪(MHT)</h4><p>多假设跟踪本质上是卡尔曼滤波方法在多目标跟踪任务上的拓展。定义$k$时刻之前的检测响应为$z^k$, 历史总的检测响应为$Z^k$, 多假设跟踪的目标是求解已有轨迹和当前检测之间关联的条件概率模型。 把似然关联假设$\Theta_k$划分为当前关联假设$\theta_k$和$k-1$时刻的关联假设$\Theta_{k-1}$, 那么依贝叶斯推理可以得到<br>$$<br>\begin{align}<br>P{\Theta_k|Z^k} &amp;= P{\theta_k, \Theta_{k-1}|z^k, Z^{k-1}} \<br>&amp;= \frac{1}{c}p[Z^k|\theta_k,\Theta_{k-1}]P{\theta_k|\Theta_{k-1}, Z^{k-1}}P{\Theta_{k-1}|Z^{k-1}}<br>\end{align}<br>$$<br>后验概率通过贝叶斯公式转换为先验概率。最下面一行等式右边第3项是$k-1$时刻的后验概率，第2项是$k$时刻之前的检测响应和对应轨迹的条件下计算当前时刻关联假设的概率，第1项是在获得当前项和历史关联假设前提下出现当前检测响应的概率。$c$是推导过程中的分母，常数，用于保证概率范围。该公式逐帧计算是迭代过程，每一帧需要计算第1,2两项。</p>
+<h3 id="经典多目标跟踪算法介绍"><a href="#经典多目标跟踪算法介绍" class="headerlink" title="经典多目标跟踪算法介绍"></a>经典多目标跟踪算法介绍</h3><h4 id="多假设跟踪-MHT"><a href="#多假设跟踪-MHT" class="headerlink" title="多假设跟踪(MHT)"></a>多假设跟踪(MHT)</h4><p>多假设跟踪本质上是卡尔曼滤波方法在多目标跟踪任务上的拓展。定义$k$时刻之前的检测响应为$z^k$, 历史总的检测响应为$Z^k$, 多假设跟踪的目标是求解已有轨迹和当前检测之间关联的条件概率模型。 把似然关联假设$\Theta_k$划分为当前关联假设$\theta_k$和$k-1$时刻的关联假设$\Theta_{k-1}$, 那么依贝叶斯推理可以得到</p>
+<script type="math/tex; mode=display">
+\begin{align}
+P\{\Theta_k|Z^k\} &= P\{\theta_k, \Theta_{k-1}|z^k, Z^{k-1}\} \\
+&= \frac{1}{c}p[Z^k|\theta_k,\Theta_{k-1}]P\{\theta_k|\Theta_{k-1}, Z^{k-1}\}P\{\Theta_{k-1}|Z^{k-1}\}
+\end{align}</script><p>后验概率通过贝叶斯公式转换为先验概率。最下面一行等式右边第3项是$k-1$时刻的后验概率，第2项是$k$时刻之前的检测响应和对应轨迹的条件下计算当前时刻关联假设的概率，第1项是在获得当前项和历史关联假设前提下出现当前检测响应的概率。$c$是推导过程中的分母，常数，用于保证概率范围。该公式逐帧计算是迭代过程，每一帧需要计算第1,2两项。</p>
 <p>MHT采用两个概率模型建模第1,2两项</p>
 <blockquote>
 <ul>
@@ -260,8 +265,9 @@
 <p>前者表示，当检测响应来自轨迹$T$时，它应符合$T$在当前时刻的高斯分布，否则认为是一个均匀分布的噪声，类似于卡尔曼滤波跟踪。后者表示，在误检和新对象出现概率确定的情况下，出现当前关联的可能性可以通过泊松分布和二项分布的乘积表示。在以上假设下，关联假设的后验分布是历史累计概率密度的 连乘，转化为对数形式，可以看出总体后验概率的对数是每一步观察似然和关联假设似然的求和。因此，选择最佳的关联假设，转化为观察似然和关联假设似然累计求和的最大化。在具体算法中， I.J.Cox等人提出一种基于假设树的优化算法，如下图</p>
 <p><img src="/2019/05/18/MOT-overview-1st/MHT.png" alt="MHT"></p>
 <p>可以发现其实MHT有局部遍历的思想， 并且利用到了之后的信息，属于离线方式。</p>
-<p>任何时刻都可能存在多种假设关联，因此到k时刻的假设构成了一种组合假设树的层次关系。 例如图4左边表示的是2个轨迹和3个观测之间可能形成的关联假设，可能存在的假设有{观测 23=&gt;轨迹1，观测22=&gt;轨迹2, 观测21=&gt;新轨迹}或者{观测22=&gt;轨迹1，观测21=&gt;轨迹 2, 观测23=&gt;新轨迹}，因此产生2个假设分支。图4右侧是从这2个关联假设出发的三层假设 树关系，可以看出随着假设层数的增多，关联假设出现组合爆炸的可能。因此进行必要的剪 枝减少假设空间的数目是必须的步骤。那么如何选择最佳的关联呢？I.J.Cox采用了2个步骤 来实现。首先，限制假设树的层数为3层。其次，是对每个分支的叶节点概率对数进行求和， 最大的分支进行保留，即选择边缘概率最大的那个分支假设作为最后选择的关联。可以把这 种选择方法简单的表示为：<br>$$<br>S(k-3) = \frac{1}{|H(k)|}\sum_{\theta^k\in H(k)}\log([Z^k|\theta_k,\Theta_{k-1}])+\log(P{\theta_k|\Theta_{k-1}, Z^{k-1}})
-$$<br>其中$H(k)$是所有可能的假设集合，所以上式是从多个假设中筛选置信度最高的假设作为跟踪结果。</p>
+<p>任何时刻都可能存在多种假设关联，因此到k时刻的假设构成了一种组合假设树的层次关系。 例如图4左边表示的是2个轨迹和3个观测之间可能形成的关联假设，可能存在的假设有{观测 23=&gt;轨迹1，观测22=&gt;轨迹2, 观测21=&gt;新轨迹}或者{观测22=&gt;轨迹1，观测21=&gt;轨迹 2, 观测23=&gt;新轨迹}，因此产生2个假设分支。图4右侧是从这2个关联假设出发的三层假设 树关系，可以看出随着假设层数的增多，关联假设出现组合爆炸的可能。因此进行必要的剪 枝减少假设空间的数目是必须的步骤。那么如何选择最佳的关联呢？I.J.Cox采用了2个步骤 来实现。首先，限制假设树的层数为3层。其次，是对每个分支的叶节点概率对数进行求和， 最大的分支进行保留，即选择边缘概率最大的那个分支假设作为最后选择的关联。可以把这 种选择方法简单的表示为：</p>
+<script type="math/tex; mode=display">
+S(k-3) = \frac{1}{|H(k)|}\sum_{\theta^k\in H(k)}\log([Z^k|\theta_k,\Theta_{k-1}])+\log(P\{\theta_k|\Theta_{k-1}, Z^{k-1}\})</script><p>其中$H(k)$是所有可能的假设集合，所以上式是从多个假设中筛选置信度最高的假设作为跟踪结果。</p>
 <p>这种基于似然概率对数累加的方法虽然方便迅速，但是存在一个主要的限制，即假定 观测关联符合高斯模型，并且在每一步选择关联假设之后，需要利用Kalman滤波更新轨迹状 态。通过对MHT基本公式(1)的扩展，可以建立不同的概率模型描述这种多假设关联的全 局概率，例如Kim等人在ICCV2015和ECCV2018通过归一化的最小均方差优化算法引入表 观模型来扩展MHT算法，取得不错的多行人跟踪结果.</p>
 <h4 id="基于检测置信度的粒子滤波算法"><a href="#基于检测置信度的粒子滤波算法" class="headerlink" title="基于检测置信度的粒子滤波算法"></a>基于检测置信度的粒子滤波算法</h4><p>该算法可分为两个步骤：</p>
 <ul>
@@ -273,18 +279,41 @@ $$<br>其中$H(k)$是所有可能的假设集合，所以上式是从多个假�
 <p>分别表示检测响应，构建相似度矩阵，计算每个粒子群权重，贪心算法或者匹配，重新计算当前目标位置。</p>
 <p>具体步骤如下：</p>
 <ol>
-<li><p>计算历史轨迹与当前检测响应的相似度<br>$$<br>S(tr, d) = g(tr, d)[c_{tr}(d) + \alpha \sum_{p\in tr}^Np_N(d-p)]<br>$$<br>tr表示轨迹， d表示检测。所以相似度包含3方面：$c_{tr}(d)$表示在线学习的分类器结果；粒子与检测的匹配度采用高斯密度函数度量，$p\in tr$表示轨迹对应的粒子群， $p_N(d-p)$表示高斯相似度；与检测尺寸大小相关的阈值函数$g(tr,d)$表示轨迹与轨迹尺度上的契合程度， $\alpha$用于控制粒子群的松紧度。</p>
+<li><p>计算历史轨迹与当前检测响应的相似度</p>
+<script type="math/tex; mode=display">
+S(tr, d) = g(tr, d)[c_{tr}(d) + \alpha \sum_{p\in tr}^Np_N(d-p)]</script><p>tr表示轨迹， d表示检测。所以相似度包含3方面：$c_{tr}(d)$表示在线学习的分类器结果；粒子与检测的匹配度采用高斯密度函数度量，$p\in tr$表示轨迹对应的粒子群， $p_N(d-p)$表示高斯相似度；与检测尺寸大小相关的阈值函数$g(tr,d)$表示轨迹与轨迹尺度上的契合程度， $\alpha$用于控制粒子群的松紧度。</p>
 <p>计算出匹配亲和度矩阵之后，可以采用二部图匹配的Hungarian算法计算匹配结果。不过作 者采用了近似的贪心匹配算法，即首先找到亲和度最大的那个匹配，然后删除这个亲和度， 寻找下一个匹配，依次类推。贪心匹配算法复杂度是线性，大部分情况下，也能得到最优匹 配结果。</p>
 </li>
-<li><p>采用粒子滤波框架，更新每条轨迹的粒子权重。<br>$$<br>w(tr, p) = \beta\cdot I(tr)\cdot p_N(p-d^*) + \gamma \cdot d_c(p)\cdot P_o(tr) + \eta\cdot c_{tr}(p)<br>$$<br>$I(tr)$是示性函数,表示轨迹在该帧中是否关联成功，成功的话，则计算粒子在关联检测为中心的高斯概率；$d_c(p)$是粒子的检测可信度， $p_o(tr)$是权重函数<br>$$<br>p_o(tr)=\begin{cases}<br>1, \quad\quad\quad&amp;\text{if} \quad\quad I(tr)=1,\<br>\max_{tr’:I(tr’)=1}p_N(tr-tr’) \quad\quad &amp;\text{elif}\quad \exists ~~I(tr’)=1 \<br>0 &amp;\text{otherwise}<br>\end{cases}<br>$$<br>表示当轨迹匹配的时候权重为1， 否则去附近成功匹配轨迹的最大高斯密度，若周围没有成功匹配，则权重为0.</p>
+<li><p>采用粒子滤波框架，更新每条轨迹的粒子权重。</p>
+<script type="math/tex; mode=display">
+w(tr, p) = \beta\cdot I(tr)\cdot p_N(p-d^*) + \gamma \cdot d_c(p)\cdot P_o(tr) + \eta\cdot c_{tr}(p)</script><p>$I(tr)$是示性函数,表示轨迹在该帧中是否关联成功，成功的话，则计算粒子在关联检测为中心的高斯概率；$d_c(p)$是粒子的检测可信度， $p_o(tr)$是权重函数</p>
+<script type="math/tex; mode=display">
+p_o(tr)=\begin{cases}
+1, \quad\quad\quad&\text{if} \quad\quad I(tr)=1,\\
+\max_{tr':I(tr')=1}p_N(tr-tr') \quad\quad &\text{elif}\quad \exists ~~I(tr')=1 \\
+0 &\text{otherwise}
+\end{cases}</script><p>表示当轨迹匹配的时候权重为1， 否则去附近成功匹配轨迹的最大高斯密度，若周围没有成功匹配，则权重为0.</p>
 <p>结合检测可信度的粒子滤波算法对轨迹的初始化采用了感兴趣区域的简单启发式策略。即， 进入图像区域边框时，初始化对象；当连续多帧没有关联到检测时终止跟踪。在一些典型数 据集上，基于检测可信度的粒子滤波算法可以得到不错的结果。</p>
 </li>
 </ol>
-<h4 id="基于最小代价流的跟踪算法"><a href="#基于最小代价流的跟踪算法" class="headerlink" title="基于最小代价流的跟踪算法"></a>基于最小代价流的跟踪算法</h4><p>该算法是一种确定性优化离线方法，其目标函数是从已知的检测结合中找出最优的轨迹集合<br>$$<br>T^* =arg\max_T P(T|D) = arg\max_T\prod_iP(d_i|T)P(T)<br>$$<br>表示成对数形式<br>$$<br>T^* = arg\min_T\sum_{T_k\in T}(-\log P(T_k) + \sum_i-\log P(d_i|T_k))<br>$$<br>第一项刻画轨迹存在的概率， 第二项表示该轨迹存在前提下对应该检测的概率。</p>
-<p>每条轨迹表示成链接的检测后，其能量可以表示为<br>$$<br>f^* = arg\min\sum_i C_{si}f_{si} + \sum_i C_if_i+\sum_{i,j}C_{ij}f_{ij} + \sum_iC_{it}f_{it}<br>$$<br>其中$f_{si}, f_i, f_{ij}, f_{it}$均为示性变量分别表示是否是起点，是否在轨迹上，是否后续连接$j$节点，是否是终点。由于MOT任务中一一对应假设，所以节点$i$前后只存在一个连接，$f_{si} + \sum_j f_{ji} = f_i = \sum_{j}f_{ij}+f_{it}=1 <del>\text{or}</del>0$</p>
+<h4 id="基于最小代价流的跟踪算法"><a href="#基于最小代价流的跟踪算法" class="headerlink" title="基于最小代价流的跟踪算法"></a>基于最小代价流的跟踪算法</h4><p>该算法是一种确定性优化离线方法，其目标函数是从已知的检测结合中找出最优的轨迹集合</p>
+<script type="math/tex; mode=display">
+T^* =arg\max_T P(T|D) = arg\max_T\prod_iP(d_i|T)P(T)</script><p>表示成对数形式</p>
+<script type="math/tex; mode=display">
+T^* = arg\min_T\sum_{T_k\in T}(-\log P(T_k) + \sum_i-\log P(d_i|T_k))</script><p>第一项刻画轨迹存在的概率， 第二项表示该轨迹存在前提下对应该检测的概率。</p>
+<p>每条轨迹表示成链接的检测后，其能量可以表示为</p>
+<script type="math/tex; mode=display">
+f^* = arg\min\sum_i C_{si}f_{si} + \sum_i C_if_i+\sum_{i,j}C_{ij}f_{ij} + \sum_iC_{it}f_{it}</script><p>其中$f_{si}, f_i, f_{ij}, f_{it}$均为示性变量分别表示是否是起点，是否在轨迹上，是否后续连接$j$节点，是否是终点。由于MOT任务中一一对应假设，所以节点$i$前后只存在一个连接，$f_{si} + \sum_j f_{ji} = f_i = \sum_{j}f_{ij}+f_{it}=1 ~\text{or}~0$</p>
 <p>网络流优化问题满足最小代价流模型：</p>
 <p><img src="/2019/05/18/MOT-overview-1st/mcn.png" alt="min-cost-flow"></p>
-<p>边的代价函数计算规则：<br>$$<br>\begin{align}<br>C_{si} &amp;= -\log P_{enter}(x_i)\<br>C_{it} &amp;= -\log P_{exit}(x_i)\<br>C_{ij} &amp;= -\log P_{link}(x_j|x_i)\<br>C_i &amp;= \log(\beta_i/(1-\beta_i))<br>\end{align}<br>$$<br>迹数目通过迭代比较的方法确定. 注意到检测节点代价Ci 的值是一个负数，所以轨迹对应的网络流代价也可能小于0。因此，通过遍历不同轨迹数目，可以确定一个全局 代价最小的解。这种方式效率较低。</p>
+<p>边的代价函数计算规则：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+C_{si} &= -\log P_{enter}(x_i)\\
+C_{it} &= -\log P_{exit}(x_i)\\
+C_{ij} &= -\log P_{link}(x_j|x_i)\\
+C_i &= \log(\beta_i/(1-\beta_i))
+\end{align}</script><p>迹数目通过迭代比较的方法确定. 注意到检测节点代价Ci 的值是一个负数，所以轨迹对应的网络流代价也可能小于0。因此，通过遍历不同轨迹数目，可以确定一个全局 代价最小的解。这种方式效率较低。</p>
 <h4 id="基于马尔科夫决策-MDP-的跟踪算法"><a href="#基于马尔科夫决策-MDP-的跟踪算法" class="headerlink" title="基于马尔科夫决策(MDP)的跟踪算法"></a>基于马尔科夫决策(MDP)的跟踪算法</h4><p>MDP是一种在线确定性推导方法。</p>
 <p>该方法把目标跟踪看作是状态转移过程。 马尔科夫决策过程包含四个元素$(S, A, R, T)$, 分别表示状态集合、动作集合、状态转移集合和奖励函数集合。一个目标的跟踪过程包括如下决策过程：</p>
 <ol>
@@ -295,15 +324,21 @@ $$<br>其中$H(k)$是所有可能的假设集合，所以上式是从多个假�
 <p><img src="/2019/05/18/MOT-overview-1st/MDP.png" alt="MDP"></p>
 <p>三种决策过程分别对应着不同的奖励函数。</p>
 <ol>
-<li><p>$$<br>R_{activate}(s, a) = y(a)(w_{activate}^T\phi_{activate}(s)+b_{activate})<br>$$</p>
-<p>$$<br>y(a) = \begin{cases}<br>1, &amp;\text{if} \quad a=a_1\<br>-1, &amp;\text{else} \quad a=a_2<br>\end{cases}<br>$$</p>
-<p>这一步主要用来判断检测是否是目标。论文中使用离线训练的SVM实现该过程。检测样本的特征包括$(x,y, w, h, d_s)$</p>
+<li><script type="math/tex; mode=display">
+R_{activate}(s, a) = y(a)(w_{activate}^T\phi_{activate}(s)+b_{activate})</script><script type="math/tex; mode=display">
+y(a) = \begin{cases}
+1, &\text{if} \quad a=a_1\\
+-1, &\text{else} \quad a=a_2
+\end{cases}</script><p>这一步主要用来判断检测是否是目标。论文中使用离线训练的SVM实现该过程。检测样本的特征包括$(x,y, w, h, d_s)$</p>
 </li>
-<li><p>$$<br>R_{Tracked}(s, a)=\begin{cases}<br>y(a) &amp;\text{if}\quad e_{medFB}&lt;e_0, \text{and} \quad o_{mean} &gt; o_0\<br>-y(a) &amp;\text(else)<br>\end{cases}<br>$$</p>
-<p>$a=a_4$时， $y(a)=1$， 否则$y(a_3)=-1$, $e_{medFB}, o_{mean}$分别表示光流中心偏差和平均重合度， $e_0, o_0$分别表示阈值。</p>
+<li><script type="math/tex; mode=display">
+R_{Tracked}(s, a)=\begin{cases}
+y(a) &\text{if}\quad e_{medFB}<e_0, \text{and} \quad o_{mean} > o_0\\
+-y(a) &\text(else)
+\end{cases}</script><p>$a=a_4$时， $y(a)=1$， 否则$y(a_3)=-1$, $e_{medFB}, o_{mean}$分别表示光流中心偏差和平均重合度， $e_0, o_0$分别表示阈值。</p>
 </li>
-<li><p>$$<br>R_{Lost}(s, a) = y(a)(\max_{k=1}^M(w^T\phi(t, d_k)+b))<br>$$</p>
-<p>计算$M$个匹配模板与检测的匹配程度，判断是否存在使得上述奖励最大且非负的匹配，当存在是选择$a=a_6$， 不存在是判断是否连续丢失次数超出阈值$T_{Lost}=50$，超出则$a=a_7$, 否则$a=a_6$. </p>
+<li><script type="math/tex; mode=display">
+R_{Lost}(s, a) = y(a)(\max_{k=1}^M(w^T\phi(t, d_k)+b))</script><p>计算$M$个匹配模板与检测的匹配程度，判断是否存在使得上述奖励最大且非负的匹配，当存在是选择$a=a_6$， 不存在是判断是否连续丢失次数超出阈值$T_{Lost}=50$，超出则$a=a_7$, 否则$a=a_6$. </p>
 </li>
 </ol>
 <p>这部分可能理解起来存在些困难。其实需要弄明白的是，强化学习中首先根据当前的状态计算能量，然后根据能量来选择动作使得奖励最大。比如第一种奖励，首先计算等式右边第二项，根据其值大小来选择$a$是执行$a_1$还是$a_2$从而使$R_{active}$最大。</p>

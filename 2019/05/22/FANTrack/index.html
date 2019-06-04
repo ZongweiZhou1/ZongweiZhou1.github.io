@@ -208,7 +208,7 @@
 
   <div class="article-content">
     <div class="markdown-body">
-      <h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p>![siamese similarity](FANTrack/siamese similarity.png)</p>
+      <h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p><img src="/2019/05/22/FANTrack/siamese similarity.png" alt="siamese similarity"></p>
 <p>目前大多数深度学习的方法主要基于特征的学习， 代价函数的设计，或者如何有效解决复杂的数据关联模型，很少有利用CNN网络端到端解决MOT的。本文提出使用CNN解决data association问题。该方案纯粹利用数据，从3D的角度实现全局的数据关联，同时处理noisy detections以及目标个数变化等问题。</p>
 <p>文章提供代码： <a href="https://git.uwaterloo.ca/wise-lab/fantrack" target="_blank" rel="noopener">https://git.uwaterloo.ca/wise-lab/fantrack</a></p>
 <h3 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h3><p>tracking-by-detection: 分为两个步骤。首先使用一个检测器从帧图像中将前景目标检测出来或者定位出来；然后在时间域内利用离散组合优化问题将noisy detections关联起来形成轨迹。</p>
@@ -232,7 +232,7 @@
 <p>SimNet有两个分支： bounding box分支和appearance 分支， 每一个分支都是siamese结构判断两个输入相似与否。这两个相似度最终按照importance 分支的重要性程度进行加权。最后有这些特征获得similarity map</p>
 <ul>
 <li><p><strong>bounding box 分支</strong></p>
-<p>![bounding box](FANTrack/bounding box.png)</p>
+<p><img src="/2019/05/22/FANTrack/bounding box.png" alt="bounding box"></p>
 <p>3D bounding box 的特征$(x, y, z, l, w, h, \theta_z)$分别表示中心点位置， 坐标对齐的长度以及z轴旋转角度。</p>
 <p>输入是$（N+M）\times 1\times 7$放入$1\times 1$的卷积核两层全连接层后得到embedding特征，然后进行归一化处理，最后得到的特征用于计算余弦相似度。</p>
 </li>
@@ -246,17 +246,20 @@
 <p>将特征concat之后进行一个2维输出，分别表示两者权重$w_{bbox}, w_{appear}$, 这部分权重没有标签，相当于学习出attention。</p>
 </li>
 <li><p><strong>Similarity map</strong></p>
-<p>![global similarity map](FANTrack/global similarity map.png)</p>
+<p><img src="/2019/05/22/FANTrack/global similarity map.png" alt="global similarity map"></p>
 <p>这张图表示的是一条轨迹与所有排列好的检测之间的相似度计算。将原始图像按照$0.5m$的距离划分成网格，然后将detections映射到对应的网格中，使用target的特征作为卷积核在网格上进行卷积得到global similarity map， 然后再从这张similarity map的target位置周围crop出$5\times 5 m^2$的区间，也就是$21\times 21$大小的map区域，于是$N$条轨迹最终获得$N\times 21\times 21$的similarity maps， 从similarity maps中直接学习匹配关系。</p>
 </li>
-<li><p><strong>Loss Function</strong><br>$$<br>L(\Theta_1) = \frac{1}{N^+}\sum_{i=1}^N w_{skew}^i \times w_{cost}^i\times (1-y^i\times \hat{y}^i(\Theta_1))<br>$$<br>$\Theta_1$是待学习的参数， $N^+$表示非零权重的个数，$y^i\in {-1, 1}$是余弦相似度的label， $w_{skew}^i$有点类似于focal loss中$\gamma$的作用,用来平衡正负样本的影响， $w_{cost}^i$用来强调hard negative样本。 $\hat{y}^i(\Theta_1)$表示网络输出的最终余弦相似度<br>$$<br>\hat{y}^i(\Theta_1) = w_{bbox}(\Theta_1)^i \times \hat{y}<em>{bbox}^i + w</em>{appear}^i \times \hat{y}_{appear}^i(\Theta_1)<br>$$</p>
-</li>
+<li><p><strong>Loss Function</strong></p>
+<script type="math/tex; mode=display">
+L(\Theta_1) = \frac{1}{N^+}\sum_{i=1}^N w_{skew}^i \times w_{cost}^i\times (1-y^i\times \hat{y}^i(\Theta_1))</script><p>$\Theta_1$是待学习的参数， $N^+$表示非零权重的个数，$y^i\in \{-1, 1\}$是余弦相似度的label， $w_{skew}^i$有点类似于focal loss中$\gamma$的作用,用来平衡正负样本的影响， $w_{cost}^i$用来强调hard negative样本。 $\hat{y}^i(\Theta_1)$表示网络输出的最终余弦相似度</p>
+<script type="math/tex; mode=display">
+\hat{y}^i(\Theta_1) = w_{bbox}(\Theta_1)^i \times \hat{y}_{bbox}^i + w_{appear}^i \times \hat{y}_{appear}^i(\Theta_1)</script></li>
 <li><p><strong>SimNet 创建训练样本</strong></p>
 <p>如果bounding box与某一个groundtruth 的IoU超过0.8则认为是正样本，另外为了增加样本多样性，如果proposals与当前已经确定类别的proposals的IoU大于0.95则抑制该proposals。</p>
 <p>这里说的都是判断proposals与groundtruth的配对，也就是给proposals分配不同的ID，然后根据ID组成不同的正负样本对。</p>
 </li>
 </ul>
-<h4 id="Data-Association-Network"><a href="#Data-Association-Network" class="headerlink" title="Data Association Network"></a>Data Association Network</h4><p>![data association](FANTrack/data association.png)</p>
+<h4 id="Data-Association-Network"><a href="#Data-Association-Network" class="headerlink" title="Data Association Network"></a>Data Association Network</h4><p><img src="/2019/05/22/FANTrack/data association.png" alt="data association"></p>
 <ul>
 <li>为了处理目标变化的情形， 设定了最大目标数$N_{max}$， 那么$N_{max}-N$称为dummy maps,有全0元素构成。</li>
 <li>处理丢失的detection时，对每一个目标引入了一个额外的cell用于解释虚假检测。</li>
@@ -265,7 +268,11 @@
 <p>由于目标和轨迹的相似度位置是已经确定的，所以网络计算association时只计算非零区域，于是设计了对每一层局部相似度map的association masks。 在masks中可能是检测的位置上为0， 否则则置为最小负值。 然后mask与logits maps叠加，这时可能是检测的区域特征被保存下来，不可能是检测的区域特征几乎都是最小值。</p>
 <p>接着叠加的特征分成了两个分支，一个分支是全连接层用于判断该轨迹是否对应漏检。另一个分支将logits maps拉成1D向量然后与第一个分支的值concat一起，形成$N_{max}\times (21\times21+1)$的tensor，然后使用softmax计算$21\times 21+1$为的概率向量。 最终经过reshape获得关联概率矩阵，然后获得关联关系。<strong>这里的softmax相当于在2D上进行softmax，所以也就只关联到1个detection，但并没有办法保证1个detection仅关联了1条轨迹</strong> 。</p>
 <ul>
-<li><strong>loss function</strong><br>$$<br>L(\Theta) = l(\Theta)<em>{assoc} + l(\Theta)</em>{reg}<br>$$<br>前后两项分别表示二值交叉熵损失和正则化损失。<br>$$<br>q_{vec} = q_{assoc}^t(i,j) \times \log(min(\hat{q}<em>{assoc}^t(i,j;\Theta)+0.01, 1))\<br>p</em>{vec} = p_{assoc}^t(i,j) \times \log(min(\hat{p}<em>{assoc}^t(i,j;\Theta)+0.01, 1))\<br>l(\Theta)</em>{assoc} = \sum_t^N\sum_{i,j}^{21+1}(-q_{vec})+(-p_{vec})<br>$$<br>这个式子是交叉熵损失函数。 $q_{assoc}^t(i,j) = 1-p_{assoc}^t(i,j)$</li>
+<li><strong>loss function</strong><script type="math/tex; mode=display">
+L(\Theta) = l(\Theta)_{assoc} + l(\Theta)_{reg}</script>前后两项分别表示二值交叉熵损失和正则化损失。<script type="math/tex; mode=display">
+q_{vec} = q_{assoc}^t(i,j) \times \log(min(\hat{q}_{assoc}^t(i,j;\Theta)+0.01, 1))\\
+p_{vec} = p_{assoc}^t(i,j) \times \log(min(\hat{p}_{assoc}^t(i,j;\Theta)+0.01, 1))\\
+l(\Theta)_{assoc} = \sum_t^N\sum_{i,j}^{21+1}(-q_{vec})+(-p_{vec})</script>这个式子是交叉熵损失函数。 $q_{assoc}^t(i,j) = 1-p_{assoc}^t(i,j)$</li>
 </ul>
 <h4 id="Track-Management"><a href="#Track-Management" class="headerlink" title="Track Management"></a>Track Management</h4><ul>
 <li><p>利用kalman滤波预测运动目标的状态</p>
@@ -274,7 +281,7 @@
 <p><img src="/2019/05/22/FANTrack/algorithm.png" alt="algorithm"></p>
 </li>
 </ul>
-<h3 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h3><h4 id="Dataset"><a href="#Dataset" class="headerlink" title="Dataset"></a>Dataset</h4><p>KITTI. 包含21段训练序列和29段测试序列。由于训练序列又按照难度、遮挡和模糊程度等划分不同的等级，作者选择每个层级的$20%$用来验证。</p>
+<h3 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h3><h4 id="Dataset"><a href="#Dataset" class="headerlink" title="Dataset"></a>Dataset</h4><p>KITTI. 包含21段训练序列和29段测试序列。由于训练序列又按照难度、遮挡和模糊程度等划分不同的等级，作者选择每个层级的$20\%$用来验证。</p>
 <h4 id="Benchmark-Results"><a href="#Benchmark-Results" class="headerlink" title="Benchmark Results"></a>Benchmark Results</h4><p><img src="/2019/05/22/FANTrack/results.png" alt="results"></p>
 <p>benchmark上的对比实验来看性能并不好。作者认为本文方法inference是在3D上进行的，而evaluation仅评估了2D指标，所以对于本文方法是不全面的，另外对比的方法都不是基于深度学习的数据关联方法。还有本文只是利用了kalman滤波进行运动状态的估计和预测， 如果用其他更复杂的算法性能或许更好。</p>
 <p>Ablation分析对比了不同的特征抽取模块和关联模块，<strong>这个实验做的并不是很充分， 比如没有分析其他的特征抽取方法和匈牙利算法的性能如何，这样才能更好地体现SimNet的性能</strong> </p>

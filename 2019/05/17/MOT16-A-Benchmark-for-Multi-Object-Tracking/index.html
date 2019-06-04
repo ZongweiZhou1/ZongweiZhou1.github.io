@@ -237,11 +237,10 @@
 </li>
 <li><p>MOT16 benchmark 提供的检测结果</p>
 <p>DPM检测结果。（另外，当前网站提供了FRCNN， SDP等多种检测结果）</p>
-<p>![detection box statistics](MOT16-A-Benchmark-for-Multi-Object-Tracking/detections statistics.png)</p>
+<p><img src="/2019/05/17/MOT16-A-Benchmark-for-Multi-Object-Tracking/detections statistics.png" alt="detection box statistics"></p>
 <p><strong>detection 存储格式</strong></p>
 <p>​    示例</p>
    <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1, -1, 794.2, 47.5, 71.2, 174.8, 67.5, -1, -1</span><br><span class="line">1, -1, 164.1, 19.6, 66.5, 163.2, 29.4, -1, -1</span><br><span class="line">1, -1, 875.4, 39.9, 25.3, 145.0, 19.6, -1, -1</span><br><span class="line">2, -1, 781.7, 25.1, 69.2, 170.2, 58.1, -1, -1</span><br></pre></td></tr></table></figure>
-
 <p><code>det.txt</code>文件的每一行存储一个box信息， 使用逗号隔开的9(实际是10)个数值表示。第一个数值表示box所在的帧号，第二个数值表示当前box对应的target id，对于detection而言，target id未知，都标注为-1；第三到六个值表示box的坐标，即<code>(topleft_x, topleft_y, width, height)</code>,<strong>标注从1开始</strong>；第七个值表示detections的置信度， 剩下三个值占位，全为 $-1$ 。</p>
 </li>
 </ul>
@@ -308,15 +307,19 @@
 </blockquote>
 <p><img src="/2019/05/17/MOT16-A-Benchmark-for-Multi-Object-Tracking/assignment_examples.png" alt="annotations_examples"></p>
 </li>
-<li><p><strong>Multiple Object Tracking Accuracy</strong><br>$$<br>MOTA = 1- \frac{\sum_t(FN_t+FP_t+IDS_t)}{\sum_t GT_t}<br>$$<br>MOTA取值范围为$(-\infty, 100)$</p>
+<li><p><strong>Multiple Object Tracking Accuracy</strong></p>
+<script type="math/tex; mode=display">
+MOTA = 1- \frac{\sum_t(FN_t+FP_t+IDS_t)}{\sum_t GT_t}</script><p>MOTA取值范围为$(-\infty, 100)$</p>
 </li>
-<li><p>Multiple Object Tracking Precision<br>$$<br>MOTP = \frac{\sum_{t,i} d_{t,i}}{\sum_{t}c_t}<br>$$<br>MOTP取值范围$(50, 100)$。这里只计算匹配成功的平均匹配度，而匹配成功的阈值是$50$.</p>
+<li><p>Multiple Object Tracking Precision</p>
+<script type="math/tex; mode=display">
+MOTP = \frac{\sum_{t,i} d_{t,i}}{\sum_{t}c_t}</script><p>MOTP取值范围$(50, 100)$。这里只计算匹配成功的平均匹配度，而匹配成功的阈值是$50$.</p>
 </li>
 <li><p>Track quality measures</p>
 <ul>
-<li>mostly tracked (MT): 至少$80%$ 关联跟踪</li>
-<li>mostly lost (ML): 至少$80%$关联失败</li>
-<li>partially tracked (PT): 少于$20%$关联成功</li>
+<li>mostly tracked (MT): 至少$80\%$ 关联跟踪</li>
+<li>mostly lost (ML): 至少$80\%$关联失败</li>
+<li>partially tracked (PT): 少于$20\%$关联成功</li>
 </ul>
 <p><strong>注意我这里说关联，而没说跟踪是因为不论跟踪的trackid是否相同，只要gt匹配到假设就认为关联成功</strong></p>
 <p>MT， ML最终计算的是相对于ground truth trajectories的总数。</p>

@@ -217,8 +217,8 @@
 <li>可能导致低层输入较小变化不会反映到最后输出中，导致上层的激活函数处于饱和区，学习过早停止。</li>
 </ul>
 <p>而BN层的提出是希望将每一层的输出通过归一化的形式缩放移动到相同的空间分布中，从而使得模型更快的收敛。 这种思想其实对应于传统方法中的<strong>白化操作</strong>。</p>
-<h3 id="BN层的数学形式"><a href="#BN层的数学形式" class="headerlink" title="BN层的数学形式"></a>BN层的数学形式</h3><p>$$<br>h = f(g\cdot \frac{x-\mu}{\sigma} + b)<br>$$</p>
-<p>这个操作可以分成两步来看。</p>
+<h3 id="BN层的数学形式"><a href="#BN层的数学形式" class="headerlink" title="BN层的数学形式"></a>BN层的数学形式</h3><script type="math/tex; mode=display">
+h = f(g\cdot \frac{x-\mu}{\sigma} + b)</script><p>这个操作可以分成两步来看。</p>
 <ul>
 <li>通过中心化和标准化将上一层输出数据$x$ 转换成标准正态分布， 即在这次normalization过程中，参与运算的样本都能处于相同的分布空间</li>
 <li>将标准正态分布再进行适当的缩放和平移形成新的数据分布空间，毕竟标准正态分布的约束过于强硬，很多情形下并不能保证成立。</li>
@@ -248,7 +248,7 @@
 </blockquote>
 <p><strong>GN</strong></p>
 <p>GN相当于与对IN和LN进行了泛化，是对BN的改善。能够处理BN针对于小batch表现不好的情形。</p>
-<p>![BN vs GN](normalization-layers/BN vs GN.png)</p>
+<p><img src="/2019/05/28/normalization-layers/BN vs GN.png" alt="BN vs GN"></p>
     </div>
   </div>
   

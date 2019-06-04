@@ -211,8 +211,7 @@
       <h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><ul>
 <li><p>文章认为MOT当前的主要挑战在于“不同帧中目标个数不定带来算法效率下降”。 </p>
 <ul>
-<li><p>LSTM 只处理了single object。(也有处理多目标的)</p>
-</li>
+<li>LSTM 只处理了single object。(也有处理多目标的)</li>
 <li><p>Re-ID exhausitively 匹配目标表观。（这个不客观，大多数方法都会通过先验条件约束范围）</p>
 </li>
 <li><p>单个box处理耗时严重，因为需要crop+resize+extract features</p>
@@ -229,8 +228,7 @@
 </li>
 </ul>
 <hr>
-<p>###Introduction</p>
-<p>主要贡献点：</p>
+<h3 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h3><p>主要贡献点：</p>
 <blockquote>
 <p>1) Frame-wise Motion Fields (FMF) to represent the association among indefinite number of objects between frames.</p>
 <p>2) Frame-wise Apearance Feature (FAF) to provide Re-ID features to assist FMF-based object association.</p>
@@ -238,17 +236,27 @@
 <p>4)  Experiments on the challenging MOT17 benchmark show that our method achieves real-time MOT with competitive performance as the state-of-the-art approaches.</p>
 </blockquote>
 <hr>
-<p>###Proposed Method (FMA)</p>
-<p>FMA方法网络结构如下图：</p>
+<h3 id="Proposed-Method-FMA"><a href="#Proposed-Method-FMA" class="headerlink" title="Proposed Method (FMA)"></a>Proposed Method (FMA)</h3><p>FMA方法网络结构如下图：</p>
 <p><img src="/2019/05/17/Frame-wise-Motion-and-Appearance-for-Real-time-Multiple-Object-Tracking/architecture.png" alt="architecture"></p>
-<h4 id="Frame-wise-Motion-Fields"><a href="#Frame-wise-Motion-Fields" class="headerlink" title="Frame-wise Motion Fields"></a>Frame-wise Motion Fields</h4><p>使用$I_1, I_2\in R^{w\times h\times 3}$分别表示时间先后的两帧图像， $b_i$表示第$i$个关联目标的bounding box， 两帧中$b_i$的$x,y$坐标分别表示为$\mathcal{X}_1(b_i), \mathcal{Y}_1(b_i), \mathcal{X}_2(b_i), \mathcal{Y}_2(b_i)$ , FMFs计算了两帧图像$I_1, I_2$之间的四个运动场信息：<br>$$<br>\begin{align}<br>F_x^1(b_i) &amp;= \mathcal{X}_2(b_i) - \mathcal{X}_1(b_i),\<br>F_y^1(b_i) &amp;= \mathcal{Y}_2(b_i) - \mathcal(Y)_1(b_i)\<br>F_x^2(b_i) &amp;= -F_x^1(b_i),\<br>F_y^2(b_i) &amp;= -F_y^1(b_i)<br>\end{align}<br>$$<br>这里预测了目标的双向motion向量，主要是为了让motion向量更加鲁棒。两方面考虑： 1）前后两帧的表观和上下文信息可能差异较大，拆开考虑更鲁棒；2）可以解决部分遮挡问题，前后分别预测。示例如下图所示</p>
+<h4 id="Frame-wise-Motion-Fields"><a href="#Frame-wise-Motion-Fields" class="headerlink" title="Frame-wise Motion Fields"></a>Frame-wise Motion Fields</h4><p>使用$I_1, I_2\in R^{w\times h\times 3}$分别表示时间先后的两帧图像， $b_i$表示第$i$个关联目标的bounding box， 两帧中$b_i$的$x,y$坐标分别表示为$\mathcal{X}_1(b_i), \mathcal{Y}_1(b_i), \mathcal{X}_2(b_i), \mathcal{Y}_2(b_i)$ , FMFs计算了两帧图像$I_1, I_2$之间的四个运动场信息：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+F_x^1(b_i) &= \mathcal{X}_2(b_i) - \mathcal{X}_1(b_i),\\
+F_y^1(b_i) &= \mathcal{Y}_2(b_i) - \mathcal(Y)_1(b_i)\\
+F_x^2(b_i) &= -F_x^1(b_i),\\
+F_y^2(b_i) &= -F_y^1(b_i)
+\end{align}</script><p>这里预测了目标的双向motion向量，主要是为了让motion向量更加鲁棒。两方面考虑： 1）前后两帧的表观和上下文信息可能差异较大，拆开考虑更鲁棒；2）可以解决部分遮挡问题，前后分别预测。示例如下图所示</p>
 <p><img src="/2019/05/17/Frame-wise-Motion-and-Appearance-for-Real-time-Multiple-Object-Tracking/FMFs.png" alt="FMFs"></p>
 <p>注意上图(b)(d)中黑色十字标注的中心点.</p>
-<p>损失函数：<br>$$<br>\mathcal{L}<em>{MSE} = \sum</em>{k=1}^2\sum_{b_i\in B}\Vert H_x^k(b_i)-F_x^k(b_i)\Vert_F^2 +  \Vert H_y^k(b_i)-F_y^k(b_i)\Vert_F^2<br>$$<br>$B$是关联的目标的bounding box的集合。</p>
+<p>损失函数：</p>
+<script type="math/tex; mode=display">
+\mathcal{L}_{MSE} = \sum_{k=1}^2\sum_{b_i\in B}\Vert H_x^k(b_i)-F_x^k(b_i)\Vert_F^2 +  \Vert H_y^k(b_i)-F_y^k(b_i)\Vert_F^2</script><p>$B$是关联的目标的bounding box的集合。</p>
 <h4 id="Frame-wise-Appearance-Features"><a href="#Frame-wise-Appearance-Features" class="headerlink" title="Frame-wise Appearance Features"></a>Frame-wise Appearance Features</h4><p>FMF可以处理简单的情况，但是碰到拥挤或者干扰太多的时候就会预测失败，这时候希望通过FAF模块采用ReID实现匹配。</p>
 <p>传统的ReID方法将每一个目标crop出来进行resize之后放到网络中抽取特征，耗时严重。该方法中利用FAF模块直接从整张图像中抽取每个目标的特征，同时FAF和FMF模块可以共享部分网络层。从而前向推理速度加快的同时也能够规避目标个数不同带来的问题。</p>
-<p>给定同一个目标在两帧图像中的bounding boxes， FAF模块从FMF抽取的特征中crop patches，然后计算相似度。 在训练过程中同一个目标的不同特征concat一起作为正样本， 不同样本特征concat一起作为负样本。正负样本比例控制在$1:4$, 损失采用交叉熵损失<br>$$<br>\mathcal{L}<em>{BCE} -\frac{1}{N}\sum</em>{j=1}^N\mathcal{S}_j\log h(p_j) + (1-\mathcal{S_j})\log (1-h(p_j))<br>$$<br>$p_j, \mathcal{S_j}$表示样本和对应label。</p>
-<h4 id="Inference-Algorithm"><a href="#Inference-Algorithm" class="headerlink" title="Inference Algorithm"></a>Inference Algorithm</h4><p>$D={D_1, \cdots, D_N}, T={T^1, \cdots, T^M}$分别表示当前时刻的检测结果和已经存在的跟踪轨迹。 $IOU(\cdot)$表示IOU算子， $SIM(\cdot)$表示表观相似度。 Inference Algorithm分为3步：</p>
+<p>给定同一个目标在两帧图像中的bounding boxes， FAF模块从FMF抽取的特征中crop patches，然后计算相似度。 在训练过程中同一个目标的不同特征concat一起作为正样本， 不同样本特征concat一起作为负样本。正负样本比例控制在$1:4$, 损失采用交叉熵损失</p>
+<script type="math/tex; mode=display">
+\mathcal{L}_{BCE} -\frac{1}{N}\sum_{j=1}^N\mathcal{S}_j\log h(p_j) + (1-\mathcal{S_j})\log (1-h(p_j))</script><p>$p_j, \mathcal{S_j}$表示样本和对应label。</p>
+<h4 id="Inference-Algorithm"><a href="#Inference-Algorithm" class="headerlink" title="Inference Algorithm"></a>Inference Algorithm</h4><p>$D=\{D_1, \cdots, D_N\}, T=\{T^1, \cdots, T^M\}$分别表示当前时刻的检测结果和已经存在的跟踪轨迹。 $IOU(\cdot)$表示IOU算子， $SIM(\cdot)$表示表观相似度。 Inference Algorithm分为3步：</p>
 <ul>
 <li>从former 到latter进行关联</li>
 <li>从latter 到former进行关联</li>

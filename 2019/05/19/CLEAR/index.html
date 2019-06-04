@@ -223,7 +223,7 @@
 <li>指标个数尽可能少，每个指标都具有较高表达能力。</li>
 </ul>
 <p>于是本文提出了CLEAR评估指标系统，用于评估MOT方法</p>
-<h3 id="CLEAR"><a href="#CLEAR" class="headerlink" title="CLEAR"></a>CLEAR</h3><p>假设每一帧中目标为${o_1, o_2, …, o_n}$, 跟踪假设为${h_1, h_2, …, h_m}$, 检测结果为${d_1, d_2, …d_k}$。跟踪假设和检测不同，跟踪假设是算法跟踪出来的结果。于是评价过程有以下基本步骤：</p>
+<h3 id="CLEAR"><a href="#CLEAR" class="headerlink" title="CLEAR"></a>CLEAR</h3><p>假设每一帧中目标为$\{o_1, o_2, …, o_n\}$, 跟踪假设为$\{h_1, h_2, …, h_m\}$, 检测结果为$\{d_1, d_2, …d_k\}$。跟踪假设和检测不同，跟踪假设是算法跟踪出来的结果。于是评价过程有以下基本步骤：</p>
 <ol>
 <li>建立假设和目标之间的对应关系。</li>
 <li>对所有的对应关联关系，计算位置偏差，即一致性程度；</li>
@@ -242,7 +242,7 @@
 </li>
 </ol>
 <p>   <img src="/2019/05/19/CLEAR/IDKeep.png" alt="IDKeep"></p>
-<ol start="2">
+<ol>
 <li><p>一致性刻画。追踪一致性能力就是指追踪器使追踪假设和对应目标长时间保持对应关系不变的能力。</p>
 <p>一致性度量有两种方式可选。第一种是选择真实轨迹的一条最优匹配跟踪结果，然后其他的匹配都认为是错误匹配，记为IDs，如下图所示</p>
 <p><img src="/2019/05/19/CLEAR/IDS.png" alt="IDS"></p>
@@ -259,12 +259,16 @@
 </li>
 <li><p>剩下未匹配的假设和目标分别记为虚警和漏检$m_t, fp_t$, 并用$g_t$表示当前时刻真正目标的个数。</p>
 </li>
-<li><p>从起始帧逐帧计算上述变量，最终统计下面的指标<br>$$<br>MOTP = \frac{\sum_{i,t}d_t^i}{\sum_tc_t}<br>$$<br>即所有匹配的平均距离，该值使用IOU时取值越大越好，一般范围在$0.50\sim1$之间，因为$IOU&gt;0.50$的才认为是正确匹配。<br>$$<br>MOTA = 1-\frac{\sum_t(m_t+fp_t+mmr_t)}{\sum_tg_t}<br>$$</p>
-</li>
+<li><p>从起始帧逐帧计算上述变量，最终统计下面的指标</p>
+<script type="math/tex; mode=display">
+MOTP = \frac{\sum_{i,t}d_t^i}{\sum_tc_t}</script><p>即所有匹配的平均距离，该值使用IOU时取值越大越好，一般范围在$0.50\sim1$之间，因为$IOU&gt;0.50$的才认为是正确匹配。</p>
+<script type="math/tex; mode=display">
+MOTA = 1-\frac{\sum_t(m_t+fp_t+mmr_t)}{\sum_tg_t}</script></li>
 </ul>
 </li>
 </ol>
-<pre><code>其中$\frac{\sum_tm_t}{\sum_tg_T}, \frac{\sum_tfp_t}{\sum_tg_t}, \frac{\sum_tmmr_t}{\sum_tg_t}$分别表示总体的漏检率，虚警率和跳变几率。 MOTA的取值范围在$(-\infty, 1)$之间， 越大越好。</code></pre><p>   注意， MOTP，MOTA都是整体过程的均值，而不是每一帧均值之后的平均值，两个之间差别还是挺大的。如下图所示，一个8帧的数据，前面4帧都被漏检，第五帧开始只有第4个目标匹配成功，这样助阵计算漏检率的话， $(1 \times 4 + 0 \times 4)/8=0.5$, 而如果统计整个跟踪过程在计算漏检率为$\frac{4\times 4}{20}=0.8$。 显然采用整体过程更合适。</p>
+<pre><code> 其中$\frac{\sum_tm_t}{\sum_tg_T}, \frac{\sum_tfp_t}{\sum_tg_t}, \frac{\sum_tmmr_t}{\sum_tg_t}$分别表示总体的漏检率，虚警率和跳变几率。 MOTA的取值范围在$(-\infty, 1)$之间， 越大越好。
+</code></pre><p>   注意， MOTP，MOTA都是整体过程的均值，而不是每一帧均值之后的平均值，两个之间差别还是挺大的。如下图所示，一个8帧的数据，前面4帧都被漏检，第五帧开始只有第4个目标匹配成功，这样助阵计算漏检率的话， $(1 \times 4 + 0 \times 4)/8=0.5$, 而如果统计整个跟踪过程在计算漏检率为$\frac{4\times 4}{20}=0.8$。 显然采用整体过程更合适。</p>
 <hr>
 <h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><p>论文在CLEARs workshops上使用提出的两个metric评价了不同的track system，发现</p>
 <blockquote>

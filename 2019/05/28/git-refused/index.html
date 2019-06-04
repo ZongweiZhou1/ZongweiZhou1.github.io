@@ -215,7 +215,6 @@
 <p><strong>解决办法</strong></p>
 <p>找到windows下git的安装目录， 然后在<code>Git\etc\ssh\</code>中找到 <code>ssh_config</code>文件，然后在这个文件的末尾加上下面这段设置：</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Host github.com</span><br><span class="line">User XXXX@163.com </span><br><span class="line">Hostname ssh.github.com</span><br><span class="line">PreferredAuthentications publickey</span><br><span class="line">Port 443</span><br></pre></td></tr></table></figure>
-
 <p>这里 <code>XXX@163.com</code>是自己注册github使用的邮箱。然后保存再次测试连接发现可以成功连接。</p>
 <p>另外一种方法就是在 `ssh文件里面创建config文件，然后将上述内容复制进去，这种文件的优先级比ssh_config的优先级更高，会覆盖掉ssh_config中的设置。</p>
     </div>

@@ -223,19 +223,22 @@
 </li>
 <li><p>打开本地服务，查看网页生成是否达到预期</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo s</span><br></pre></td></tr></table></figure>
-
 <p>然后浏览器输入<code>localhost:4000</code></p>
 </li>
 <li><p>上传到网站</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo d</span><br></pre></td></tr></table></figure>
-
 <p>此时便可登录网站查看生成的blog</p>
 </li>
 </ol>
 <h4 id="主题选择"><a href="#主题选择" class="headerlink" title="主题选择"></a>主题选择</h4><p>主题的选择看个人需求，比如我博客内容更多的关于科研文章的解读，需要频繁的输入公式和贴图，论文的截图一般都是白色背景，所以我选择主题需要支持<code>mathjax</code>, 以及白色背景最好， 最终选择模板<a href="https://github.com/dongyuanxin/theme-bmw" target="_blank" rel="noopener">BMW</a></p>
 <h4 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h4><h5 id="测试公式是否能显示正常"><a href="#测试公式是否能显示正常" class="headerlink" title="测试公式是否能显示正常"></a>测试公式是否能显示正常</h5><p>行内公式： $y=\frac{\alpha^2+\sum_{i=1}^\beta\Phi(\hat{x}_i)}{\text{exp}(x^2)}$</p>
-<p>行间公式：<br>$$<br>y=<br>\begin{cases}<br>x^2+z^2, \text{   if} x&gt;z, \<br>(z-x)^2, \text{else}<br>\end{cases}.<br>$$</p>
-<h5 id="测试图片是否能够正常显示"><a href="#测试图片是否能够正常显示" class="headerlink" title="测试图片是否能够正常显示"></a>测试图片是否能够正常显示</h5><p><img src="/2019/05/17/hello-world/girl.png" alt="girl"></p>
+<p>行间公式：</p>
+<script type="math/tex; mode=display">
+y=
+\begin{cases}
+x^2+z^2, \text{   if} x>z, \\
+(z-x)^2, \text{else}
+\end{cases}.</script><h5 id="测试图片是否能够正常显示"><a href="#测试图片是否能够正常显示" class="headerlink" title="测试图片是否能够正常显示"></a>测试图片是否能够正常显示</h5><p><img src="/2019/05/17/hello-world/girl.png" alt="girl"></p>
     </div>
   </div>
   

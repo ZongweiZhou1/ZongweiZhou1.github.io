@@ -224,10 +224,10 @@
 <p>这篇文章提出了一个统一框架用于融合多线索进行相似性度量。其主要思想是在空间和时间上同时利用relation network刻画目标之间关系，包括位置和表观。</p>
 <p>如Figure 1.所示， 现在每一帧中利用关系网络进一步strengthen 每一个目标的表观特征，然后再与存在的tracklets的strengthen的表观特征利用时域的关系网络进行串联并学习相似度。</p>
 <hr>
-<h3 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h3><h4 id="Notation"><a href="#Notation" class="headerlink" title="Notation"></a>Notation</h4><p>${T_i}_{i=1}^N$                                      表示$N$条轨迹</p>
-<p>$T_i={b_i^t}_{t=1}^T$                             表示第$i$条轨迹中的$T$帧中匹配到的位置， bounding box。</p>
+<h3 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h3><h4 id="Notation"><a href="#Notation" class="headerlink" title="Notation"></a>Notation</h4><p>$\{T_i\}_{i=1}^N$                                      表示$N$条轨迹</p>
+<p>$T_i=\{b_i^t\}_{t=1}^T$                             表示第$i$条轨迹中的$T$帧中匹配到的位置， bounding box。</p>
 <p>$b_i^t = [x_i^t, y_i^t, w_i^t, h_i^t]$                  中心点的坐标和目标的宽度与高度</p>
-<p>$D_t={b_j^t}_{j=1}^{N_t}$                           时刻$t$中的所有检测响应                       </p>
+<p>$D_t=\{b_j^t\}_{j=1}^{N_t}$                           时刻$t$中的所有检测响应                       </p>
 <h4 id="跟踪流程"><a href="#跟踪流程" class="headerlink" title="跟踪流程"></a>跟踪流程</h4><p><img src="/2019/05/19/STRN/pipeline.png" alt="pipeline"></p>
 <p>本文方法依然在tracking-by-detection框架下，因此给定图像序列，首先使用检测器对目标进行检测。然后将以跟踪的轨迹与当前帧的检测配对放入到Spatial-Temporal Relation Networks (STRN)中计算每一个点对的相似度。于是轨迹和检测就行了二部图，采用匈牙利算法进行数据关联将检测分配给不同的轨迹。</p>
 <p>Spatial-Temporal Relation Networks的框架如下图所示：</p>
@@ -240,29 +240,51 @@
 <blockquote>
 <p>H. Hu, J. Gu, Z. Zhang, J. Dai, and Y. Wei. Relation networks for object detection. 2018.</p>
 </blockquote>
-<p>每一个目标可以使用$o_i = (\phi_i, b_i)$表示，分别表示表观特征和位置信息。那么refined 特征相当于GCN网络抽取的特征。<br>$$<br>\phi_i’ = \phi_i + \sum_j w_{ij} \cdot (W_V\cdot \phi_j)<br>$$<br>$j$取同一帧中所有目标， 所以上式表示新的特征等于本身特征和其他目标的影响的结合。$W_V$是学习参数，表示对特征的进一步抽象。$w_ij$表示$j$样本对当前$i$样本的贡献量，是一种attention权重。<br>$$<br>w_{ij} = \frac{w_{ij}^G\exp(w_{ij}^A)}{\sum_k^Nw_{ik}^G\exp(w_{ik}^A)}<br>$$<br>$w_{ij}^A$表示的是projected后的表观特征的scaled的内积。这个scale主要是让attention更加平稳。<br>$$<br>w_{ij}^A = \frac{&lt;W_Q\phi_i, W_K\phi_j&gt;}{\sqrt{d}}<br>$$<br>$W_Q, W_K$分别表示project矩阵， $d$表示投影特征的维度， $w_{ij}^G$表示的是相对位置关系。$w_{ij}^G = \log\big( \frac{|x_i-x_j|}{w_j}, \frac{|y_i-y_j}{h_j}, \frac{w_i}{w_j}, \frac{h_i}{h_j}\big )$</p>
-<ol start="2">
+<p>每一个目标可以使用$o_i = (\phi_i, b_i)$表示，分别表示表观特征和位置信息。那么refined 特征相当于GCN网络抽取的特征。</p>
+<script type="math/tex; mode=display">
+\phi_i' = \phi_i + \sum_j w_{ij} \cdot (W_V\cdot \phi_j)</script><p>$j$取同一帧中所有目标， 所以上式表示新的特征等于本身特征和其他目标的影响的结合。$W_V$是学习参数，表示对特征的进一步抽象。$w_ij$表示$j$样本对当前$i$样本的贡献量，是一种attention权重。</p>
+<script type="math/tex; mode=display">
+w_{ij} = \frac{w_{ij}^G\exp(w_{ij}^A)}{\sum_k^Nw_{ik}^G\exp(w_{ik}^A)}</script><p>$w_{ij}^A$表示的是projected后的表观特征的scaled的内积。这个scale主要是让attention更加平稳。</p>
+<script type="math/tex; mode=display">
+w_{ij}^A = \frac{<W_Q\phi_i, W_K\phi_j>}{\sqrt{d}}</script><p>$W_Q, W_K$分别表示project矩阵， $d$表示投影特征的维度， $w_{ij}^G$表示的是相对位置关系。$w_{ij}^G = \log\big( \frac{|x_i-x_j|}{w_j}, \frac{|y_i-y_j}{h_j}, \frac{w_i}{w_j}, \frac{h_i}{h_j}\big )$</p>
+<ol>
 <li>时域的关系网络</li>
 </ol>
 <p>时域的关系网络可直接通过节点域有单帧图像扩大到多帧图像处理，但这种方式存在两个缺陷。</p>
 <p>首先，计算量急剧增大；其次，空间特征和时间特征本质上是不同的信息。</p>
 <p>所以，这这篇文章中的时域关系网络本质上是时域上的attention机制，即加权平均值。</p>
-<p>空间关系网络输出特征表示为$\phi_{S,i}$ 时间关系网络在空间关系网络的输出特征上进行操作。​<br>$$<br>\phi_{ST,i}^t = \sum_{k}^{\tau_1-1} w_i^{t-k}\cdot \phi_{s,i}^{t-k}<br>$$<br>这里值得注意的是，计算时间关系特征的时候只计算轨迹的特征，而当前帧中的检测不参与计算。<br>$$<br>w_i^t = \frac{\exp(&lt;w_T, \phi_{S,i}^t&gt;)}{\sum_k\exp(&lt;w_T, \phi_{S,i}^k&gt;)}<br>$$<br>$w_T$是待学习参数。</p>
-<p>![spatial attention](STRN/spatial attention.png)</p>
-<p>![temporal attention](STRN/temporal attention.png)</p>
-<h4 id="Feature-representation"><a href="#Feature-representation" class="headerlink" title="Feature representation"></a>Feature representation</h4><p>这个模块主要用于集成不同的线索，最终计算相似度。<br>$$<br>s_{ij}^t = \text{sigmod}(W_{s2}\cdot ReLU(W_{s1}\cdot [\phi_R; \phi_C; \phi_L;\phi_M]))<br>$$<br>下面介绍四种特征$\phi_R, \phi_C, \phi_L, \phi_M$.</p>
+<p>空间关系网络输出特征表示为$\phi_{S,i}$ 时间关系网络在空间关系网络的输出特征上进行操作。​</p>
+<script type="math/tex; mode=display">
+\phi_{ST,i}^t = \sum_{k}^{\tau_1-1} w_i^{t-k}\cdot \phi_{s,i}^{t-k}</script><p>这里值得注意的是，计算时间关系特征的时候只计算轨迹的特征，而当前帧中的检测不参与计算。</p>
+<script type="math/tex; mode=display">
+w_i^t = \frac{\exp(<w_T, \phi_{S,i}^t>)}{\sum_k\exp(<w_T, \phi_{S,i}^k>)}</script><p>$w_T$是待学习参数。</p>
+<p><img src="/2019/05/19/STRN/spatial attention.png" alt="spatial attention"></p>
+<p><img src="/2019/05/19/STRN/temporal attention.png" alt="temporal attention"></p>
+<h4 id="Feature-representation"><a href="#Feature-representation" class="headerlink" title="Feature representation"></a>Feature representation</h4><p>这个模块主要用于集成不同的线索，最终计算相似度。</p>
+<script type="math/tex; mode=display">
+s_{ij}^t = \text{sigmod}(W_{s2}\cdot ReLU(W_{s1}\cdot [\phi_R; \phi_C; \phi_L;\phi_M]))</script><p>下面介绍四种特征$\phi_R, \phi_C, \phi_L, \phi_M$.</p>
 <ol>
 <li><p>Relation features</p>
-<p>最直接的方式是将每个待关联的轨迹最后一帧的特征和待检测目标的特征串联起来作为新的特征然后将新的特征送入网络进一步抽象。<br>$$<br>\phi_R = W_R \cdot [\phi_{ST,i}^{t-k}; \phi_{S,j}^t], 1\le k \le \tau_2<br>$$<br>作者认为这个特征是把双刃剑，既可以直接用来计算相似度，也给学习紧致的目标特征带来了难度。因此作者又在关系特征$\phi_{ST,i}^{t-k}, \phi_{S,j}^t$上直接显示的计算了余弦相似度。<br>$$<br>\phi_C = \cos (W_C\cdot \phi_{ST,i}^{t-k}, W_C\cdot \phi_{S,j}^t), 1\le k \le \tau_2<br>$$<br><strong>分析</strong>：</p>
+<p>最直接的方式是将每个待关联的轨迹最后一帧的特征和待检测目标的特征串联起来作为新的特征然后将新的特征送入网络进一步抽象。</p>
+<script type="math/tex; mode=display">
+\phi_R = W_R \cdot [\phi_{ST,i}^{t-k}; \phi_{S,j}^t], 1\le k \le \tau_2</script><p>作者认为这个特征是把双刃剑，既可以直接用来计算相似度，也给学习紧致的目标特征带来了难度。因此作者又在关系特征$\phi_{ST,i}^{t-k}, \phi_{S,j}^t$上直接显示的计算了余弦相似度。</p>
+<script type="math/tex; mode=display">
+\phi_C = \cos (W_C\cdot \phi_{ST,i}^{t-k}, W_C\cdot \phi_{S,j}^t), 1\le k \le \tau_2</script><p><strong>分析</strong>：</p>
 <blockquote>
 <p>In general, cosine value could take effect only in the scenarios where two input features are compatible in representation.</p>
 </blockquote>
 <p>即一般而言，cosine距离最好直接度量来自于相同空间向量的相似度，但这里的特征来自于检测和轨迹。看起来似乎不同空间。但是经过分析可以发现轨迹的特征其实是在时间域上的加权平均值，而每一个元素都是每帧图像检测的空间特征，因此特，他们其实分布在临近空间，所以可以使用cosine距离刻画。</p>
 </li>
 <li><p>location features</p>
-<p>位置关系和运动信息是另外两种常用的匹配信息。文章选择每个跟踪轨迹的最后出现目标的位置的大小作为参考目标，embedding 当前检测的位置和大小信息。<br>$$<br>\phi_* = W_* \cdot \varepsilon_<em>(f_</em>(b_i^{t-k}, b_j^t))<br>$$<br>其中$*\in {L, M}$分别表示位置和运动信息。</p>
-<p>位置信息是4维特征。<br>$$<br>f_L’(b_j^t) = \big(\frac{x_j^t}{I_w^t}, \frac{y_j^t}{I_h^t}, \frac{w_j^t}{I_w^t}, \frac{h_j^t}{I_h^t}\big)<br>$$<br>其中$I_w^t, I_h^t$表示第$t$帧图像的宽和高。  $f_L(b_i^{t-k}, b_j^t) = [f_L’(b_i^{t-k}); f_L’(b_j^t)]$ </p>
-<p>运动信息则是刻画的目标之间的相互位置和大小关系。<br>$$<br>f_M((b_i^{t-k}, b_j^t) = \log\big( \frac{|x_i^{t-k}-x_j^t|}{kw_i^{t-k}}, \frac{|y_i^{t-k}-y_j^t|}{kh_i^{t-k}}, \frac{w_j^t}{kw_i^{t-k}}, \frac{h_j^t}{kh_i^{t-k}}\big)<br>$$<br><strong>这部分我觉得设计存在一定问题。前面两项都是计算的变化速度，但后面两项其实不应该计算相对比例的变化速度，直接使用比值，或者平均差值或者会更好</strong></p>
+<p>位置关系和运动信息是另外两种常用的匹配信息。文章选择每个跟踪轨迹的最后出现目标的位置的大小作为参考目标，embedding 当前检测的位置和大小信息。</p>
+<script type="math/tex; mode=display">
+\phi_* = W_* \cdot \varepsilon_*(f_*(b_i^{t-k}, b_j^t))</script><p>其中$*\in \{L, M\}$分别表示位置和运动信息。</p>
+<p>位置信息是4维特征。</p>
+<script type="math/tex; mode=display">
+f_L'(b_j^t) = \big(\frac{x_j^t}{I_w^t}, \frac{y_j^t}{I_h^t}, \frac{w_j^t}{I_w^t}, \frac{h_j^t}{I_h^t}\big)</script><p>其中$I_w^t, I_h^t$表示第$t$帧图像的宽和高。  $f_L(b_i^{t-k}, b_j^t) = [f_L’(b_i^{t-k}); f_L’(b_j^t)]$ </p>
+<p>运动信息则是刻画的目标之间的相互位置和大小关系。</p>
+<script type="math/tex; mode=display">
+f_M((b_i^{t-k}, b_j^t) = \log\big( \frac{|x_i^{t-k}-x_j^t|}{kw_i^{t-k}}, \frac{|y_i^{t-k}-y_j^t|}{kh_i^{t-k}}, \frac{w_j^t}{kw_i^{t-k}}, \frac{h_j^t}{kh_i^{t-k}}\big)</script><p><strong>这部分我觉得设计存在一定问题。前面两项都是计算的变化速度，但后面两项其实不应该计算相对比例的变化速度，直接使用比值，或者平均差值或者会更好</strong></p>
 <hr>
 </li>
 </ol>

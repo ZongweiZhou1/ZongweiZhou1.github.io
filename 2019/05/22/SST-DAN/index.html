@@ -222,7 +222,7 @@
 <li>$\Psi_{t-n,t}$是一个$N\times N\times 2M$的tensor，其中N表示目标的个数， $M$表示每个目标特征向量的维度，$N\times N$表示的任意两个来自于不同帧的目标配对，相当于global association。</li>
 <li>$L_{t-n, t}$二值关联矩阵， 1表示关联， 0表示不关联， 表示来自于两张图片中目标的关联矩阵。这里包含了终止和起始状态。</li>
 <li>$A_{t-n, t}$相似度矩阵， 由$\Psi$到$A$进而得到$L$</li>
-<li>$\Tau_t$ 直至第$t$帧时的轨迹的集合。轨迹使用二元组的集合表示,$\Tau_t^i={(0,1),(1,2)}$表示轨迹中的关联是第0帧的第一个目标和第1帧的第2个目标。</li>
+<li>$\Tau_t$ 直至第$t$帧时的轨迹的集合。轨迹使用二元组的集合表示,$\Tau_t^i=\{(0,1),(1,2)\}$表示轨迹中的关联是第0帧的第一个目标和第1帧的第2个目标。</li>
 <li>$\mathcal{Z}(\cdot)$算子用来计算集合或者矩阵中的元素</li>
 <li>$\Lambda_t\in R^{\mathcal{Z}(\Tau_{t-1})\times(\mathcal{Z}(\mathcal{C_t})+1)}$ 是一个accumulator matrix，其元素表示目标与轨迹的相似度</li>
 <li>$N_m$表示每一帧中最大允许的目标个数， $B$是batchsize</li>
@@ -230,7 +230,7 @@
 </li>
 <li><p><strong>Deep Affinity Network （DAN）</strong></p>
 <p>如图1所示， DAN包含了两部分：特征抽取模块(feature extractor)和相似度估计模块(Affinity estimator), 整体的训练是end-to-end方式的。</p>
-<p>DAN的输入是两幅图像$I_t, I_{t-n}$以及每幅图像中对应目标的中心点坐标$\mathcal{C}<em>t, \mathcal{C}</em>{t-n}$, 这里不要求两幅图像连续， 时间间隔$N\in\mathbb{N}^{rand}\sim [1, N_V]$. </p>
+<p>DAN的输入是两幅图像$I_t, I_{t-n}$以及每幅图像中对应目标的中心点坐标$\mathcal{C}_t, \mathcal{C}_{t-n}$, 这里不要求两幅图像连续， 时间间隔$N\in\mathbb{N}^{rand}\sim [1, N_V]$. </p>
 <p>DAN的输出应该是两幅图像中目标的关联矩阵$L_{t-n, t}$</p>
 <p>其主要过程：</p>
 <ul>
@@ -253,8 +253,7 @@
 <li><p>MOT中每一帧存活的轨迹个数不是固定的，给网络的训练带来难度。因此文章给出了一个轨迹个数的上限值$N_m=80$ , Fig.2 给出了关联矩阵的构建示意图。这里为了清晰演示，取$N_m=5$. 第1帧和第30帧图像各检测到4个目标， 总共有$5$个人。 Fig.2c展示了包含dummy row和column的中间矩阵$L_{1, 30}’$的构建, dummy row或者column用来表示dummy bounding box，从而让关联矩阵大小一致，不随目标个数变化而变化。 Fig.2d中关联矩阵进一步augmented引入新的row和column，表示新出现的目标和终止的轨迹。最终使用Fig.2d的矩阵作为训练目标。最后一行或者列中包含多个1则表示多个目标终止或出现。</p>
 <p><img src="/2019/05/22/SST-DAN/1552789627289.png" alt="association matrix"></p>
 <p>这里dummy行或者列与augmented行列是不同的， dummy是用来保证总体的匹配个数相同，需要服从每一行或者列最多只能有1个非零元素，augmented则是用来刻画轨迹的终止和起始，对其非零元素的个数没有约束。允许多条轨迹同时结束， 多个目标同时作为多条新轨迹的起点。</p>
-<p>####Feature extractor</p>
-<p>在VGG16上进行了修改， 将VGG16后面的全连接层和softmax层都换成了卷积层，这么做主要是卷积层能够更好地encoding目标的空间特征并且可以从空间上抽取每个目标的特征。另外这里的输入数据也更大$3\times 900 \times 900$, 从而修改后的VGG16最后一层的输出还有$56\times 56$大小。 VGG16最后输出的$56\times 56$的feature map采用表2上半部分的结构进一步缩小到$3\times 3$</p>
+<h4 id="Feature-extractor"><a href="#Feature-extractor" class="headerlink" title="Feature extractor"></a>Feature extractor</h4><p>在VGG16上进行了修改， 将VGG16后面的全连接层和softmax层都换成了卷积层，这么做主要是卷积层能够更好地encoding目标的空间特征并且可以从空间上抽取每个目标的特征。另外这里的输入数据也更大$3\times 900 \times 900$, 从而修改后的VGG16最后一层的输出还有$56\times 56$大小。 VGG16最后输出的$56\times 56$的feature map采用表2上半部分的结构进一步缩小到$3\times 3$</p>
 <p>特征抽取和估计affinity的网络参数如下表：</p>
 <p><img src="/2019/05/22/SST-DAN/1552791780072.png" alt="architecture details"></p>
 <p>修改后的feature extractor网络具有33层卷积层，然后从中选择了9层作为最终提取特征的层，其选择的层数索引，以及如何从该层降维获得表观特征参数如下</p>
@@ -267,7 +266,15 @@
 </li>
 <li><p><strong>Network Loss</strong></p>
 <p>$M_1\in R^{N_m\times(N_m+1)}$列扩展矩阵每一行表示第$m$个目标关联情况或者是否结束。 $M_2\in R^{(N_m+1)\times N_m}$行扩展矩阵对应了反向匹配时第二幅图像中目标的关联情况或者是否是新出现的轨迹。对行，列扩展矩阵$M_1, M_2$分别进行行，列softmax得到$A_1, A_2$表示的是概率。</p>
-<p>因此DAN网络损失包含4部分：前向损失，后向损失，一致性损失和组合损失<br>$$<br>\begin{aligned}<br>\mathcal{L}<em>f(L_1, A_1) &amp;= \frac{\sum(L_1\odot(-\log A_1))}{\sum L_1}\<br>\mathcal{L}_b(L_2, A_2) &amp;= \frac{\sum(L_2\odot(-\log A_2))}{\sum L_2}\<br>\mathcal{L_c}(\widehat{A_1}, \widehat{A_2}) &amp;= \Vert\widehat{A_1}-\widehat{A_2} \Vert_1\<br>\mathcal{L_a}(L_3, \widehat{A_1}, \widehat{A_2}) &amp;= \frac{\sum (L_3\odot (-\log(max(\widehat{A_1}, \widehat{A_2}))))}{\sum (L_3)}\<br>\mathcal{L} &amp;= \frac{\mathcal{L_f}+\mathcal{L_b}+\mathcal{L_a}+\mathcal{L_c}}{4}<br>\end{aligned}<br>$$<br>其中$L_1, L_2$都是与$M_1, M_2$对应的$L</em>{t-n, t}$的trimmed 版本， $\widehat{A_1}, \widehat{A_2}$是trimmed成$N_m\times N_m$的版本， $L_3$则是同时去掉了最后一行和最后一列。</p>
+<p>因此DAN网络损失包含4部分：前向损失，后向损失，一致性损失和组合损失</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\mathcal{L}_f(L_1, A_1) &= \frac{\sum(L_1\odot(-\log A_1))}{\sum L_1}\\
+\mathcal{L}_b(L_2, A_2) &= \frac{\sum(L_2\odot(-\log A_2))}{\sum L_2}\\
+\mathcal{L_c}(\widehat{A_1}, \widehat{A_2}) &= \Vert\widehat{A_1}-\widehat{A_2} \Vert_1\\
+\mathcal{L_a}(L_3, \widehat{A_1}, \widehat{A_2}) &= \frac{\sum (L_3\odot (-\log(max(\widehat{A_1}, \widehat{A_2}))))}{\sum (L_3)}\\
+\mathcal{L} &= \frac{\mathcal{L_f}+\mathcal{L_b}+\mathcal{L_a}+\mathcal{L_c}}{4}
+\end{aligned}</script><p>其中$L_1, L_2$都是与$M_1, M_2$对应的$L_{t-n, t}$的trimmed 版本， $\widehat{A_1}, \widehat{A_2}$是trimmed成$N_m\times N_m$的版本， $L_3$则是同时去掉了最后一行和最后一列。</p>
 <p>四种Loss损失：</p>
 <ul>
 <li>对于前向和后向损失，文章并没有直接使用输出$A_q(q=1,2)$与目标$L_q(q=1,2)$的距离作为损失， 而是采用$A_q$在真实关联位置的相对系数，也就是$-\log(A_q)$作为优化目标，这种方法其实是让关联位置的输出概率更快的接近于1， 而对于其他非真实关联的位置，由于$A_q$采用了行或者softmax，所以就非常接近于0.</li>
@@ -275,7 +282,7 @@
 <li>$L_a$和$L_q(q=1,2)$类似， 不同的是选择最大$\widehat{A_1}, \widehat{A_2}$作为最终的关联矩阵。</li>
 </ul>
 </li>
-<li><p>*<em>DAN deployment *</em></p>
+<li><p><strong>DAN deployment </strong></p>
 <p>因为feature extractor部分是参数共享的，而在计算相似度矩阵的时候只是后面的affinity estimator牵涉到两两相互操作，因此，每张图片其实只进行一次feature extractor的操作，后面的affinity estimator是进行匹配。</p>
 </li>
 <li><p><strong>Deep track association</strong></p>

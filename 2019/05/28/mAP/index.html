@@ -224,38 +224,41 @@
 <p>由于目标检测模型一般指定了学习的类别， 因此检测模型只需要定位于区分这些指定的类别。另外一般使用矩形框<strong>bounding box</strong>来定位目标。</p>
 <p>所以，目标检测任务包含定位和分类两个子问题。</p>
 <p>下面要介绍的mAP指标特别适合那些定位不同类目标的算法，所以<strong>mAP可以用来评估下图中的定位模型，目标检测模型和目标分割模型。</strong></p>
-<p>![image processing problems](mAP/image processing problems.png)</p>
+<p><img src="/2019/05/28/mAP/image processing problems.png" alt="image processing problems"></p>
 <hr>
 <h3 id="评价目标检测模型"><a href="#评价目标检测模型" class="headerlink" title="评价目标检测模型"></a>评价目标检测模型</h3><h4 id="为什么选择-mAP指标？"><a href="#为什么选择-mAP指标？" class="headerlink" title="为什么选择 mAP指标？"></a>为什么选择 mAP指标？</h4><p>在目标检测任务中， 每张图像都可能包含不同类别中的不同目标。而这些目标的定位和分类都需要评估。 因此图像分类任务中的标准评价指标不能直接应用到目标检测任务中。 于是mAP进入了视野。</p>
 <h4 id="关于ground-truth"><a href="#关于ground-truth" class="headerlink" title="关于ground truth"></a>关于ground truth</h4><p>无论是什么算法，评估算法性能都是比较算法的输出和样本的真是标签。对于目标检测任务，ground truth 数据包括<strong>图像</strong>、<strong>目标的类别</strong>以及目标在图像中真是的<strong>标定框</strong>。</p>
 <p>如下图所示， 图像，类别和标定框。当然，一般数据集的ground truth数据都是给定一幅图像以及对应的一串包含类别和标定框信息的文本内容。我们将文本内容表现在图像上从而更直观。</p>
-<p>![ground truth data](mAP/ground truth data.png)</p>
+<p><img src="/2019/05/28/mAP/ground truth data.png" alt="ground truth data"></p>
 <p>下面我们重点来介绍下mAP是如何计算的<strong>get our hands dirty</strong>, 首先我们假设已经获得某个检测器在验证集上的检测结果，希望评价这个检测器的性能。</p>
 <h4 id="计算mAP"><a href="#计算mAP" class="headerlink" title="计算mAP"></a>计算mAP</h4><p>检测器一般会输出大量的预测结果，但是其中大部分预测的置信度都比较低，所以在评估时只考虑那些置信度超出指定阈值的预测结果。</p>
 <p>将验证集的某张图像输入检测器中，经过与预测结果置信度阈值筛选后的预测结果就是检测器的最终输出。</p>
 <p>比如下图：</p>
-<p>![detector results](mAP/detector results.png)</p>
+<p><img src="/2019/05/28/mAP/detector results.png" alt="detector results"></p>
 <p>我们可以很直观的说这些检测是正确的，那么如何该如何量化的表示检测结果呢？</p>
 <p>首先我们需要度量这些检测结果的正确性。一般使用 IOU （Intersection over Union) 来预测boundingbox的正确性。 IoU是一个非常简单的视觉量。</p>
 <p>下面详细的介绍了IoU的计算过程。</p>
 <h4 id="IOU"><a href="#IOU" class="headerlink" title="IOU"></a>IOU</h4><p>IoU是指预测的bounding box与真实的bounding box的交集面积与并集面积的壁纸。也被称为Iaccard Index, 最早是由Paul Jaccard在19世纪初提出。 </p>
 <p>为了计算交并值，需要将预测框和真实框重叠在一起。对于每一类而言，检测框和真实框重叠的部分称为交集，而检测框和真实框覆盖的总区域称为并集。如下图中关于<code>马</code> 这类的交并比</p>
-<p>![iou of horse](mAP/iou of horse.png)</p>
+<p><img src="/2019/05/28/mAP/iou of horse.png" alt="iou of horse"></p>
 <p>IoU计算的图形化表示如下</p>
-<p>![iou graph format](mAP/iou graph format.png)</p>
+<p><img src="/2019/05/28/mAP/iou graph format.png" alt="iou graph format"></p>
 <h4 id="识别正确的检测并计算正确率和召回率"><a href="#识别正确的检测并计算正确率和召回率" class="headerlink" title="识别正确的检测并计算正确率和召回率"></a>识别正确的检测并计算正确率和召回率</h4><p>和所有的机器学习算法一样，为了计算正确率和召回率，首先需要区分True Positives， False Positives, True Negatives 和 False Negatives.</p>
 <p>我们使用IoU来筛选True和FALSE Positives。大多数情况下IoU的阈值为$0.5$, 也就是说当一个检测与同类别的某个ground truth 框的IoU大于 0.5时认为这个检测框属于True positive， 否则被认为是False Positive。 COCO数据集评测时建议通过交叉验证来获得IoU的阈值，这里为了简单，我们采取PASCAL VOC的度量标准， 即将阈值固定为0.5</p>
 <p>计算召回率时，需要计数negative的个数，按照分类问题中的定义，图像中所有没预测到目标的部分都可以认为是负样本，但这种假设导致true negative没有任何实际意义，（即true negative可能就只是背景）。所以这里只计算“False” Negatives， 即没有被检测到的目标的个数。</p>
 <p>另外一个需要考虑的因素是模型给出的每个检测的置信度。 通过置信度阈值的调整，划分为正样本positives的检测肯定不同。基本上所有的预测，（与类别无关），如果置信度大于阈值就是positive box，小于阈值就是negative box。</p>
 <p>对于每一张图像，其groundtruth数据能够得知图像中每一类目标的真实个数。</p>
-<p>通过阈值筛选出所有的positive detections之后，可以计算positive detections与ground truth之间的IoU。 然后利用这些数值与预先设定的IoU阈值可以找出每一张图像中correct detections的个数。从而计算出每一类的正确率precision<br>$$<br>\frac{TP}{TP+FP}=\frac{TP}{P}<br>$$<br>获得正确检测(True Positives)的个数，以及错误检测(False Positive)的个数后, 其召回率，即所有的ground truth中检测到的比率可以如下计算<br>$$<br>rec = \frac{TP}{FN+TP} = \frac{TP}{|G_t|}<br>$$</p>
-<h4 id="计算mAP-1"><a href="#计算mAP-1" class="headerlink" title="计算mAP"></a>计算mAP</h4><ul>
+<p>通过阈值筛选出所有的positive detections之后，可以计算positive detections与ground truth之间的IoU。 然后利用这些数值与预先设定的IoU阈值可以找出每一张图像中correct detections的个数。从而计算出每一类的正确率precision</p>
+<script type="math/tex; mode=display">
+\frac{TP}{TP+FP}=\frac{TP}{P}</script><p>获得正确检测(True Positives)的个数，以及错误检测(False Positive)的个数后, 其召回率，即所有的ground truth中检测到的比率可以如下计算</p>
+<script type="math/tex; mode=display">
+rec = \frac{TP}{FN+TP} = \frac{TP}{|G_t|}</script><h4 id="计算mAP-1"><a href="#计算mAP-1" class="headerlink" title="计算mAP"></a>计算mAP</h4><ul>
 <li><p>使用PASCAL VOC的评价标准。</p>
 <p>mAP在不同的领域有着不同的定义。 该度量广泛应用于信息检索和目标检测领域。 而在这两个领域中mAP的计算方式也不同。 这里讲的是目标检测领域内的mAP计算方式。</p>
 <p>目标检测领域内mAP是PASCAL VOC Challenge首先形式化表述的。 详见具体论文<a href="https://tarangshah.com/blog/assets/ijcv_voc09.pdf" target="_blank" rel="noopener">paper</a></p>
 <p>我们本节计算mAP中使用的pre和rec计算方式和前面一节方法相同。</p>
 <p>正如前文所说，计算pre和rec时，有两个很重要的阈值， 即置信度阈值和IoU阈值。</p>
-<p>IoU是一种简单的几何度量，可以很容易的标准化处理，比如PASCAL VOC中全部基于IoU=0.5条件下计算mAP， COCO则更进一步在不同的IoU阈值$5% \sim 95%$下计算mAP。但置信度阈值却随着模型不同变化很大。在一个模型中$50%$置信度很可能等价于其他模型中$80%$的置信度， 这就会导致pre-rec曲线形状差别很大。于是PASCAL VOC的组织者提出了一种解决办法。</p>
+<p>IoU是一种简单的几何度量，可以很容易的标准化处理，比如PASCAL VOC中全部基于IoU=0.5条件下计算mAP， COCO则更进一步在不同的IoU阈值$5\% \sim 95\%$下计算mAP。但置信度阈值却随着模型不同变化很大。在一个模型中$50\%$置信度很可能等价于其他模型中$80\%$的置信度， 这就会导致pre-rec曲线形状差别很大。于是PASCAL VOC的组织者提出了一种解决办法。</p>
 <p>文章中建议计算一种AP的度量。</p>
 <blockquote>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; For a given task and class, the precision/recall curve is computed from a method’s ranked output. Recall is defined as the proportion of all positive examples ranked above a given rank. Precision is the proportion of all examples above that rank which are from the positive class. The AP summarises the shape of the precision/recall curve, and is defined as the mean precision at a set of eleven equally spaced recall levels [0,0.1,...,1]:</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
@@ -269,23 +272,33 @@
 <blockquote>
 <figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; The precision at each recall level r is interpolated by taking the maximum precision measured for a method for which the corresponding recall exceeds r</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
 </blockquote>
-<p>  即对于某个recall值r， precision值取所有recall&gt;r值中的最大值， 保证了p-r曲线单调不增<br>  $$<br>  p_{interp}(r) = max_{\hat{r}\gt r} p(\hat{r})<br>  $$</p>
-<p>关于计算recall对应的precision时可能有点难理解，下面我们通过示例来解释一下<a href="https://github.com/rafaelpadilla/Object-Detection-Metrics" target="_blank" rel="noopener">example</a></p>
+<p>  即对于某个recall值r， precision值取所有recall&gt;r值中的最大值， 保证了p-r曲线单调不增</p>
+<script type="math/tex; mode=display">
+  p_{interp}(r) = max_{\hat{r}\gt r} p(\hat{r})</script><p>关于计算recall对应的precision时可能有点难理解，下面我们通过示例来解释一下<a href="https://github.com/rafaelpadilla/Object-Detection-Metrics" target="_blank" rel="noopener">example</a></p>
 <p>假设检测器对下面7张图片的检测结果为（绿色标识ground truth， 红色表示检测结果， 数字表示置信度）</p>
-<p>![detection example](mAP/detection example.png)</p>
+<p><img src="/2019/05/28/mAP/detection example.png" alt="detection example"></p>
 <p>那么如果将IoU阈值设为$0.3$,就可以判断每个检测是否是真正的positive， 在计算IoU进行配对时，每个ground truth最多只能对应一个检测，所以当多个检测与同一个ground truth IoU都大于阈值时，选择最大IoU的那个检测，其余的都不能分配给这个ground truth，再与其他的ground truth匹配。</p>
-<p>![pos or neg](mAP/pos or neg.png)</p>
+<p><img src="/2019/05/28/mAP/pos or neg.png" alt="pos or neg"></p>
 <p>然后对所有的检测按照置信度降序排列，然后通过逐渐增多认为是positive的检测的个数，可以得到每个阈值下对应的rec和pre</p>
-<p>![acc pre and acc rec](mAP/acc pre and acc rec.png)</p>
-<p>Acc TP， Acc FP 表示将每个检测的置信度设为阈值时的累积TP和FP。 由累积的TP和FP可以计算每个阈值下的pre和rec<br>$$<br>pre=\frac{tp_a}{ tp_a + fp_a}\<br>rec = \frac{tp_a}{N_d}<br>$$<br>那么将每一对(rec, pre)绘制在平面上得到：</p>
-<p>![pre-rec curver](mAP/pre-rec curver.png)</p>
+<p><img src="/2019/05/28/mAP/acc pre and acc rec.png" alt="acc pre and acc rec"></p>
+<p>Acc TP， Acc FP 表示将每个检测的置信度设为阈值时的累积TP和FP。 由累积的TP和FP可以计算每个阈值下的pre和rec</p>
+<script type="math/tex; mode=display">
+pre=\frac{tp_a}{ tp_a + fp_a}\\
+rec = \frac{tp_a}{N_d}</script><p>那么将每一对(rec, pre)绘制在平面上得到：</p>
+<p><img src="/2019/05/28/mAP/pre-rec curver.png" alt="pre-rec curver"></p>
 <p>可以返现曲线并不是单调的，而且一个rec可能对应着多个pre，这时候采用11点插值的做法是，将rec均匀采样为11个点，每一个点可能并不恰好对应于上图中的节点，比如rec没有等于0.1的点，这时候就需要插值得到对应的点的坐标(rec, pre).  AP是pre-rec曲线的AUC（area Under Curve）</p>
 <p>按照上文所说，每一个选中的rec对应的pre是大于该rec的所有点中最大的pre值。于是得到下图. 比如 rec=0.0时肯定找不到对应的点，这时候找所有rec&gt;0.0时的点对应的最大pre值作为0.0对应的pre，同理像是rec=0.2， rec=0.3时找到的对应pre都与rec=0.4时相同。</p>
-<p>![pre interplation](mAP/pre interplation.png)</p>
-<p>那么阶梯状连接所有的插值点，计算线下面积就是VOC标准下的mAP值。<br>$$<br>AP = \frac{1}{11}(1 +0.6666+0.4285+0.4285+0.4285+0+0+0+0+0) = 26.84%<br>$$<br><strong>而采用COCO标准的计算方法不同</strong></p>
+<p><img src="/2019/05/28/mAP/pre interplation.png" alt="pre interplation"></p>
+<p>那么阶梯状连接所有的插值点，计算线下面积就是VOC标准下的mAP值。</p>
+<script type="math/tex; mode=display">
+AP = \frac{1}{11}(1 +0.6666+0.4285+0.4285+0.4285+0+0+0+0+0) = 26.84\%</script><p><strong>而采用COCO标准的计算方法不同</strong></p>
 <p>COCO计算所有点对应的rec和pre， 而不是对rec进行均匀采样。其一般操作如下图所示, rec从1逐步下降到0， pre选择遍历过程中出现的最大值。</p>
 <p><img src="/2019/05/28/mAP/coco_mAP.png" alt="coco-mAP"></p>
-<p>所以COCO标准下，同样的检测结果， mAP计算为<br>$$<br>A1 = (0.0666-0)<em>1=0.0666; \quad  A2 = (0.13333-0.0666) * 0.6666 - 0.0445\<br>A3 = (0.4-0.1333) * 0.4285 = 0.1143; \quad A4 = (0.4666-0.4)</em>0.3043 = 0.0203\<br>AP = 24.46%<br>$$<br>发现两个标准下还是存在不同的，其实对比两张曲线图可以发现线下面积的不同。首先VOC是是rec进行了均匀采样，而COCO没有。其次COCO对原始曲线的包络更紧致，也更准确。</p>
+<p>所以COCO标准下，同样的检测结果， mAP计算为</p>
+<script type="math/tex; mode=display">
+A1 = (0.0666-0)*1=0.0666; \quad  A2 = (0.13333-0.0666) * 0.6666 - 0.0445\\
+A3 = (0.4-0.1333) * 0.4285 = 0.1143; \quad A4 = (0.4666-0.4)*0.3043 = 0.0203\\
+AP = 24.46\%</script><p>发现两个标准下还是存在不同的，其实对比两张曲线图可以发现线下面积的不同。首先VOC是是rec进行了均匀采样，而COCO没有。其次COCO对原始曲线的包络更紧致，也更准确。</p>
 <p><img src="/2019/05/28/mAP/compare.png" alt="compare"></p>
 <p>一些比较mAP值时需要注意的地方</p>
 <ul>
@@ -296,37 +309,19 @@
 <h3 id="mAP的开源代码"><a href="#mAP的开源代码" class="headerlink" title="mAP的开源代码"></a>mAP的开源代码</h3><ul>
 <li><p>计算每多一个detection作为positive下， 对应的pre和rec指标</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">sorted_ind 	= np.argsort(-confidence)  <span class="comment"># 置信度降序排列下的索引</span></span><br><span class="line">BB 		   	= BB[sorted_ind, :]  <span class="comment"># 所有的检测框按照置信度降序排列， 检测框来源于多张图像</span></span><br><span class="line">image_ids 	= [image_ids[x] <span class="keyword">for</span> x <span class="keyword">in</span> sorted_ind] <span class="comment"># 每个检测对应的图像</span></span><br><span class="line">nd 			= len(sorted_ind)   <span class="comment"># 检测结果的个数</span></span><br><span class="line">tp 			= np.zeros(nd)</span><br><span class="line">fp 			= np.zeros(nd)  <span class="comment"># 每个检测的标志位， 1表示是fp， 0表示不是， tp与fp类似</span></span><br><span class="line"><span class="keyword">for</span> d <span class="keyword">in</span> range(nd):  <span class="comment"># 遍历每一个检测，判断其是否是positive</span></span><br><span class="line">    R 		= class_recs[image_ids[d]]  <span class="comment"># 对应图像中的标注信息</span></span><br><span class="line">    bb 		= BB[d, :].astype(float)  <span class="comment"># bounding box的4个值</span></span><br><span class="line">    ovmax 	= -np.inf   <span class="comment"># 与ground truth的最大overlap</span></span><br><span class="line">    BBGT 	= R[<span class="string">'bbox'</span>].astype(float)  <span class="comment"># 当前图像对应的所有ground truth boxes</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> BBGT.size &gt; <span class="number">0</span>:  <span class="comment"># 存在gt box， 则计算检测与gt box的iou配对</span></span><br><span class="line">        xmin = np.maximum(BBGT[:, <span class="number">0</span>], bb[<span class="number">0</span>])</span><br><span class="line">        xmax = np.minimum(BBGT[:, <span class="number">2</span>], bb[<span class="number">2</span>])</span><br><span class="line">        ymin = np.maximum(BBGT[:, <span class="number">1</span>], bb[<span class="number">1</span>])</span><br><span class="line">        ymax = np.minimum(BBGT[:, <span class="number">2</span>], bb[<span class="number">2</span>])</span><br><span class="line">        w = np.maximum(xmax - xmin + <span class="number">1</span>, <span class="number">0.</span>)</span><br><span class="line">        h = np.maximum(ymax - ymin + <span class="number">1</span>, <span class="number">0</span>,)</span><br><span class="line">        inters = w * h  	<span class="comment"># intersection</span></span><br><span class="line">        unions = (bb[<span class="number">2</span>] - bb[<span class="number">0</span>] + <span class="number">1.</span>) * (bb[<span class="number">3</span>] - bb[<span class="number">1</span>] + <span class="number">1.</span>) +</span><br><span class="line">        		 (BBGT[:, <span class="number">2</span>] - BBGT[:, <span class="number">0</span>] + <span class="number">1.</span>) *(BBGT[:, <span class="number">3</span>] - BBGT[:, <span class="number">1</span>] + <span class="number">1.</span>) -</span><br><span class="line">            	 inters   <span class="comment"># union</span></span><br><span class="line">                </span><br><span class="line">        ious    = inters / unions</span><br><span class="line">        ovrmax 	= np.max(ious)  <span class="comment"># 与gt boxes存在的最大的iou</span></span><br><span class="line">        jmax 	= np.argmax(ious)  <span class="comment"># 最大iou的gt box的索引</span></span><br><span class="line">    <span class="keyword">if</span> ovmax &gt; ovthresh: 		<span class="comment"># 大于IoU阈值则认为是匹配成功的</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> R[<span class="string">'diffcult'</span>][jmax]:  <span class="comment"># 非diffcult的样本参与评估</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> R[<span class="string">'det'</span>][jmax]:   <span class="comment"># 如果该ground truth没有被分配过检测，则分配</span></span><br><span class="line">                tp[d] = <span class="number">1</span></span><br><span class="line">                R[<span class="string">'det'</span>][jmax] = <span class="number">1</span>  <span class="comment"># 用来保证每个gt只分配最近的检测</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                fp[d] = <span class="number">1</span>   <span class="comment"># 该检测没有分配成功</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        fp[d] = <span class="number">1</span></span><br><span class="line">fp 		= np.cumsum(fp)  <span class="comment"># 累积fp值 fp_a</span></span><br><span class="line">tp 		= np.cumsum(tp)  <span class="comment"># 累积tp值 tp_a</span></span><br><span class="line">rec 	= tp/ float(npos)  <span class="comment"># npos表示所有ground truth的个数</span></span><br><span class="line">pre 	= tp/np.maximum(tp + fp, np.finfo(np.float64).eps)  <span class="comment"># 防止分母为0</span></span><br></pre></td></tr></table></figure>
-
 <p><strong>我认为这部分计算其实是存在问题的</strong></p>
 <p>举个例子， 现在有两个gt分别为gt1, gt2, 检测器检测出两个响应d1, d2, 其置信度分别为0.7和0.6，</p>
 <p>计算d1, d2与gt1， gt2的iou矩阵如下</p>
-<table>
-<thead>
-<tr>
-<th>-</th>
-<th>gt1</th>
-<th>gt2</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>d1</td>
-<td>0.8</td>
-<td>0.6</td>
-</tr>
-<tr>
-<td>d2</td>
-<td>0.7</td>
-<td>0.68</td>
-</tr>
-</tbody></table>
-<p>那么按照上面提供的代码计算得到的值<br>$$<br>TP = [1, 0] ;\quad \quad  FP = [0, 1]<br>$$<br>但直观上来看， d2既然不能分配给gt1了，那为什么就不能分配给gt2了呢？而直接就认为d2是false positive了呢？</p>
+<p>| -    | gt1  | gt2  |<br>| —— | —— | —— |<br>| d1   | 0.8  | 0.6  |<br>| d2   | 0.7  | 0.68 |</p>
+<p>那么按照上面提供的代码计算得到的值</p>
+<script type="math/tex; mode=display">
+TP = [1, 0] ;\quad \quad  FP = [0, 1]</script><p>但直观上来看， d2既然不能分配给gt1了，那为什么就不能分配给gt2了呢？而直接就认为d2是false positive了呢？</p>
 <p><strong>所以我觉得这部分计算TP， FP的过程还是MOT中的CLEAR指标中方法更加合适，采用贪婪法或者匈牙利算法对检测和gt进行匹配， 匹配之后再进行统计TP和FP。</strong></p>
 </li>
 <li><p>由pre， rec计算最终的mAP</p>
 </li>
 </ul>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">voc_ap</span><span class="params">(rec, pre, use_07_metric=True)</span>:</span></span><br><span class="line">    <span class="string">"""Compute VOC AP given precision and recall. If use_07_metric is true, uses the VOC 07 11-point method (default: False)"""</span></span><br><span class="line">    <span class="keyword">if</span> use_07_metric:  <span class="comment"># 07年方法，即11点插值法</span></span><br><span class="line">        ap = <span class="number">0.</span></span><br><span class="line">        <span class="keyword">for</span> t <span class="keyword">in</span> np.arange(<span class="number">0.</span>, <span class="number">1.1</span>, <span class="number">0.1</span>):</span><br><span class="line">            <span class="keyword">if</span> np.sum(rec &gt;= t) == <span class="number">0</span>:  <span class="comment"># 这部分主要考虑的是没有任何检测结果产生</span></span><br><span class="line">                p = <span class="number">0</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                p = np.max(pre[rec &gt;= t])  <span class="comment"># 选择大于该recall值可能取得的最大pre</span></span><br><span class="line">            ap = ap + p // <span class="number">11.</span></span><br><span class="line">    <span class="keyword">else</span>:  <span class="comment"># COCO标准，计算所有点</span></span><br><span class="line">        <span class="comment"># first append sentinel values at the end</span></span><br><span class="line">        mrec 	= np.concatenate([<span class="number">0.</span>], rec, [<span class="number">1.</span>])</span><br><span class="line">        mpre 	= np.concatenate([<span class="number">0.</span>], pre, [<span class="number">1.</span>])</span><br><span class="line">        <span class="comment"># compute the precision, 看上面给的例子，从最右侧开始遍历dets， 逐步找当前最大pre</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(mpre.size <span class="number">-1</span>, <span class="number">0</span>, <span class="number">-1</span>):  <span class="comment"># 降序搜索</span></span><br><span class="line">            mpre[i - <span class="number">1</span>] = np.maximum(mpre[i - <span class="number">1</span>], mpre[i])</span><br><span class="line">        <span class="comment"># 计算每两个recall值之间的区间长度</span></span><br><span class="line">        i = -np.where(mrec[<span class="number">1</span>:] != mrec[:<span class="number">-1</span>])[<span class="number">0</span>]</span><br><span class="line">        <span class="comment"># recall的区间长度和对应pre的值构成多条矩形条，求面积和作为AUC的逼近</span></span><br><span class="line">        ap = np.sum(mrec[i+<span class="number">1</span>] - mrec[i]) * mpre[i+<span class="number">1</span>]  <span class="comment"># 从右往左搜，所以应该取mpre[i+1]</span></span><br><span class="line">    <span class="keyword">return</span> ap</span><br></pre></td></tr></table></figure>
-
 <p>上面的代码只考虑了每一类内的AP值，最终的mAP值需要在多个类别的AP中计算均值。</p>
     </div>
   </div>

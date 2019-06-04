@@ -219,16 +219,18 @@
 <li>每一个时刻目标个数不同就导致输出个数随着时间而变化。</li>
 </ul>
 <h4 id="Recurrent-Neural-Networks"><a href="#Recurrent-Neural-Networks" class="headerlink" title="Recurrent Neural Networks"></a>Recurrent Neural Networks</h4><p>RNN主要用于处理序列化数据， 每个时刻的输入包含当前时刻的数据以及前一时刻的状态。一般而言，每一时刻的处理可以使用多层网络实现， 在$t$时刻的多层隐状态可以使用$h_t^l, l=0, …, L$表示， $h_t^0$表示当前时刻的输入， $h_t^L$表示最终用于生成输出值$y_t$的embedding 特征。每一层形式化表示为$h_t^l = \tanh W^l(h_t^{l-1}, h_{t-1}^l)$ .</p>
-<p>RNN在运动估计、状态更新方面效果较好，但是其并不能很好的处理数据关联这种组合任务。因此使用LSTM单元处理这类问题。 LSTM单元相对于RNN单元多出了一个记忆状态量$c$, 然后经过多个门函数对状态信息进行遗忘，更新和输出等，其形式化表示为$h_t^l = o\odot \tanh(c_t^l), c_t^l = f\odot c_{t-1}^l + i\odot g$, $\odot$表示元素乘法。<br>$$<br>i, o, f = \sigma[W^l(h_t^{l-1}, h_{t-1}^l)]<br>$$</p>
-<h4 id="Bayesian-Filtering"><a href="#Bayesian-Filtering" class="headerlink" title="Bayesian Filtering"></a>Bayesian Filtering</h4><p>假设真实状态$x$, 观测量$z$, 利用马尔科夫假设，当前时刻的状态分布计算为<br>$$<br>p(z_t|z_{1:t}) \propto p(z_t|x_t)\int p(x_t|x_{t-1})p(x_{t-1}|z_{1:t-1})dx_{t-1}<br>$$<br>$p(z_t|x_t), p(x_t|x_{t-1}) $分别表示观测概率和转移概率。一般分为预测和状态更新两步。典型的模型有kalman滤波和粒子滤波。</p>
+<p>RNN在运动估计、状态更新方面效果较好，但是其并不能很好的处理数据关联这种组合任务。因此使用LSTM单元处理这类问题。 LSTM单元相对于RNN单元多出了一个记忆状态量$c$, 然后经过多个门函数对状态信息进行遗忘，更新和输出等，其形式化表示为$h_t^l = o\odot \tanh(c_t^l), c_t^l = f\odot c_{t-1}^l + i\odot g$, $\odot$表示元素乘法。</p>
+<script type="math/tex; mode=display">
+i, o, f = \sigma[W^l(h_t^{l-1}, h_{t-1}^l)]</script><h4 id="Bayesian-Filtering"><a href="#Bayesian-Filtering" class="headerlink" title="Bayesian Filtering"></a>Bayesian Filtering</h4><p>假设真实状态$x$, 观测量$z$, 利用马尔科夫假设，当前时刻的状态分布计算为</p>
+<script type="math/tex; mode=display">
+p(z_t|z_{1:t}) \propto p(z_t|x_t)\int p(x_t|x_{t-1})p(x_{t-1}|z_{1:t-1})dx_{t-1}</script><p>$p(z_t|x_t), p(x_t|x_{t-1}) $分别表示观测概率和转移概率。一般分为预测和状态更新两步。典型的模型有kalman滤波和粒子滤波。</p>
 <p>处理多目标任务时还会遇到两个额外的挑战：</p>
 <ul>
 <li>状态更新前需要先利用数据关联确定目标和检测的对应关系。</li>
 <li>应该有机制能够处理新的轨迹以及移除终止的轨迹。</li>
 </ul>
 <hr>
-<p>###Approach</p>
-<h4 id="Notations"><a href="#Notations" class="headerlink" title="Notations"></a>Notations</h4><p>$x_t\in R^{N\cdot D}$               特定时刻所有目标的状态， 本文$D=4$， 包含$(x, y, w, h)$, $N$是目标个数。</p>
+<h3 id="Approach"><a href="#Approach" class="headerlink" title="Approach"></a>Approach</h3><h4 id="Notations"><a href="#Notations" class="headerlink" title="Notations"></a>Notations</h4><p>$x_t\in R^{N\cdot D}$               特定时刻所有目标的状态， 本文$D=4$， 包含$(x, y, w, h)$, $N$是目标个数。</p>
 <p>$x_t^i$                               表示第$i$个目标的状态</p>
 <p>$z_t\in R^{M\cdot D}$                 表示当前时刻检测的状态。</p>
 <p>$A\in [0, 1]^{N \times (M+1)}$    关联矩阵， $\forall i:  \sum_j A_{ij}=1$, $M+1$考虑了一些目标当前出现漏检的情形。</p>
@@ -248,24 +250,26 @@
 <li>Update： 利用当前观测去更新目标状态</li>
 <li>Birth/Death: 根据目标状态来判别当前时刻检测是目标轨迹的起点还是终点</li>
 </ul>
-<p><strong>值得注意的是， 这里的</strong>$x_{t+1}^<em>, z_{t+1}$*</em>concat时利用的是关联矩阵$A_{t+1}$的信息**</p>
-<h4 id="Loss"><a href="#Loss" class="headerlink" title="Loss"></a>Loss</h4><p>$$<br>\mathcal{L}(x^<em>, x, \varepsilon, \tilde{x}, \tilde{\varepsilon}) = \frac{\lambda}{ND}\sum\Vert x^</em> - \tilde{x}\Vert^2 + \frac{k}{ND}\Vert x-\tilde{x}\Vert^2 + v\mathcal{L}_{\varepsilon}+\xi\varepsilon^*
-$$</p>
-<p>等式右边三项分别表示预测误差，更新误差以及birth/death+reg误差。<br>$$<br>\mathcal{L}_{\varepsilon}(\varepsilon, \tilde{\varepsilon}) = \tilde{\varepsilon}\log \varepsilon + (1-\tilde{\varepsilon})\log (1-\varepsilon)<br>$$<br>二值交叉熵损失。</p>
+<p><strong>值得注意的是， 这里的</strong>$x_{t+1}^<em>, z_{t+1}$<em>*concat时利用的是关联矩阵$A_{t+1}$的信息</em></em></p>
+<h4 id="Loss"><a href="#Loss" class="headerlink" title="Loss"></a>Loss</h4><script type="math/tex; mode=display">
+\mathcal{L}(x^*, x, \varepsilon, \tilde{x}, \tilde{\varepsilon}) = \frac{\lambda}{ND}\sum\Vert x^* - \tilde{x}\Vert^2 + \frac{k}{ND}\Vert x-\tilde{x}\Vert^2 + v\mathcal{L}_{\varepsilon}+\xi\varepsilon^*</script><p>等式右边三项分别表示预测误差，更新误差以及birth/death+reg误差。</p>
+<script type="math/tex; mode=display">
+\mathcal{L}_{\varepsilon}(\varepsilon, \tilde{\varepsilon}) = \tilde{\varepsilon}\log \varepsilon + (1-\tilde{\varepsilon})\log (1-\varepsilon)</script><p>二值交叉熵损失。</p>
 <p>由于$\tilde{\varepsilon}$真实值是一个相对于时间的矩形窗函数，如果单独采用二值交叉熵损失，特别容易导致漏检引起轨迹终止的问题，于是加了一个正则化项用于平滑损失。如下如所示：</p>
 <p><img src="/2019/05/23/MOT-RNN/smoothness.png" alt="smoothness"></p>
 <p>最左边是真实值，中间是没有正则项的结果，最右是正则化项辅助下的记过，黑色点和线表示轨迹，中间点没有均匀分布表示出现漏检，而中间图中漏检对应的地方其$\varepsilon$都很低，表示轨迹结束。</p>
 <h4 id="Data-Association-with-LSTMs"><a href="#Data-Association-with-LSTMs" class="headerlink" title="Data Association with LSTMs"></a>Data Association with LSTMs</h4><p>LSTM的输入是$C|{ij} = \Vert x^i - z^j\Vert_2$矩阵，即欧氏距离矩阵，输出是匹配概率矩阵$A$, $A$的每一行执行softmax归一化，保证每一个轨迹只关联一个检测。</p>
-<h4 id="Loss-1"><a href="#Loss-1" class="headerlink" title="Loss"></a>Loss</h4><p>负对数似然损失<br>$$<br>\mathcal{L}(A^i, \tilde{a}) = -\log (A_{i\tilde{a}})<br>$$</p>
-<p> $\tilde{a}$是正确的关联关系。</p>
+<h4 id="Loss-1"><a href="#Loss-1" class="headerlink" title="Loss"></a>Loss</h4><p>负对数似然损失</p>
+<script type="math/tex; mode=display">
+\mathcal{L}(A^i, \tilde{a}) = -\log (A_{i\tilde{a}})</script><p> $\tilde{a}$是正确的关联关系。</p>
 <h4 id="Training-Data"><a href="#Training-Data" class="headerlink" title="Training Data"></a>Training Data</h4><p>由于视频数据标注代价太大，文章使用了大规模的合成数据。具体而言，首先从已知的轨迹中构建一个运动模型（估计轨迹起点位置以及平均速度的均值和方差）然后对于每一个训练样本就可以通过采样的方式生成$N$个训练样本。</p>
 <h4 id="Network-size"><a href="#Network-size" class="headerlink" title="Network size"></a>Network size</h4><p>RNN单元只有一层300个隐节点， LSTM单元两层500个隐节点。</p>
 <h4 id="Data"><a href="#Data" class="headerlink" title="Data"></a>Data</h4><p>RNN训练数据： $100K$ 长度为20帧的长序列。 mini-batches的大小为每个10， 图像中目标数据归一化为[-0.5, 0.5]。</p>
 <hr>
-<h3 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h3><h4 id="Simulated-data"><a href="#Simulated-data" class="headerlink" title="Simulated data"></a>Simulated data</h4><p>![simulated data](MOT-RNN/simulated data.png)</p>
+<h3 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h3><h4 id="Simulated-data"><a href="#Simulated-data" class="headerlink" title="Simulated data"></a>Simulated data</h4><p><img src="/2019/05/23/MOT-RNN/simulated data.png" alt="simulated data"></p>
 <p>分布的点表示每一时刻目标的位置，groundtruth或者detections， 没有形成轨迹的点是一些噪声点。最先面是用来判断轨迹终止的概率，可以发现在合成数据上效果还是不错的。</p>
-<h4 id="MOT15"><a href="#MOT15" class="headerlink" title="MOT15"></a>MOT15</h4><p>![MOT15 training](MOT-RNN/MOT15 training.png)</p>
-<p>![MOT15 test](MOT-RNN/MOT15 test.png)</p>
+<h4 id="MOT15"><a href="#MOT15" class="headerlink" title="MOT15"></a>MOT15</h4><p><img src="/2019/05/23/MOT-RNN/MOT15 training.png" alt="MOT15 training"></p>
+<p><img src="/2019/05/23/MOT-RNN/MOT15 test.png" alt="MOT15 test"></p>
 <p>实验可以发现这篇文章主要还是在RNN做数据关联方面一个全新的尝试，其效果并不理想，尤其是在test集上，这可能是因为训练数据集太少。另外在训练集上我们也发现RNN_HA的效果比RNN_LSTM效果要好，这说明LSTM实现data association的效果目前还比不了匈牙利算法。</p>
 <h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><p>加上前面的两篇笔记，总共三篇文章都是在尝试用深度网络直接实现数据关联。总的来说Milan大神的这篇文章出现的最早，但由于技术的原因吧性能不好，所以后续研究不多。目前随着数据量的增大以及检测精度的增加，基于CNN做数据关联的工作开始逐渐崭露头角。</p>
 <p>我觉得用深度网络实现数据关联一定会是一个发展趋势，只有数据关联部分使用网络实现了，才能真正意义上说是用深度学习解决多目标跟踪任务。</p>

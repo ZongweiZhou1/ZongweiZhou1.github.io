@@ -209,136 +209,140 @@
   <div class="article-content">
     <div class="markdown-body">
       <h3 id="导言"><a href="#导言" class="headerlink" title="导言"></a>导言</h3><p>本文主要收集MOT领域的一些资源， 包括数据集，相关论文以及部分开源代码等。</p>
-<h3 id="Dataset"><a href="#Dataset" class="headerlink" title="Dataset"></a>Dataset</h3><table>
+<h3 id="Dataset"><a href="#Dataset" class="headerlink" title="Dataset"></a>Dataset</h3><div class="table-container">
+<table>
 <thead>
 <tr>
 <th>Dataset</th>
-<th align="center">MultiView</th>
-<th align="center">Groundtruth</th>
+<th style="text-align:center">MultiView</th>
+<th style="text-align:center">Groundtruth</th>
 <th>Site</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>PETS2006</td>
-<td align="center">$\checkmark$</td>
-<td align="center">$\times$</td>
+<td style="text-align:center">$\checkmark$</td>
+<td style="text-align:center">$\times$</td>
 <td><a href="www.cvg.rdg.ac.uk/PETS2006/data.html">www.cvg.rdg.ac.uk/PETS2006/data.html</a></td>
 </tr>
 <tr>
 <td>PETS2007</td>
-<td align="center">$\checkmark$</td>
-<td align="center">$\checkmark$</td>
+<td style="text-align:center">$\checkmark$</td>
+<td style="text-align:center">$\checkmark$</td>
 <td><a href="http://www.cvg.reading.ac.uk/PETS2007/" target="_blank" rel="noopener">http://www.cvg.reading.ac.uk/PETS2007/</a></td>
 </tr>
 <tr>
 <td>PETS2009</td>
-<td align="center">$\checkmark$</td>
-<td align="center">$\checkmark$</td>
+<td style="text-align:center">$\checkmark$</td>
+<td style="text-align:center">$\checkmark$</td>
 <td><a href="www.cvg.rdg.ac.uk/PETS2009/a.html">www.cvg.rdg.ac.uk/PETS2009/a.html</a></td>
 </tr>
 <tr>
 <td>CAVIAR</td>
-<td align="center">$\checkmark$</td>
-<td align="center">$\checkmark$</td>
+<td style="text-align:center">$\checkmark$</td>
+<td style="text-align:center">$\checkmark$</td>
 <td><a href="http://groups.inf.ed.ac.uk/vision/CAVIAR/CAVIARDATA1/" target="_blank" rel="noopener">http://groups.inf.ed.ac.uk/vision/CAVIAR/CAVIARDATA1/</a></td>
 </tr>
 <tr>
 <td>TUD</td>
-<td align="center">$\times$</td>
-<td align="center">$\checkmark$</td>
+<td style="text-align:center">$\times$</td>
+<td style="text-align:center">$\checkmark$</td>
 <td><a href="www.d2.mpi-inf.mpg.de/datasets">www.d2.mpi-inf.mpg.de/datasets</a></td>
 </tr>
 <tr>
 <td>TRECVID</td>
-<td align="center">$\checkmark$</td>
-<td align="center">$\times$</td>
+<td style="text-align:center">$\checkmark$</td>
+<td style="text-align:center">$\times$</td>
 <td><a href="http://www-nlpir-nist.gov/projects/" target="_blank" rel="noopener">http://www-nlpir-nist.gov/projects/</a></td>
 </tr>
 <tr>
 <td>Caltech Pedestrian</td>
-<td align="center">$\times$</td>
-<td align="center">$\checkmark$</td>
+<td style="text-align:center">$\times$</td>
+<td style="text-align:center">$\checkmark$</td>
 <td><a href="www.vision.caltech.edu/Image_Datasets/CaltechPedestrians/">www.vision.caltech.edu/Image_Datasets/CaltechPedestrians/</a></td>
 </tr>
 <tr>
 <td>UBC Hockey</td>
-<td align="center">$\times$</td>
-<td align="center">$\times$</td>
+<td style="text-align:center">$\times$</td>
+<td style="text-align:center">$\times$</td>
 <td><a href="www.cs.ubc.ca/~okumak/research.html">www.cs.ubc.ca/~okumak/research.html</a></td>
 </tr>
 <tr>
 <td>AVSS 2007</td>
-<td align="center">$\times$</td>
-<td align="center">$\checkmark$</td>
+<td style="text-align:center">$\times$</td>
+<td style="text-align:center">$\checkmark$</td>
 <td><a href="www.eecs.qmul.ac.uk/~andrea/avss2007_d.html">www.eecs.qmul.ac.uk/~andrea/avss2007_d.html</a></td>
 </tr>
 <tr>
 <td>ETH pedestrian</td>
-<td align="center">$\checkmark$</td>
-<td align="center">$\checkmark$</td>
+<td style="text-align:center">$\checkmark$</td>
+<td style="text-align:center">$\checkmark$</td>
 <td><a href="www.vision.ee.ethz.ch/~aess/dataset/">www.vision.ee.ethz.ch/~aess/dataset/</a></td>
 </tr>
 <tr>
 <td>ETHZ Central</td>
-<td align="center">$\times$</td>
-<td align="center">$\checkmark$</td>
+<td style="text-align:center">$\times$</td>
+<td style="text-align:center">$\checkmark$</td>
 <td><a href="www.vision.ee.ethz.ch/datasets">www.vision.ee.ethz.ch/datasets</a></td>
 </tr>
 <tr>
 <td>Town Centre</td>
-<td align="center">$\times$</td>
-<td align="center">$\checkmark$</td>
+<td style="text-align:center">$\times$</td>
+<td style="text-align:center">$\checkmark$</td>
 <td><a href="www.robots.ox.ac.uk/ActiveVision/Research/Projects/2009bbenfold_headpose/project.htnl#datasets">www.robots.ox.ac.uk/ActiveVision/Research/Projects/2009bbenfold_headpose/project.htnl#datasets</a></td>
 </tr>
 <tr>
 <td>Zara</td>
-<td align="center">$\times$</td>
-<td align="center">$\times$</td>
+<td style="text-align:center">$\times$</td>
+<td style="text-align:center">$\times$</td>
 <td><a href="https://graphics.cs.ucy.ac.cy/research/downloads/crowd-data" target="_blank" rel="noopener">https://graphics.cs.ucy.ac.cy/research/downloads/crowd-data</a></td>
 </tr>
 <tr>
 <td>UCSD</td>
-<td align="center">$\times$</td>
-<td align="center">$\times$</td>
+<td style="text-align:center">$\times$</td>
+<td style="text-align:center">$\times$</td>
 <td><a href="http://www.svcl.ucsd.edu/projects/anomaly/dataset.htm" target="_blank" rel="noopener">http://www.svcl.ucsd.edu/projects/anomaly/dataset.htm</a></td>
 </tr>
 <tr>
 <td>UCF Crowds</td>
-<td align="center">$\times$</td>
-<td align="center">$\times$</td>
+<td style="text-align:center">$\times$</td>
+<td style="text-align:center">$\times$</td>
 <td><a href="www.crcv.ucf.edu/data/crowd.php">www.crcv.ucf.edu/data/crowd.php</a></td>
 </tr>
 <tr>
 <td>KITTI</td>
-<td align="center">$\times$</td>
-<td align="center">$\checkmark$</td>
+<td style="text-align:center">$\times$</td>
+<td style="text-align:center">$\checkmark$</td>
 <td><a href="http://www.cvlibs.net/datasets/kitti/eval_tracking.php" target="_blank" rel="noopener">http://www.cvlibs.net/datasets/kitti/eval_tracking.php</a></td>
 </tr>
 <tr>
 <td>MOT2015</td>
-<td align="center">$\times$</td>
-<td align="center">$\checkmark$</td>
+<td style="text-align:center">$\times$</td>
+<td style="text-align:center">$\checkmark$</td>
 <td><a href="https://motchallenge.net/data/2D_MOT_2015/" target="_blank" rel="noopener">https://motchallenge.net/data/2D_MOT_2015/</a></td>
 </tr>
 <tr>
 <td>MOT2016</td>
-<td align="center">$\times$</td>
-<td align="center">$\checkmark$</td>
+<td style="text-align:center">$\times$</td>
+<td style="text-align:center">$\checkmark$</td>
 <td><a href="https://motchallenge.net/data/MOT16/" target="_blank" rel="noopener">https://motchallenge.net/data/MOT16/</a></td>
 </tr>
 <tr>
 <td>MOT2017</td>
-<td align="center">$\times$</td>
-<td align="center">$\checkmark$</td>
+<td style="text-align:center">$\times$</td>
+<td style="text-align:center">$\checkmark$</td>
 <td><a href="https://motchallenge.net/data/MOT17/" target="_blank" rel="noopener">https://motchallenge.net/data/MOT17/</a></td>
 </tr>
 <tr>
 <td>MOT2019</td>
-<td align="center">$\times$</td>
-<td align="center">$\checkmark$</td>
+<td style="text-align:center">$\times$</td>
+<td style="text-align:center">$\checkmark$</td>
 <td><a href="https://motchallenge.net/data/CVPR_2019_Tracking_Challenge/" target="_blank" rel="noopener">https://motchallenge.net/data/CVPR_2019_Tracking_Challenge/</a></td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
+</div>
 <p>目前多目标跟踪主要使用的数据集是MOTChallenge数据集， 包括MOT15， MOT16， MOT17和MOT19.</p>
 <h3 id="Papers"><a href="#Papers" class="headerlink" title="Papers"></a>Papers</h3><blockquote>
 <p> <strong>Evaluation Metric</strong> </p>
@@ -362,7 +366,7 @@
 <blockquote>
 <p><strong>2019</strong> </p>
 </blockquote>
-<p><strong>NT</strong>:                 Longyin Wen<em>, Dawei Du</em>, Shengkun Li, Xiao Bian, Siwei Lyu Learning Non-Uniform Hypergraph for Multi-Object Tracking, In AAAI 2019.  [paper](<a href="http://www.cs.albany.edu/~lsw/papers/aaai19a.pdf" target="_blank" rel="noopener">http://www.cs.albany.edu/~lsw/papers/aaai19a.pdf</a>  from  github.com/longyin880815)</p>
+<p><strong>NT</strong>:                 Longyin Wen<em>, Dawei Du</em>, Shengkun Li, Xiao Bian, Siwei Lyu Learning Non-Uniform Hypergraph for Multi-Object Tracking, In AAAI 2019.  <a href="http://www.cs.albany.edu/~lsw/papers/aaai19a.pdf  from  github.com/longyin880815" target="_blank" rel="noopener">paper</a></p>
 <p><strong>FMA</strong>:           Zhang, J., Zhou, S., Wang, J., &amp; Huang, D. (2019). Frame-wise Motion and Appearance for Real-time Multiple Object Tracking, (1).  <a href="arxiv.org/abs/1905.02292">paper</a></p>
 <p><strong>STRN</strong>:           Xu, J., Cao, Y., Zhang, Z., &amp; Hu, H. (2019). Spatial-Temporal Relation Networks for Multi-Object Tracking.  <a href="arxiv.org/abs/1904.11489">paper</a></p>
 <p><strong>LSST</strong>:             Feng, W., Hu, Z., Wu, W., Yan, J., &amp; Ouyang, W. (2019). Multi-Object Tracking with Multiple Cues and Switcher-Aware Classification.  <a href="arxiv.org/abs/1901.06129">paper</a></p>

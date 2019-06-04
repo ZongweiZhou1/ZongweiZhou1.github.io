@@ -215,16 +215,38 @@
 <blockquote>
 <p>Attention is all your need</p>
 </blockquote>
-<p>具体而言，假设经过特征抽取网络，比如RPN层结果，获得了$N$个候选目标的表观特征$f_A$和几何特征$f_G$，也就是bounding box特征。 $N$个特征表示为${(f_A^n, f_G^n）}_{n=1}^N$, 那么经过relation module之后的特征$f_R(n)$如下计算<br>$$<br>f_R(n) = \sum_mw^{mn}\cdot(W_v\cdot f_A^m)<br>$$<br>可以看到$W_v$其实是对表观特征先进行一次embedding，然后使用一组与目标$n$有关的权重进行加权求和作为第$n$个样本新的特征，所以这是一种Attention的操作。</p>
+<p>具体而言，假设经过特征抽取网络，比如RPN层结果，获得了$N$个候选目标的表观特征$f_A$和几何特征$f_G$，也就是bounding box特征。 $N$个特征表示为$\{(f_A^n, f_G^n）\}_{n=1}^N$, 那么经过relation module之后的特征$f_R(n)$如下计算</p>
+<script type="math/tex; mode=display">
+f_R(n) = \sum_mw^{mn}\cdot(W_v\cdot f_A^m)</script><p>可以看到$W_v$其实是对表观特征先进行一次embedding，然后使用一组与目标$n$有关的权重进行加权求和作为第$n$个样本新的特征，所以这是一种Attention的操作。</p>
 <p>而权重的计算结合了空间几何特征和表观特征，其模块计算图如下：</p>
-<p>![relation module](relationNetwork/relation module.png)</p>
-<p>具体公式如下：<br>$$<br>\begin{align}<br>w_A^{mn}&amp;=\frac{\text{dot}(W_kf_A^m, W_Qf_A^n)}{\sqrt{d_k}}\<br>w_G^{mn} &amp;= \max {0, W_G\cdot \Epsilon_G(f_G^m, f_G^n)}\<br>w^{mn} &amp;= \frac{w_G^{mn}\cdot \exp{(w_A^{mn})}}{\sum_k w_G^{kn}\cdot \exp{(w_A^{kn})}}<br>\end{align}<br>$$<br>其中$W_A, W_V, W_Q, W_k$都是需要学习的参数，$\Epsilon(\cdot,\cdot)$是特征融合函数，可以使用网络实现，论文中类似于’Attention is all your need’的做法，使用cosine和sine functions融合位置参数$f_G=(\log(\frac{|x_m-x_n|}{w_m}),\log(\frac{|y_m-y_n|}{h_m}),\log(\frac{w_n}{w_m}),\log(\frac{h_n}{m_m}))$</p>
-<p>由于空间中目标个数也是不定的，所以其实就是在图上进行一种attention， 可以参考论文Graph Attention Network（GAT）, 同样的类似于GAT方法，文章中也使用了multi-head attention的一种方式，如Figure 2所示，每一个relation模块是一种attention， 多个attention 模块同时作用， 文中取16个这种模块。 另外attention之后的特征和原始特征进行相加，这类似于Graph Convolution Network中邻接矩阵的归一化加上单位阵的操作。<br>$$<br>f_A^n = f_A^n + \text{Concat}[f_R^1(n), \cdots , f_R^{N_r}(n)], \text{for all}\quad n<br>$$<br>如果将所有attention的结果等长加在一起会导致计算量太大，所以这里将所有的attention结果concat在一起和原始的特征加在一起减小运算量，但文章没有实验对比性能有什么差异。<strong>注意</strong>每一个attention模块的输出大小应该特殊设置，以使得最后concat之后特征与原始特征等长从而能够进行相加操作。 </p>
+<p><img src="/2019/05/22/relationNetwork/relation module.png" alt="relation module"></p>
+<p>具体公式如下：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+w_A^{mn}&=\frac{\text{dot}(W_kf_A^m, W_Qf_A^n)}{\sqrt{d_k}}\\
+w_G^{mn} &= \max \{0, W_G\cdot \Epsilon_G(f_G^m, f_G^n)\}\\
+w^{mn} &= \frac{w_G^{mn}\cdot \exp{(w_A^{mn})}}{\sum_k w_G^{kn}\cdot \exp{(w_A^{kn})}}
+\end{align}</script><p>其中$W_A, W_V, W_Q, W_k$都是需要学习的参数，$\Epsilon(\cdot,\cdot)$是特征融合函数，可以使用网络实现，论文中类似于’Attention is all your need’的做法，使用cosine和sine functions融合位置参数$f_G=(\log(\frac{|x_m-x_n|}{w_m}),\log(\frac{|y_m-y_n|}{h_m}),\log(\frac{w_n}{w_m}),\log(\frac{h_n}{m_m}))$</p>
+<p>由于空间中目标个数也是不定的，所以其实就是在图上进行一种attention， 可以参考论文Graph Attention Network（GAT）, 同样的类似于GAT方法，文章中也使用了multi-head attention的一种方式，如Figure 2所示，每一个relation模块是一种attention， 多个attention 模块同时作用， 文中取16个这种模块。 另外attention之后的特征和原始特征进行相加，这类似于Graph Convolution Network中邻接矩阵的归一化加上单位阵的操作。</p>
+<script type="math/tex; mode=display">
+f_A^n = f_A^n + \text{Concat}[f_R^1(n), \cdots , f_R^{N_r}(n)], \text{for all}\quad n</script><p>如果将所有attention的结果等长加在一起会导致计算量太大，所以这里将所有的attention结果concat在一起和原始的特征加在一起减小运算量，但文章没有实验对比性能有什么差异。<strong>注意</strong>每一个attention模块的输出大小应该特殊设置，以使得最后concat之后特征与原始特征等长从而能够进行相加操作。 </p>
 <hr>
 <h3 id="Relation-Networks-for-Object-Detection"><a href="#Relation-Networks-for-Object-Detection" class="headerlink" title="Relation Networks for Object Detection"></a>Relation Networks for Object Detection</h3><p>相对于已有的object detection框架而言，简单的增加了两个模块，如下图所示。(a)用于刻画Instance之间的关系，(b)用于去除重复的Instances，下面会介绍两个模块。</p>
 <p><img src="/2019/05/22/relationNetwork/illustration.png" alt="illustration"></p>
 <p>第一个模块是用于从每个目标所处的空间关系出发，融合目标的context信息从而提取更好地特征， 第二个模块是希望利用目标之间的位置关系将NMS的过程融合到网络里面从而避免阈值的选取。<strong>注意</strong>(b)图中$s_0, s_1$是乘法操作。</p>
-<h4 id="Relation-for-Instance-Recognition"><a href="#Relation-for-Instance-Recognition" class="headerlink" title="Relation for Instance Recognition"></a>Relation for Instance Recognition</h4><p>以RCNN为basenet，RCNN在ROI pooling之后过程如下:<br>$$<br>\begin{align}<br>ROI_Feat_n &amp;\xrightarrow{FC} \quad \quad 1024 \<br>&amp;\xrightarrow{FC} \quad \quad 1024\<br> &amp;\xrightarrow{LINEAR}(score_n, bbox_n)<br>\end{align}<br>$$<br>加上relation module，即Figure 2模块在FC之后得到计算过程如下：<br>$$<br>\begin{align}<br>{ROI_Feat_n}<em>{n=1}^N &amp;\xrightarrow{FC} \quad \quad 1024\cdot N \xrightarrow{（RM）^{r_1}} 1024 \cdot N\<br>&amp;\xrightarrow{FC} \quad \quad 1024 \cdot N \xrightarrow{（RM）^{r_2}} 1024 \cdot N\<br> &amp;\xrightarrow{LINEAR}(score_n, bbox_n)</em>{n=1}^N<br>\end{align}<br>$$<br>这里$r_1, r_2$分别表示每个RM模块中head的个数，可以选择不同的数值。</p>
+<h4 id="Relation-for-Instance-Recognition"><a href="#Relation-for-Instance-Recognition" class="headerlink" title="Relation for Instance Recognition"></a>Relation for Instance Recognition</h4><p>以RCNN为basenet，RCNN在ROI pooling之后过程如下:</p>
+<script type="math/tex; mode=display">
+\begin{align}
+ROI\_Feat_n &\xrightarrow{FC} \quad \quad 1024 \\
+&\xrightarrow{FC} \quad \quad 1024\\
+ &\xrightarrow{LINEAR}(score_n, bbox_n)
+\end{align}</script><p>加上relation module，即Figure 2模块在FC之后得到计算过程如下：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\{ROI\_Feat_n\}_{n=1}^N &\xrightarrow{FC} \quad \quad 1024\cdot N \xrightarrow{（RM）^{r_1}} 1024 \cdot N\\
+&\xrightarrow{FC} \quad \quad 1024 \cdot N \xrightarrow{（RM）^{r_2}} 1024 \cdot N\\
+ &\xrightarrow{LINEAR}(score_n, bbox_n)_{n=1}^N
+\end{align}</script><p>这里$r_1, r_2$分别表示每个RM模块中head的个数，可以选择不同的数值。</p>
 <h4 id="Relation-for-Duplicate-Removal"><a href="#Relation-for-Duplicate-Removal" class="headerlink" title="Relation for Duplicate Removal"></a>Relation for Duplicate Removal</h4><p>作者把duplicate removal归结成一个二分类问题，对于每一个gt box，只有一个detected box是正确的，其他的都是所谓duplicate。作者的duplicate removal network是接在classifier的输出后面。该模块的输入包括object proposal的 score vector（属于各个类别的概率）, bbox，以及proposal的特征（典型的1024维）。对于某一个object proposal的某一个类别，假设属于这个类别的概率为$score^n$，首先经过一个rank embed模块，即拿出其他object proposal属于该类别的score，进行排序，得到第n个object proposal在排序中的下标（rank），作者特别说明了，使用rank值而不是直接score的值非常重要。然后将rank值映射到128维向量，同时将该proposal的特征也映射到128维，将两种128维的特征相加之后作为新的appearance feature，然后和bbox作为relation module的输入，得到新的128维的输出，和$W_s$做内积之后通过sigmoid得到$s_1$，最终的correct的概率$s=s_0 * s_1$</p>
 <p>我觉得这部分选择rank而不是score作为特征的原因在于rank是一种序列特征，其与score的具体数值无关。</p>
 <h4 id="End-to-End-Object-Detection"><a href="#End-to-End-Object-Detection" class="headerlink" title="End-to-End Object Detection"></a>End-to-End Object Detection</h4><p>这一部分我觉得挺有意思的。</p>

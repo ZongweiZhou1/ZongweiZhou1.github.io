@@ -237,7 +237,7 @@
 <p><img src="/2019/05/21/repulsion-loss/miss_detection.png" alt="miss_detection"></p>
 <p>横轴的label表示在指定false positive数目条条件下，miss detection的数目， 比如#Miss@20fp表示调节参数使得保留20个false positive下的miss detection数目。可以看到在所有的miss detections中，源于reasonable-crowd的大约占了60%，表明crowd occlusion是影响detector性能的主要因素。另外通过降低NMS的阈值，如false positive从100到500， 因crowd occlusion引起的miss detections比例从60.7%上升到了69.2%， 表明<strong>NMS降低阈值并不能解决因crowd occlusion引起的漏检问题</strong>。</p>
 <p>在下图(a)中，给出了miss detection 随着检测器置信度阈值增大的变化曲线。可以发现baseline方法在置信度较高时会产生更多的漏检，这部分主要是由于detections之间的重叠导致的。同时该图表明了RepGT对于miss detection和False positive的作用</p>
-<p>![miss_detections_det_score](repulsion-loss/miss detection_det_score.png)![proportion of crowed error](repulsion-loss\proportion of crowed error.png)</p>
+<p><img src="/2019/05/21/repulsion-loss/miss detection_det_score.png" alt="miss_detections_det_score"><img src="/2019/05/21/repulsion-loss/proportion of crowed error.png" alt="proportion of crowed error"></p>
 </li>
 <li><p>False Positives</p>
 <p>false positives可以分为三类：</p>
@@ -246,7 +246,7 @@
 <li>localization error: 与一个且只有一个target的$IoU \ge 0.1$ ，注意这里是指没有匹配上，但依然与某些目标存在IOU; </li>
 <li>Crowd error: predictions 与至少两个ground-truth的$IoU\ge 0.1$ </li>
 </ul>
-<p>上图中的(b)图表示crowed errors随着false positives的变化所占的比例。可以发现其几乎稳定在$20%$左右。</p>
+<p>上图中的(b)图表示crowed errors随着false positives的变化所占的比例。可以发现其几乎稳定在$20\%$左右。</p>
 <p>也表明在相同的False positive 数中RepGT loss中Crowd error的占比一直低于baseline中产生的Crowd error占比。</p>
 <p>下图一些crowd error的例子。</p>
 <p><img src="/2019/05/21/repulsion-loss/crowd error1.png" style="zoom:10"><img src="/2019/05/21/repulsion-loss/crowd error2.png" style="zoom:10"></p>
@@ -259,13 +259,26 @@
 </li>
 </ul>
 <hr>
-<h3 id="Repulsion-Loss"><a href="#Repulsion-Loss" class="headerlink" title="Repulsion Loss"></a>Repulsion Loss</h3><p>总的损失 $L = L_{Attr} + \alpha * L_{RepGT} + \beta * L_{RepBox}$ </p>
+<h3 id="Repulsion-Loss"><a href="#Repulsion-Loss" class="headerlink" title="Repulsion Loss"></a>Repulsion Loss</h3><p>总的损失 $L = L_{Attr} + \alpha <em> L_{RepGT} + \beta </em> L_{RepBox}$ </p>
 <p>其中attraction term $L_{Attr}$表示预测框和真实框之间的相似度， $L_{RepGT}$表示的预测框与其它真实框尽可能地远离， $L_{RepBox}$表示预测框与其他target的预测框尽可能地远离。 </p>
-<p>$P = (l_p, t_p, w_p, h_p), G=(l_G, t_G, w_G, h_G)$ 分别表示提取的框和真实的框， $P_+={P}$  表示所有正样本组成的集合 (存在至少一个ground-truth背景 $IoU \ge 0.5$ ), $\mathcal{G} = {G}$表示所有的ground-truth </p>
-<p><strong>Attraction Term</strong><br>$$<br>L_{Attr} = \frac{\sum_{P\in P_+}Smooth_{L_1}(B^P, G_{Attr}^P)}{|P_+|}<br>$$<br>其中 $G_{Attr}^P = arg max_{G\in \mathcal{G}} IoU(G, P)$ </p>
-<p> *<em>Repulsion Term (RepGT) *</em><br>$$<br>G_{Rep}^P = arg max_{G\in\mathcal{G\setminus{G_{Attr}^P}}}IoU(G, P)<br>$$<br>表示的是与预测框的IoU第二大的ground truth<br>$$<br>L_{Attr} = \frac{\sum_{P\in P_+}Smooth_{ln}(IoG(B^P, G_{Rep}^P))}{|P_+|}<br>$$<br>其中$IoG(B, G) = \frac{area(B\and G)}{area(G)}$<br>$$<br>Smooth_{ln} = \begin{cases}<br>-ln(1-x), <del>x\le \sigma \<br>\frac{x-\sigma}{1-\sigma} - ln(1-\sigma), ~</del>x\gt \sigma<br>\end{cases}<br>$$<br>$\sigma \in [0, 1)$是光滑参数。</p>
+<p>$P = (l_p, t_p, w_p, h_p), G=(l_G, t_G, w_G, h_G)$ 分别表示提取的框和真实的框， $P_+=\{P\}$  表示所有正样本组成的集合 (存在至少一个ground-truth背景 $IoU \ge 0.5$ ), $\mathcal{G} = \{G\}$表示所有的ground-truth </p>
+<p><strong>Attraction Term</strong> </p>
+<script type="math/tex; mode=display">
+L_{Attr} = \frac{\sum_{P\in P_+}Smooth_{L_1}(B^P, G_{Attr}^P)}{|P_+|}</script><p>其中 $G_{Attr}^P = arg max_{G\in \mathcal{G}} IoU(G, P)$ </p>
+<p> <strong>Repulsion Term (RepGT) </strong></p>
+<script type="math/tex; mode=display">
+G_{Rep}^P = arg max_{G\in\mathcal{G\setminus{G_{Attr}^P}}}IoU(G, P)</script><p>表示的是与预测框的IoU第二大的ground truth</p>
+<script type="math/tex; mode=display">
+L_{Attr} = \frac{\sum_{P\in P_+}Smooth_{ln}(IoG(B^P, G_{Rep}^P))}{|P_+|}</script><p>其中$IoG(B, G) = \frac{area(B\and G)}{area(G)}$ </p>
+<script type="math/tex; mode=display">
+Smooth_{ln} = \begin{cases}
+-ln(1-x), ~~~~~~~~~~x\le \sigma \\
+\frac{x-\sigma}{1-\sigma} - ln(1-\sigma), ~~x\gt \sigma
+\end{cases}</script><p>$\sigma \in [0, 1)$是光滑参数。</p>
 <p><strong>RepulsionTerm（RepBox）</strong></p>
-<p>为了让检测结果对NMS尽可能地鲁棒， RepBox Loss的目的是让predict与其他目标的target的尽可能地远离。将$P_+$ 根据IoU分配到$|\mathcal{G}|$ 中，$P_+ = P_1 \and P_2 \and \cdots \and P_{|\mathcal{G}|}$. 那么对于任意两个来自于不同子集的proposals，希望他们的重叠度尽可能的小<br>$$<br>L_{RepBox} = \frac{\sum_{i\neq j}Smooth_{ln}(IoU(B^{P_i}, B^{P_j}))}{\sum_{i\neq j}\bold{1}[IoU(B^{P_i}, B^{P_j}) &gt; 0] + \epsilon}<br>$$<br>其中$\bold{1}$ 表示identity 函数， $\epsilon$ 是很小的常量防止除零操作。</p>
+<p>为了让检测结果对NMS尽可能地鲁棒， RepBox Loss的目的是让predict与其他目标的target的尽可能地远离。将$P_+$ 根据IoU分配到$|\mathcal{G}|$ 中，$P_+ = P_1 \and P_2 \and \cdots \and P_{|\mathcal{G}|}$. 那么对于任意两个来自于不同子集的proposals，希望他们的重叠度尽可能的小</p>
+<script type="math/tex; mode=display">
+L_{RepBox} = \frac{\sum_{i\neq j}Smooth_{ln}(IoU(B^{P_i}, B^{P_j}))}{\sum_{i\neq j}\bold{1}[IoU(B^{P_i}, B^{P_j}) > 0] + \epsilon}</script><p>其中$\bold{1}$ 表示identity 函数， $\epsilon$ 是很小的常量防止除零操作。</p>
 <p><strong>Discussion</strong> </p>
 <ul>
 <li><p>Distance metric。 在计算repulsion term时， 使用IoG, IoU而不是$Smooth_{L1}$ 是由于 IoG, IoU 取值[0,1]，而SmoothL1无界， 使用SmoothL1会要求predicted box与repulsion ground-truth越远越好， 而IoG只是要求overlap越小越好，所以后者与我们设计思想更搭。另外在RepGT中使用IoG而不是IoU是因为，IoU-based loss可能导致enlarge bounding box增大union area来降低IoU，而IoG的降低则必须是overlap的降低.</p>
@@ -297,7 +310,7 @@
 <li><p>RepGT Loss</p>
 <p>Table 1中比较了不同的$\sigma$ 对SmoothL1loss的影响， $\sigma=0$ 意味着直接将 $-ln(1-IoG)$相加。</p>
 <p><img src="/2019/05/21/repulsion-loss/ablation.png" alt="ablation"></p>
-<p><img src="/2019/05/21/repulsion-loss/repulsion-loss%5Cparameters.png" alt="parameters"></p>
+<p><img src="/2019/05/21/repulsion-loss/parameters.png" alt="parameters"></p>
 </li>
 <li><p>RepBox Loss</p>
 <p>由table1可以发现在$\sigma=0$的时候RepBox Loss的性能最好， $\sigma=0$时相当于对IoU进行求和。这个可能是因为 RepGT处理的是预测和ground truth之间的重叠，这种情形下outliers其实很少，所以对outliers的抑制较大， 而RepBox处理的框更多，显然outliers也更多，这时候因为都是predict所以不知道之间哪个更可靠，就惩罚的少一点。</p>
@@ -310,9 +323,9 @@
 </ul>
 <p><strong>Comparisons with state-of-the-art methods</strong></p>
 <p><img src="/2019/05/21/repulsion-loss/table3.png" alt="table3"></p>
-<p>其中Reasonable set： $occlusion\le 35%$;   Partial set: $10% \lt occlusion \le 35%$; Bare set: $occlusion \le 10%$ Heavy set: $occlusion\gt 35%$  。图8给出了具体的MR和FPPI的曲线图， 右上角的label对应IoU=0.5下的MR</p>
+<p>其中Reasonable set： $occlusion\le 35\%$;   Partial set: $10\% \lt occlusion \le 35\%$; Bare set: $occlusion \le 10\%$ Heavy set: $occlusion\gt 35\%$  。图8给出了具体的MR和FPPI的曲线图， 右上角的label对应IoU=0.5下的MR</p>
 <p><img src="/2019/05/21/repulsion-loss/table4.png" alt></p>
-<p><img src="/2019/05/21/repulsion-loss/repulsion-loss%5Ctable5.png" alt></p>
+<p><img src="/2019/05/21/repulsion-loss/table5.png" alt></p>
 <p><img src="/2019/05/21/repulsion-loss/fig8.png" alt> </p>
 <hr>
 <h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><p>本文提出的loss其本质上创新性并不是很强，但作者针对于特定的问题提出了解决办法，并实验证明了算法有效。这点还是值得借鉴的。</p>
