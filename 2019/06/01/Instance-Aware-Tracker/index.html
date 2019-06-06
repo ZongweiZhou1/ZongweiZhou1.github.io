@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta name="author" content="董沅鑫, yuanxin.me@gmail.com">
+  
+  
+  
+  <title>阅读笔记-Online Multi-Object Tracking with Instance-Aware Tracker and Dynamic Model Refreshment | YixiaoZhou&#39;s blog</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="SOT for MOT,Instance-aware,dynimic model refreshment,">
+  
+
+  <script>
+    console.log('\n%c Hexo-theme-bmw v4.0 ' + '%c 🎉 https://github.com/dongyuanxin/theme-bmw 🎉\n' + '\n%c View demo online ' + '%c 🔍 https://godbmw.com/ 🔍  \n' , 'color: #fadfa3; background: #030307; padding:3px 0;', '', 'color: #fadfa3; background: #030307; padding:3px 0;', '');
+  </script>
+
+  
+    <meta name="description" content="海阔全是浪，天高皆是霾。">
+  
+
+  
+
+  
+    <link rel="icon" href="/images/fvatar2.png">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/icon/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+  <script src="/js/util.js"></script>
+<script src="/js/valine.min.js"></script>
+
+  
+
+  
+    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
+  
+
+  
+    <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
+  
+  
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js" async></script>
+  
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.0/dist/av-min.js"></script>
+  
+
+</head>
+
+  <body>
+
+    
+
+    <div id="app">
+
+      <div class="header-wrap">
+  <header>
+    <div class="site-brand">
+      <div class="site-title">
+        <a href="/">YiXiaoZhou</a>
+      </div>
+    </div>
+    <nav class="site-navigation">
+      <ul class="nav-menu">
+      
+        <li class="nav-item" data-path="/">
+          
+            <a href="/" target="_self">
+              主页
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          
+            <a href="/archives/" target="_self">
+              归档
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          
+            <a href="/friends/" target="_self">
+              友链
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          
+            <a href="/about/" target="_self">
+              关于
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path>
+          
+            <a href="javascript:void(0);" v-else>抓到我</a>
+            <ul class="nav-menu--dropdown">
+              
+                <li>
+                  <a href="https://github.com/ZongweiZhou1" target="_blank">
+                    Github
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://www.facebook.com/duncon.chou" target="_blank">
+                    Facebook
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://weibo.com/u/3231820650/home?wvr=5" target="_self">
+                    weibo
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+      </ul>
+    </nav>
+    <i class="iconfont icon-menu"></i>
+  </header>
+</div>
+
+<script>
+  let links = document.querySelectorAll('.nav-item');
+  for(let link of links){
+    let childrenLink = link.querySelector('ul');
+    link.addEventListener('mouseenter', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown active";
+      }
+    })
+    link.addEventListener('mouseleave', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown";
+      }
+    })
+  }
+  let rootRealPath = getRealPath(window.location.pathname, true);
+  for(let link of links) {
+    let linkPath = link.getAttribute("data-path");
+    if(linkPath && getRealPath(linkPath, true) === rootRealPath) {
+      link.className = "nav-item hover";
+    }
+  }
+
+  let iconMenu = document.querySelector("i.iconfont.icon-menu"),
+    iconMenuClicked = false;
+  let navDOM = document.querySelector("nav.site-navigation");
+  iconMenu.addEventListener("click", () => {
+    iconMenuClicked 
+      ? navDOM.className = "site-navigation active"
+      : navDOM.className = "site-navigation";
+    iconMenuClicked = !iconMenuClicked;
+  })
+</script>
+
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
+  
+
+<div class="post">
+  <h1 class="article-title">
+    <span>阅读笔记-Online Multi-Object Tracking with Instance-Aware Tracker and Dynamic Model Refreshment</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2019-06-01
+    </span>
+    
+    
+      <span>
+        浏览 : <span class="article-timer" data-identity="Instance-Aware-Tracker"></span>
+      </span>
+    
+  </div>
+
+  
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>随着单目标跟踪方法(SOT)的快速发展，许多将单目标算法应用到多目标任务上的方法也相继被提出。model-free型单目标跟踪算法不需要依赖于检测器。但是SOT一般针对于首帧标定的目标区域，主要用来鉴别目标和周围环境，所以直接应用到多目标任务中效果并不好，因为MOT中往往多个同类的目标聚集一起。针对于这个问题， 本文提出一种通过编码对环境和其他目标集成SOT的instance-aware跟踪器用于多目标跟踪。具体而言就是通过融合对其他目标和周围环境的鉴别信息为每个目标构建跟踪模型。为了保持每个模型的独一性，instance-aware模型又结合了响应图和空间位置关系进一步提升精度。 文章另一个贡献点是利用深度网络动态的更新模型。这种做法可以帮助减少初始化噪声以及适应目标尺寸和表观变化。</p>
+<h3 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h3><p>大多数基于检测的多目标跟踪方法虽然性能较好，但是， 检测和跟踪分离开会导致丢失了帧与帧之间的相关关系，将视频中目标检测简化为了静态图像的目标检测(<strong>注：目前基于视频的目标检测研究也在不断进步</strong>)， 另外对检测器的依赖也使得跟踪算法在处理复杂场景时由于检测器性能的急剧下降而导致跟踪性能的大幅下降。</p>
+<p>另一方面MOT可以看做是SOT的一种推广，即多个SOT同时运行。SOT在近些年研究取得了极大进展。但是，即使选取合适的trajectory management策略， 将SOT直接应用到MOT任务中也会遇到各种问题</p>
+<p>SOT一般为了更好地处理表观变化，模型空间往往更大，但是在MOT场景中，SOT的搜索区域内可能存在多个表观非常相似的不同目标，这就会导致SOT频繁的匹配错误。还有一个更严重的问题， SOT一般模型都取决于第一帧中标定的区域，那么在MOT中必须在每一条轨迹第一次出现时就有非常精确的标定，但MOT中的候选框都是检测器得到的，不可避免的包含各种噪声。</p>
+<p>这篇文章提出一种instance-aware的跟踪器，希望（harvest）同时吸取SOT的优势和解决SOT存在的问题。具体而言，对于每一个目标， IA（Instance-Aware） 跟踪器是一个高效的KCF框架， 能够通过特征融合区分目标与其他目标个背景区域。这里的aware就是指target和其他targets之间的鉴别性。而对于整体而言，所有目标模型生成的响应图被集成起来用于预测下一帧中目标的位置。模型的更新过程则是通过一个自适应的CNN实现。</p>
+<p>主要贡献点：</p>
+<ul>
+<li>全新的instance-aware跟踪器，使得SOT能够高效的处理MOT问题。 利用instance-aware的内在特性和交互性，改善相邻且相似目标的歧义性。</li>
+<li>基于CNN的模型自适应更新方法更好地提升了SOT在MOT环境中的使用。</li>
+</ul>
+<h3 id="系统概貌"><a href="#系统概貌" class="headerlink" title="系统概貌"></a>系统概貌</h3><p><img src="/2019/06/01/Instance-Aware-Tracker/overview.png" alt="overview"></p>
+<p>如上图所示，对于第$t$帧而言，系统的输入是第$t$帧的图像以及$t$帧中的检测结果。Instance-aware跟踪器的目标模型被用于预测每一条轨迹的位置，以及每一个检测的置信度。然后一个detection verification process将检测响应与预测响应进行一一配对。如果配对的检测比预测的框能够更好地enclosing目标(打分)， 那么就用detection更新模型， 而没匹配成功的预测和检测将通过一个backup模型进行再次关联。再之后未配对的检测和预测送入到遮挡处理模块。最后处理轨迹的起始和终止。（<strong>这个套路其实是目前MOT的固定套路</strong>）</p>
+<h3 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h3><h4 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h4><p>在第$t$帧，MOT任务可以认为是从图像$I^t$中的$M^t$个候选$O^t=\{x_j^t\}_{j=1}^{M^t}$中选择$N^t$个目标位置$\hat{X}^t = \{\hat{x}_i^t\}_{i=1}^{N^t}$ , 目标函数为：</p>
+<script type="math/tex; mode=display">
+\hat{X}_t = \arg \max_{X^t \subset O^t} f(I^t, X^t; a^t, W^{t-1}).\\
+s.t.\quad \sum_j a_{ij}^t \le 1, a_{ij}^t\in \{0, 1\}.</script><p>$a^t = \{a_{ij}^t \in \{0, 1\}\}$指示第$t-1$帧中目标位置$\hat{X}^{t-1}$的第$i$个位置与当前帧中$X^t$的第$j$个目标匹配与否。 $W^t = \{w_i^t\}_{i=1}^{N^t}$ 是<strong>每一个模型的模型参数</strong>。 该参数有targets的表观和位置信息训练得到。$f(\cdot)$是评估匹配质量的函数， 其定义如下：</p>
+<script type="math/tex; mode=display">
+f(I^t, X^t) = \sum_{ij}a_{ij}^tg_i(I^t, x_j^t; w_i^{t-1})</script><p>能量函数$g(\cdot)$是单目标跟踪的目标函数. </p>
+<p>于是多目标问题的求解也就是单目标匹配的能量和关联变量$a$的求解。</p>
+<h4 id="Instance-Aware-Tracker"><a href="#Instance-Aware-Tracker" class="headerlink" title="Instance-Aware Tracker"></a>Instance-Aware Tracker</h4><p>IA tracker用来从两个层次求解$a^t, g_i(\cdot)$.   对于单独目标而言， $g_i(I^t, x_j^t)$应该具有对真实目标取得较高响应的同时抑制其他目标和背景的响应。而整体求解的时候， $a^t$需要让分配满足一一对应约束。</p>
+<p>首先介绍目标函数$g_i(I^t, x_j^t)$ . 一般的SOT方法集中在鉴别目标和背景，并且允许目标发生一定的形变，但这就意味着对于不同目标之间表观的差异不够敏感。所以SOT直接用于MOT很容易导致漂移错误。在这篇文章中， MOT中跟踪单目标包含两个子问题：</p>
+<ul>
+<li><p>从background中鉴别目标</p>
+</li>
+<li><p>区分不同的targets</p>
+</li>
+</ul>
+<script type="math/tex; mode=display">
+  g_i(I^t, x_j^t) = g_{det}(I^t, x_j^t;\theta_i^{t-1}) + g_{id}(I^t, x_j^t;\epsilon_i^{t-1})</script><p>  $\theta_i^{t-1}$ 和$\epsilon_i^{t-1}$ 是模型参数， 因此$g_{det}(I^t, x_j^t;\theta_i^{t-1})$ 是度量位置$x_j^t$包含目标的指标， $g_{id}(I^t, x_j^t; \epsilon_i^{t-1})$度量的是目标$x_j$与$x_i$之间的相似度。</p>
+<p>作者认为将两个问题拆开的优势是可以利用已有的较好的模型和数据集，比如第一项是行人检测，第二项是reid任务。</p>
+<p>目标函数都采用<strong>脊回归</strong>的形式。 $g(z;\Phi) = \phi z^T$, 所以目标函数可以重写为</p>
+<script type="math/tex; mode=display">
+g_i(I^t, x_j^t) = \phi_i^{t-1}T_{det}(I^t, x_j^t)^T + \epsilon_i^{t-1}T_id(I^t, x_j^t)^T \\
+= \Phi_i^{t-1} [T_{det}(I^t, x_j^t), T_{id}(I^t, x_j^t)]^T</script><p>$T_{det}(., x_j^t),  T_{id}(., x_j^t)$是$x_j^t$中心的图像变化， $\Phi_i^{t-1}=[\phi_i^{t-1}, \epsilon_o^{t-1}]$.</p>
+<p>模型框架如下：</p>
+<p><img src="/2019/06/01/Instance-Aware-Tracker/architecture.png" alt="architecture"></p>
+<p><strong>感觉文章叙述的挺乱的，浅显的东西被写的深奥难懂，我下面按自己的理解捋一捋</strong></p>
+<p>方法的主要流程：</p>
+<ul>
+<li>对于第$t$帧首先利用单目标跟踪器预测每一条轨迹的当前位置$p$。（<strong>单目标预测</strong>）</li>
+<li>然后将预测的候选位置和检测框都当做候选框，在于已经存在的轨迹进行关联，这里关联方法采用的是子图多割的方法。（<strong>子图多割</strong>）</li>
+<li>多目标跟踪器的模型参数需要根据具体情况利用检测结果进行更新，而什么时候更新则依据一个基于CNN的二值分类器。（<strong>模型更新</strong>）</li>
+<li>对于没有在子图多割中匹配成功的检测结果则需要进一步利用一个svm计算与剩余的未匹配的轨迹的相似度，然后再使用匈牙利算法进行二次关联。（<strong>遮挡处理</strong>）</li>
+<li>最终进行轨迹起始和终止的判断。（<strong>轨迹管理</strong>）</li>
+</ul>
+<p>下面我们讲讲这几个步骤</p>
+<h4 id="单目标预测"><a href="#单目标预测" class="headerlink" title="单目标预测"></a>单目标预测</h4><p>单目标预测其实就是SOT， 每个目标执行自己的单目标跟踪算法。而本文的单目标跟踪算法则使用的KCF模型。</p>
+<p>假设轨迹$i$在第$t-1$帧中的目标的特征为$z^t$, 那么根据KCF，可以计算得到该轨迹对应的单目标跟踪器模型参数</p>
+<script type="math/tex; mode=display">
+{\bar{w}'}_i^t = \frac{\hat{y}}{\hat{k}^{z^tz^t}+\lambda}</script><p>其中$y$是label， $k$是核函数， $\lambda$是正则系数， $(\hat{\cdot})$是傅里叶变换。关于KCF的详细解释可以参考<a href="https://ZongweiZhou1.github.io/2019/05/18/High-speed-tracking-with-kernelized-correlation-filters/" target="_blank" rel="noopener">KCF</a>, 然后对于预测的位置通过计算响应值来找到最可能匹配的位置</p>
+<script type="math/tex; mode=display">
+\hat{x}_i^{tP} = \arg\max_{x_j^t\in O^t} \mathcal{F}^{-1}(\hat{k}^{z^{t-1}z^t}\odot {\hat{w}'}_i^t )</script><p>于是每一个目标都找到了其对应的最可能匹配的位置，作为在当前帧中的预测位置。</p>
+<h4 id="子图多割"><a href="#子图多割" class="headerlink" title="子图多割"></a>子图多割</h4><p>这一部分就是文章中的Detection Verification。 作者认为， 只利用单目标跟踪器的话会导致有些预测位置发生冲突，因为没有全局考虑嘛。而只利用检测结果作为候选框，也就是传统teacking-by-detection的方法，则会受到detections中可能的false negative导致有些没检测到的响应的影响。（注：其实我觉得更主要的其实是必须依靠检测结果才能发现新的轨迹起点）， 所以文章中将上一步单目标预测的结果和当前帧的检测结果放到一起作为当前帧候选的匹配框。但这又带来一个问题，就是预测和检测可能存在大概了的重叠，很难直接利用匈牙利类似的一对一算法进行匹配。所以<strong>作者采用了子图多割的策略，允许一条轨迹配对多个候选框</strong>。</p>
+<p>作者构图方式：当前帧的所有候选框集合表示为$O^t = D^t \or P^t$, $D^t, P^t$分别表示检测结果和预测结果的集合。那么有图$G(V, E), V=\hat{X}^{t-1}\or O^t$, 其中$\hat{X}^{t-1}$表示上一帧获得的每条轨迹的位置点， （显然， 这里的子图多割就是希望将$O^t$中的点成group的分配给不同的$\hat{X}_i^{t-1}$, $E$文章中没说是否有约束条件，那么应该是任意两点都存在连接边。 图割问题的形式化表述为</p>
+<script type="math/tex; mode=display">
+\min_{c_e\in \{0, 1\}}\sum_{e\in E}c_ed_e\\
+s.t. \quad \forall P_{uv} \in \mathcal{P}, \forall e\in P_{uv}: c_e\le \sum_{e'\in P_e/e}c_{e'}</script><p>这里$d_e$表示每条边的代价， $c_e$是示性量表示该条边是否关联， $0$表示关联， $1$表示断开，约束条件是用来约束每一个子图中的连接关系一致。文章中这部分没介绍清楚。$\mathcal{P}$应该是所有通路的集合， $p_{uv}$应该是两点之间存在的通路 $e$则表示一条边，于是约束的意义是：如果两个点$u,v$除了直连边之外的其他通路都是连接的， 那么直连边一定是连接的， 相反如果直连边是断开的，那么其他的通路必定也是断开的。</p>
+<p>每条边上的代价函数</p>
+<script type="math/tex; mode=display">
+d_e=\begin{cases}
+g_i(I^t, x_j^t), \quad \text{if} ~~ u\in \hat{X}^{t-1}, v\in O^t\\ 
+IoU(b_j^t, b_{j'}^{t}), \text{if}~~u\in O^t, v\in O^t\\
+-C,  \quad\quad \quad ~~\text{if}~u\in \hat{X}^{t-1}, v\in \hat{X}^{t-1}
+\end{cases}</script><p>即当点分别来自于前一帧的目标和当前帧的候选框时，利用KCF计算相似度；当两点都来自于候选框的时候两者的相似度使用IoU计算；当两者都来自于前一帧的目标时，给定一个较大的负常数作为相似度。显然目标是不希望任意两个前一帧的目标被划分在一起。这个优化问题通过启发式方法求解。参见Siyu Tang的一系列多目标跟踪论文</p>
+<p>这里不是每帧都是用检测结果进行验证，而是隔$F_V$帧验证一次，毕竟这个图割还是挺耗时的。</p>
+<h4 id="模型更新"><a href="#模型更新" class="headerlink" title="模型更新"></a>模型更新</h4><p>KCF跟踪器是每一帧都进行更新的，但是对于MOT任务而言，如果每一帧都进行更新的话可能会导致将噪声更新进模型参数中，从而导致跟踪漂移，所以文章专门设计了一个基于CNN的二值分类器用于判断当前是否需要用检测结果更新模型参数。而这个分类器的解释是判断检测结果和预测结果哪一个能够更好地enclosing真实的target。</p>
+<p>该分类器采用强化学习的方式进行训练。模型训练的正负样本分别依靠下述规则生成。</p>
+<ul>
+<li>模型更新了参数，但是预测的框与真实ground truth的iou高于检测框与ground truth的iou， 这时候认为产生了负样本， 将检测和预测concate一起作为负样本的特征。</li>
+<li>模型没有更新参数，但是显然检测框与预测框能够更好地enclose ground truth， 这时候认为产生了正样本， 将检测和预测特征concate一起作为正样本的特征。</li>
+</ul>
+<p>这里的正负样本是指是否需要更新模型参数。 另外还有一个问题：可能一个subgraph中多个detection如何选择，文章中没看到。我觉得两种方式，一种就是分别每一个detection都和prediction concate一次作为样本，另一种就是选择enclose目标最好的detection与prediction做concatenation。</p>
+<p><strong>Back up</strong> 文章中这里还设计了一个备份的策略，就是在更新模型的时候把上一个模型参数暂时保存起来，然后观察更新的模型参数合不合适，不合适就继续采用之前的模型参数。而判断模型参数合不合适的方式是在$t+1$帧看模型能不能与检测匹配成功。</p>
+<h4 id="遮挡处理"><a href="#遮挡处理" class="headerlink" title="遮挡处理"></a>遮挡处理</h4><p>对于剩下的没有跟踪成功的轨迹和没有匹配的检测，作者认为是由于遮挡造成的，所以需要对这些轨迹和样本进行再一次关联。而这次关联则与传统的MOT方法思想一样，计算检测和轨迹的相似度，然后通过匈牙利算法进行匹配。</p>
+<p>在计算相似度时采用的是SVM分类器， 每个配对的特征设计如下</p>
+<script type="math/tex; mode=display">
+[t-t', \frac{\varepsilon_2-\varepsilon_1}{\bar{\eta}}, \frac{\epsilon_2-\epsilon_1}{\bar{\eta}}, \frac{\eta_2-\eta_1}{\bar{\eta}}, IoU(b_1, b_2), \phi_{hist}]</script><p>$\varepsilon. \epsilon, \eta$分别表示（x,y）坐标和高度。 $\bar{\eta}$则表示均值。$b_1$表示的是轨迹开始出现遮挡时的bounding box， $b_2$则是轨迹遮挡消失那一刻的bounding box。 $\phi_{hist}$是颜色直方图的intersection。</p>
+<p><strong>这部分和层次匹配的思想非常像</strong></p>
+<h4 id="轨迹管理"><a href="#轨迹管理" class="headerlink" title="轨迹管理"></a>轨迹管理</h4><ul>
+<li>轨迹起始： 前面几个阶段都没有关联成功检测作为新的轨迹的起点</li>
+<li>轨迹终止：如果bounding box超出视野认为轨迹终止； 如果轨迹连续多帧没有匹配到detection则认为轨迹终止。</li>
+</ul>
+<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><p>还有一点需要说明的就是在使用KCF进行预测时的feature从哪里来， 正如文章中的fig3所示， 这个特征有两部分组成， 一部分是det网络提取的特征，一部分是re-id网络抽取的特征。在实验中分别使用PAFNet和PartNet作为检测和重识别网络。</p>
+<p>现在再来看方法的系统图就容易看懂了</p>
+<p><img src="/2019/06/01/Instance-Aware-Tracker/overview.png" alt="overview"></p>
+<h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><p>特征抽取器： 检测部分使用的PAFNet， 身份重识别部分采用的PartNet的全卷积层输出。</p>
+<p>训练策略： CNN当错误发生时以Batchsize=32， lr=0.001迭代5次。</p>
+<p>实验结果：</p>
+<ul>
+<li><p>$T_V$</p>
+<p><img src="/2019/06/01/Instance-Aware-Tracker/TV.png" alt="TV"></p>
+<p>$T_V$对FP和FN指标会产生影响， 当$T_V$增大时，也就是长时间不用detection矫正跟踪，那么可能会出现更多的FP； 当$T_V$减小时，极限是每帧都更新，那么就会因为漏检导致轨迹过早结束，使得FN增大。</p>
+</li>
+<li><p>Ablation Study</p>
+<p><img src="/2019/06/01/Instance-Aware-Tracker/ablation.png" alt="ablation"></p>
+<p>MR: Model Refresh</p>
+<p>DV: detection verfication</p>
+<p>TA: 表示开始KCF使用的特征</p>
+<p>可以看到当DV不使用时，也就是全靠单目标KCF跟踪器处理MOT，然后MOTA非常差， 而使用VGG16抽取的特征替代本文中来自于ReID和Det的特征效果也有些许下降，这可能是因为训练不够充分。</p>
+</li>
+<li><p>Results on Test Sequences</p>
+<p><img src="/2019/06/01/Instance-Aware-Tracker/results.png" alt="results"></p>
+</li>
+</ul>
+<p>总的来说性能还行，但是对比的方法并不是state-of-the-art的方法。</p>
+<h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><p>这篇文章也是一种使用SOT处理MOT的方法，同一类的方法有DMAN和STAM算法。 而这个的主要贡献点可能在于使用子图多割模型处理多个候选框对应一个target的问题。</p>
+<p>其实将预测和检测融合在一起再进行匹配跟踪本身就能取得一个相当的实验结果。</p>
+<p>所以可以提供借鉴的点在于：使检测更加的准确。比如利用预测减少FN， 利用refine减少FP等。这也是我目前在做的工作。</p>
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : zhouzongwei <br>
+        
+        原文链接 : <a href>http://yoursite.com/2019/06/01/Instance-Aware-Tracker/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
+    </div>
+  
+  
+  
+    <div class="social-share" style="margin-top: -2rem" data-wechat-qrcode-title="<p>微信扫一扫</p>" data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>" data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter">
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
+</div>
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async></script>
+  
+
+  
+    <div id="reward">
+  
+    <p id="reward-meta">知识 & 情怀 | 赏或者不赏，我都在这，不声不响</p>
+  
+  <button id="reward-btn">
+    
+    <span>打赏</span>
+  </button>
+  <div id="reward-qrcode">
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/wechatimg.jpg" alt="微信扫一扫, 以资鼓励">
+        <p class="qrcode-meta">微信扫一扫, 以资鼓励</p>
+      </div>
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/alipayimg.jpg" alt="支付宝扫一扫, 再接再厉">
+        <p class="qrcode-meta">支付宝扫一扫, 再接再厉</p>
+      </div>
+    
+  </div>
+
+</div>
+
+<script>
+  (() => {
+    let button = document.querySelector('#reward-btn'),
+      qrcode = document.querySelector('#reward-qrcode'),
+      display = false;
+    
+    button.addEventListener('click', () => {
+      qrcode.style.display = display ? 'none' : 'block'
+      display = !display
+    }, false)
+  })()
+</script>
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+          <i class="iconfont icon-06tags"></i>标签: 
+          
+          <span class="span--tag">
+            <a href="/tags/SOT-for-MOT/">
+              #SOT for MOT
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/Instance-aware/">
+              #Instance-aware
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/dynimic-model-refreshment/">
+              #dynimic model refreshment
+            </a>
+          </span>
+          
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
+    
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2019/05/29/nms-and-softnms/" target="_self">深度学习-nms 和 softnms [代码]</a>
+      </div>
+    
+    
+      <div class="nav-next">
+        下一篇:
+        <a href="/2019/06/04/hexo-github-latex/" target="_self">工具使用-hexo  主题中部分数学公式无法正确显示的解决办法</a>
+        <i class="iconfont icon-next"></i>
+      </div>
+    
+  </nav>
+
+  
+    <a href="#comment" class="comment-anchor"></a>
+<div class="comment-title"><i class="iconfont icon-footprint"></i> 留下足迹 <i class="iconfont icon-footprint"></i></div>
+<div id="vcomments"></div>
+
+<script defer>
+  if( true ) {
+    let path = getRealPath()
+    new Valine({
+      el: "#vcomments",
+      appId: "oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz",
+      appKey: "fWABYGLTAoV1LT4LYzh1PNmQ",
+      notify: false,
+      verify: false,
+      avatar: "robohash",
+      placeholder: "正确填写邮箱, 才能及时收到回复哦♪(^∇^*)",
+      path
+    });
+  }
+</script>
+   
+
+  
+    <script defer>
+const valineAPI = (() => {
+  try {
+    AV.init("oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz", "fWABYGLTAoV1LT4LYzh1PNmQ");
+  } catch(error) {}
+  const isExist = (identity) => {
+    identity = identity || getRealPath();
+    let query = new AV.Query('Timer');
+    return new Promise((resolve, reject) => {
+      query.equalTo("identity", identity);
+      query.find().then(results => {
+        resolve(results.length > 0);
+      }, error => reject(error));
+    })
+  }
+
+  const _get = (identity) => {
+    let query = null;
+    if(identity && identity instanceof Array){
+      let querys = [];
+      for(let i = 0; i < identity.length; ++i) {
+        querys[i] = new AV.Query('Timer');
+        querys[i].equalTo('identity', identity[i]);
+      }
+      query = AV.Query.or.apply(null ,querys);
+    } else {
+      identity = identity || getRealPath();
+      query = new AV.Query("Timer");
+      query.equalTo("identity", identity);
+    }
+
+    return new Promise((resolve, reject) => {
+      query.find()
+      .then(results => resolve(results))
+      .catch(error => reject(error))
+    })
+  }
+
+  const create = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let Todo = AV.Object.extend('Timer');
+      let todo = new Todo();
+      todo.set("times", 1);
+      todo.set("identity", identity);
+      todo.save().then(res => resolve(true), error => reject(error));
+    })
+  }
+
+  const update = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let query = new AV.Query('Timer');
+      query.equalTo("identity", identity);
+      query.find().then(todos => {
+        todos.forEach(todo => {
+          todo.set("times", todo.attributes.times + 1);
+        });
+        return AV.Object.saveAll(todos);
+      }).then(todos => resolve(true), error => reject(error));
+    })
+  }
+
+  return {
+    isExist,
+    _get,
+    update,
+    create
+  }
+})()
+
+const calcAndWriteTimes = () => {
+  let isPost = true;
+
+  let timerAllDOM = document.querySelectorAll(".article-timer");
+
+  if(isPost) {
+    let identity = timerAllDOM[0].getAttribute("data-identity");
+    valineAPI.isExist(identity)
+    .then(exist => {
+      if(exist) {
+        return valineAPI.update(identity);
+      }
+      return new Promise(resolve => resolve(true));
+    })
+    .then( succuess => valineAPI._get(identity))
+    .then( result => timerAllDOM[0].innerText = result[0].attributes.times)
+    .catch(error => console.log(error.message))
+    return ;
+  }
+
+  let timerDOMCache = {};
+
+  for(let timerDOM of timerAllDOM) {
+    let identity = timerDOM.getAttribute("data-identity");
+    if(timerDOMCache.hasOwnProperty(identity)){
+      timerDOMCache[identity].dom.push(timerDOM);
+    }else{
+      timerDOMCache[identity] = {
+        dom: [timerDOM],
+        times: undefined
+      };
+    }
+  }
+
+  let identities = Object.keys(timerDOMCache);
+  valineAPI._get(identities).then(results => {
+    for(let result of results) {
+      let {identity, times} = result.attributes;
+      timerDOMCache[identity].times = times;
+      timerDOMCache[identity].dom.map(item => item.innerText = times);
+    }
+    for(let identity of identities) {
+      if(timerDOMCache[identity].times){
+        continue;
+      }
+      timerDOMCache[identity].dom.map(item => item.innerText = 1);
+      valineAPI.create(identity);
+    }
+  }).catch(error => console.log(error.message))
+}
+
+if(true){
+  calcAndWriteTimes();
+}
+</script>
+   
+
+</div>
+
+
+      <footer>
+  <p class="site-info">
+    博客已萌萌哒运行<span id="time-to-now"></span><span class="my-face">(●'◡'●)ﾉ♥</span>
+    <br>
+    Theme - <a href="https://github.com/dongyuanxin/theme-bmw">BMW</a> | Made With 💗 | Powered by <a href="https://godbmw.com/">GodBMW</a>
+    <br>
+    
+  </p>
+</footer>
+
+
+
+<script>
+const timeToNowDOM = document.querySelector("#time-to-now");
+const startTimestamp = new Date(2018, 1, 10).getTime();
+
+const updateTimeStr = () => {
+  let offset = parseInt(
+      (new Date().getTime() - startTimestamp) / 1000,
+      10
+    ),
+    day = Math.floor(offset / 86400),
+    hour = Math.floor((offset % 86400) / 3600),
+    minute = Math.floor(((offset % 86400) % 3600) / 60),
+    second = Math.floor(((offset % 86400) % 3600) % 60);
+  timeToNowDOM.innerHTML =
+    day + "天" + hour + "小时" + minute + "分钟" + second + "秒";
+  setTimeout(updateTimeStr, 500);
+}
+
+setTimeout(updateTimeStr, 500);
+</script>
+
+
+      <div class="back-to-top hidden">
+  <span>
+    <i class="iconfont icon-60"></i><span></span>%
+  </span>
+</div>
+
+<script>
+const updateIconToTop = percent => {
+  let dom = document.querySelector(".back-to-top span span");
+  dom.innerText = percent;
+  if(percent < 1) {
+    document.querySelector(".back-to-top").className = "back-to-top hidden";
+  } else {
+    document.querySelector(".back-to-top").className = "back-to-top";
+  }
+}
+
+const handleScoll = () => {
+  let isRunning = false;
+  return () => {
+    if (isRunning) return;
+    isRunning = true;
+    window.requestAnimationFrame(timestamp => {
+      let scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop,
+        scrollHeight =
+          document.documentElement.scrollHeight ||
+          document.body.scrollHeight,
+        clientHeight =
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+      isRunning = false;
+      if (scrollTop <= 1) {
+        updateIconToTop(0);
+        return;
+      }
+      if (scrollTop + clientHeight >= scrollHeight) {
+        updateIconToTop(100);
+      } else {
+        updateIconToTop(parseInt(
+          100 * scrollTop / (scrollHeight - clientHeight),
+          10
+        ));
+      }
+    });
+  };
+}
+
+const backToTop = () => {
+  let scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop,
+    delay = 10,
+    time = 200;
+  if (scrollTop <= 20) {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    return;
+  }
+  let step = Math.ceil(scrollTop * delay / time);
+  let timer = setInterval(() => {
+    scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollTop - step <= 0) {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      clearInterval(timer);
+    } else {
+      document.documentElement.scrollTop = scrollTop - step;
+      document.body.scrollTop = scrollTop - step;
+    }
+  }, delay);
+}
+
+document.addEventListener("scroll", handleScoll(), false);
+
+document.querySelector(".back-to-top").addEventListener("click", backToTop, false);
+
+</script>
+
+    </div>
+
+    
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+<script>
+  (() => {
+    const mathjaxConfig = {
+      showProcessingMessages: false, //关闭js加载过程信息
+      messageStyle: "none", //不显示信息
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]], //行内公式选择符
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]], //段内公式选择符
+        skipTags: ["script", "noscript", "style", "textarea", "pre", "code", "a"] //避开某些标签
+      },
+      "HTML-CSS": {
+        availableFonts: ["STIX", "TeX"], //可选字体
+        showMathMenu: false //关闭右击菜单显示
+      }
+    }
+
+    let mathjaxInterval = setInterval(() => {
+      if(!window.MathJax){
+        return;
+      }
+      window.MathJax.Hub.Config(mathjaxConfig)
+      window.MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById('app')])
+
+      clearInterval(mathjaxInterval)
+    }, 10)    
+  })()
+</script>
+    
+
+    <script src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script>
+<script async>
+  let fancyTimer = setInterval(function(){
+    if(!window.$){
+      return;
+    }
+    $(document).ready(function() {
+      $(".post img").each(function () {
+        if($(this).parent().get(0).tagName.toLowerCase() === "a") {
+          return;
+        }
+        // $(this).attr("data-fancybox", "gallery"); // if you add 'data-fancybox', img will display after showed
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "gallery");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      });
+      
+      clearInterval(fancyTimer);
+    });
+  }, 10);
+</script>
+
+    
+  </body>
+
+</html>
