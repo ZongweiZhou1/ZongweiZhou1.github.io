@@ -8,12 +8,12 @@
   
   
   
-  <title>MOTS | YixiaoZhou&#39;s blog</title>
+  <title>工具使用-miniconda 安装、卸载和使用 | YixiaoZhou&#39;s blog</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   
-    <meta name="keywords" content="Hexo, theme-bmw">
+    <meta name="keywords" content="conda,miniconda,install,remove,">
   
 
   <script>
@@ -189,17 +189,17 @@
 
 <div class="post">
   <h1 class="article-title">
-    <span>MOTS</span>
+    <span>工具使用-miniconda 安装、卸载和使用</span>
   </h1>
   <div class="article-top-meta">
     <span>
       发布 : 
-      2019-06-08
+      2019-06-13
     </span>
     
     
       <span>
-        浏览 : <span class="article-timer" data-identity="MOTS"></span>
+        浏览 : <span class="article-timer" data-identity="conda"></span>
       </span>
     
   </div>
@@ -208,7 +208,52 @@
 
   <div class="article-content">
     <div class="markdown-body">
-      
+      <h4 id="conda安装"><a href="#conda安装" class="headerlink" title="conda安装"></a>conda安装</h4><p>根据需求， 下载miniconda的<a href="https://docs.conda.io/en/latest/miniconda.html" target="_blank" rel="noopener">安装包</a></p>
+<p><img src="/2019/06/13/conda/miniconda.png" alt="miniconda"></p>
+<p>这里 python3.7， python2.7是指conda默认安装，即没有指定python版本时， 创建环境的python版本。我安装的是python3.7 + linux + 64-bit 的安装包。</p>
+<ul>
+<li><p>首先下载安装文件</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>然后运行下载的安装文件， 进行安装</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash Miniconda2-latest-Linux-x86_64.sh</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装过程中出现几处交互指令：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Do you accept thelicense terms? [yes|no]</span><br><span class="line">[no] &gt;&gt;&gt; yes</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Miniconda3 will now be installed into this location:</span><br><span class="line">/data/zwzhou/miniconda3</span><br><span class="line">...</span><br><span class="line">[/data/zwzhou/miniconda3] &gt;&gt;&gt;    (直接Enter)</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">by running conda init? [yes|no]</span><br><span class="line">[no] &gt;&gt;&gt; yes</span><br></pre></td></tr></table></figure>
+<p>然后会提示安装成功：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Thank you <span class="keyword">for</span> installing Miniconda3!</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装完需要重新bash以下，使路径更新</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
+<p>至此， conda 安装完毕， 可以使用conda 创建环境。</p>
+</li>
+</ul>
+<h4 id="conda使用"><a href="#conda使用" class="headerlink" title="conda使用"></a>conda使用</h4><ul>
+<li><p>创建conda环境</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda create -n python36 python=3.6</span><br></pre></td></tr></table></figure>
+<p>其中 <code>-n</code> 后面的参数指定了环境的名称是<code>python36</code>,  最后一个是指定安装环境的python版本为3.6.</p>
+</li>
+<li><p>激活conda 环境</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> activate python36</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>退出conda环境</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> deactivate</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>conda环境安装包， 比如numpy， matplotlib等</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda install numpy, matplotlib</span><br></pre></td></tr></table></figure>
+<p>又是conda安装失败，可以尝试在该环境内使用<code>pip</code>安装。</p>
+</li>
+<li><p>删除 conda 环境</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda remove -n python36 --all</span><br></pre></td></tr></table></figure>
+<p>注意这里必须指定 <code>--all</code>才能将该环境全部删除。</p>
+</li>
+</ul>
+<h4 id="conda-卸载"><a href="#conda-卸载" class="headerlink" title="conda 卸载"></a>conda 卸载</h4><p>安装完miniconda之后会出现一个安装文件夹， 比如我的 <code>miniconda3</code>, 直接删除该文件夹即可。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rm -rf ~/miniconda3</span><br></pre></td></tr></table></figure>
+<p>此时可以将<code>.bashrc</code> 中与conda相关的设置注释掉或者直接删除。然后再</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
     </div>
   </div>
   
@@ -219,7 +264,7 @@
         
           本文作者 : zhouzongwei <br>
         
-        原文链接 : <a href>http://yoursite.com/2019/06/08/MOTS/</a><br>
+        原文链接 : <a href>http://yoursite.com/2019/06/13/conda/</a><br>
         版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
         </blockquote>
       </div>
@@ -276,6 +321,33 @@
     <div class="article-meta pull-left">
       <span>
         
+          <i class="iconfont icon-06tags"></i>标签: 
+          
+          <span class="span--tag">
+            <a href="/tags/conda/">
+              #conda
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/miniconda/">
+              #miniconda
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/install/">
+              #install
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/remove/">
+              #remove
+            </a>
+          </span>
+          
+        
       </span>
     </div>
     <div class="article-meta pull-right">
@@ -296,13 +368,13 @@
       <div class="nav-pre">
         <i class="iconfont icon-prev"></i>
         上一篇:
-        <a href="/2019/06/07/ZiChuan/" target="_self">读书感悟-《紫川》</a>
+        <a href="/2019/06/08/MOTS/" target="_self">MOTS</a>
       </div>
     
     
       <div class="nav-next">
         下一篇:
-        <a href="/2019/06/13/conda/" target="_self">工具使用-miniconda 安装、卸载和使用</a>
+        <a href="/2019/06/13/jupyter-notebook/" target="_self">工具使用-jupyter notebook的安装，卸载，设置不同的conda环境</a>
         <i class="iconfont icon-next"></i>
       </div>
     

@@ -8,12 +8,12 @@
   
   
   
-  <title>MOTS | YixiaoZhou&#39;s blog</title>
+  <title>工具使用-jupyter notebook的安装，卸载，设置不同的conda环境 | YixiaoZhou&#39;s blog</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   
-    <meta name="keywords" content="Hexo, theme-bmw">
+    <meta name="keywords" content="conda,jupyter-notebook,">
   
 
   <script>
@@ -189,17 +189,17 @@
 
 <div class="post">
   <h1 class="article-title">
-    <span>MOTS</span>
+    <span>工具使用-jupyter notebook的安装，卸载，设置不同的conda环境</span>
   </h1>
   <div class="article-top-meta">
     <span>
       发布 : 
-      2019-06-08
+      2019-06-13
     </span>
     
     
       <span>
-        浏览 : <span class="article-timer" data-identity="MOTS"></span>
+        浏览 : <span class="article-timer" data-identity="jupyter-notebook"></span>
       </span>
     
   </div>
@@ -208,7 +208,65 @@
 
   <div class="article-content">
     <div class="markdown-body">
-      
+      <p><strong>NOTE</strong>  我找了好久如何在无root权限下安装jupyter notebook， 都没找到。所以以下操作在安装jupyter notebook时还是需要有root权限的。</p>
+<p>如果按照官网安装了完全的 Anaconda， 那么本身就会安装jupyter notebook。 这里由于我们conda安装的是miniconda版本，所以需要额外的单独安装jupyter notebook。</p>
+<h4 id="jupyter-notebook安装"><a href="#jupyter-notebook安装" class="headerlink" title="jupyter notebook安装"></a>jupyter notebook安装</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo python -m pip install --upgrade pip</span><br><span class="line">sudo python -m pip install -jupyter</span><br></pre></td></tr></table></figure>
+<p>这里在python2环境下安装。</p>
+<p>此时打开jupyter notebook，则会弹出火狐浏览器对应窗口。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jupyter notebook</span><br></pre></td></tr></table></figure>
+<p>如果需要修改默认参数，可以在<code>jupyter_notebook_config.py</code>文件中修改。但单独安装的jupyter notebook没有该文件，此时可以使用如下指令生成文件。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jupyter notebook --generate-config</span><br></pre></td></tr></table></figure>
+<p>然后在<code>~/.jupyter</code> 文件夹中可以找到对应文件。</p>
+<h4 id="jupyter-notebook卸载"><a href="#jupyter-notebook卸载" class="headerlink" title="jupyter notebook卸载"></a>jupyter notebook卸载</h4><p>执行以下指令：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sudo pip uninstall -y jupyter</span><br><span class="line">sudo pip uninstall -y jupyter_core</span><br><span class="line">sudo pip uninstall -y jupyter-client</span><br><span class="line">sudo pip uninstall -y jupyter-console</span><br><span class="line">sudo pip uninstall -y notebook</span><br><span class="line">sudo pip uninstall -y qtconsole</span><br><span class="line">sudo pip uninstall -y nbconvert</span><br><span class="line">sudo pip uninstall -y nbformat</span><br></pre></td></tr></table></figure>
+<h4 id="jupyter-notebook-添加kernel"><a href="#jupyter-notebook-添加kernel" class="headerlink" title="jupyter notebook 添加kernel"></a>jupyter notebook 添加kernel</h4><p>这里单独指给jupyter notebook添加不同的conda环境。</p>
+<ul>
+<li><p>首先创建好需要的conda环境， 比如环境名称<code>python36</code>. 然后激活该环境，并在该环境中安装<code>ipykernel</code></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> activate python36</span><br><span class="line">conda install ipykernel</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>然后为jupyter kernel写入对应的环境</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -m ipykernel install --user --name python36 --display-name <span class="string">"py36_pytorch101"</span></span><br></pre></td></tr></table></figure>
+<p>最后一个参数是在jupyter notebook上显示的kernel 名称。</p>
+<p>打开jupyter notebook， 可以看到当前的kernel成功写入。</p>
+<p><img src="/2019/06/13/jupyter-notebook/kernel.png" alt="kernel"></p>
+</li>
+<li><p>查看当前添加的kernel</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jupyter kernelspec list</span><br></pre></td></tr></table></figure>
+<p><img src="/2019/06/13/jupyter-notebook/kernel_list.png" alt="kernel_list"></p>
+</li>
+<li><p>删除指定的kernel</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jupyter kernelspec remove py36_pytorch101</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="远程访问jupyter-notebook"><a href="#远程访问jupyter-notebook" class="headerlink" title="远程访问jupyter notebook"></a>远程访问jupyter notebook</h4><p>在本地访问服务器上的jupyter notebook。</p>
+<ul>
+<li>终端打开python， 然后输入下面两行获得通信密码。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> notebook.auth <span class="keyword">import</span> passwd</span><br><span class="line">passwd()</span><br></pre></td></tr></table></figure>
+<p><img src="/2019/06/13/jupyter-notebook/keys.png" alt="keys"></p>
+<ul>
+<li><p>然后打开我们之前生成的配置文件<code>~/.jupyter/jupyter_notebook_config.py</code>, 修改部分参数：</p>
+<blockquote>
+<p>第204行修改为<code>c.NotebookApp.ip = &quot;0.0.0.0&quot;</code></p>
+<p>第267行修改为<code>c.NotebookApp.open_browser = False</code></p>
+<p>第276行修改为<code>c.NotebookApp.password = u&quot;刚才的sha1密码&quot;</code></p>
+<p>第287行修改为<code>c.NotebookApp.port = 8888</code> </p>
+</blockquote>
+</li>
+</ul>
+<p>网上又说ip可以设置为任意， 即<code>c.NotebookApp.ip = &quot;*&quot;</code> 但是我的出现如下错误， 修改为<code>0.0.0.0</code>后没问题了。</p>
+<p><img src="/2019/06/13/jupyter-notebook/ip_error.png" alt="ip_error"></p>
+<p>最后一个设置本地访问时的端口号。</p>
+<ul>
+<li><p>然后打开jupyter notebook之后，在浏览器中输入服务器的地址和端口号就可以远程打开jupyter notebook。</p>
+<p>命令行输入：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jupyter notebook</span><br></pre></td></tr></table></figure>
+<p>浏览器中输入地址：</p>
+<p><img src="/2019/06/13/jupyter-notebook/login.png" alt="login"></p>
+</li>
+<li><p>为了让jupyter notebook可以在后台运行，推荐配合tmux使用， 效果更佳。</p>
+</li>
+</ul>
     </div>
   </div>
   
@@ -219,7 +277,7 @@
         
           本文作者 : zhouzongwei <br>
         
-        原文链接 : <a href>http://yoursite.com/2019/06/08/MOTS/</a><br>
+        原文链接 : <a href>http://yoursite.com/2019/06/13/jupyter-notebook/</a><br>
         版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
         </blockquote>
       </div>
@@ -276,6 +334,21 @@
     <div class="article-meta pull-left">
       <span>
         
+          <i class="iconfont icon-06tags"></i>标签: 
+          
+          <span class="span--tag">
+            <a href="/tags/conda/">
+              #conda
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/jupyter-notebook/">
+              #jupyter-notebook
+            </a>
+          </span>
+          
+        
       </span>
     </div>
     <div class="article-meta pull-right">
@@ -296,13 +369,13 @@
       <div class="nav-pre">
         <i class="iconfont icon-prev"></i>
         上一篇:
-        <a href="/2019/06/07/ZiChuan/" target="_self">读书感悟-《紫川》</a>
+        <a href="/2019/06/13/conda/" target="_self">工具使用-miniconda 安装、卸载和使用</a>
       </div>
     
     
       <div class="nav-next">
         下一篇:
-        <a href="/2019/06/13/conda/" target="_self">工具使用-miniconda 安装、卸载和使用</a>
+        <a href="/2019/06/13/cuda-update/" target="_self">工具使用-Ubuntu16.04下cuda和cudnn的卸载，更新和多版本切换</a>
         <i class="iconfont icon-next"></i>
       </div>
     
