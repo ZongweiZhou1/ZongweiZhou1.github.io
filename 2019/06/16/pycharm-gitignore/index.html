@@ -8,12 +8,12 @@
   
   
   
-  <title>工具使用-Ubuntu16.04下cuda和cudnn的卸载，更新和多版本切换 | YixiaoZhou&#39;s blog</title>
+  <title>工具使用-pycharm如何配置 .gitignore 文件 | YixiaoZhou&#39;s blog</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   
-    <meta name="keywords" content="cuda upgrade,cudnn upgrade,">
+    <meta name="keywords" content="pycharm,gitignore,">
   
 
   <script>
@@ -189,17 +189,17 @@
 
 <div class="post">
   <h1 class="article-title">
-    <span>工具使用-Ubuntu16.04下cuda和cudnn的卸载，更新和多版本切换</span>
+    <span>工具使用-pycharm如何配置 .gitignore 文件</span>
   </h1>
   <div class="article-top-meta">
     <span>
       发布 : 
-      2019-06-13
+      2019-06-16
     </span>
     
     
       <span>
-        浏览 : <span class="article-timer" data-identity="cuda-update"></span>
+        浏览 : <span class="article-timer" data-identity="pycharm-gitignore"></span>
       </span>
     
   </div>
@@ -208,50 +208,25 @@
 
   <div class="article-content">
     <div class="markdown-body">
-      <h4 id="cuda安装"><a href="#cuda安装" class="headerlink" title="cuda安装"></a>cuda安装</h4><ul>
-<li><p>首先去Nvidia官网选择下载自己希望安装的cuda版本。</p>
-<p><img src="/2019/06/13/cuda-update/download.png" alt="download"></p>
-<p>服务器上直接下载， 可以右键复制下载链接，然后使用如下指令</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.168_418.67_linux.run</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>安装cuda</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo sh cuda_10.1.168_418.67_linux.run</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>安装过程中一直enter键，直到协议结束出现下面的选择</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Do you accept the previously read EULA?</span><br><span class="line">accept/decline/quit: accept     # 同意协议</span><br><span class="line"></span><br><span class="line">Install NVIDIA Accelerated Graphics Driver for Linux-x86_64 396.37?</span><br><span class="line">(y)es/(n)o/(q)uit: n   # 如果显卡驱动没安装，则需要选择yes， 这里是安装新的版本，所以旧的cuda安装时，已经安装过显卡驱动，所以可以选择no， 不再安装显卡驱动</span><br><span class="line"></span><br><span class="line">Install the CUDA 9.2 Toolkit?</span><br><span class="line">(y)es/(n)o/(q)uit: y  # 安装工具包</span><br><span class="line"></span><br><span class="line">Enter Toolkit Location</span><br><span class="line"> [ default is /usr/local/cuda-9.2 ]:  # 这里就选择默认安装路径就好</span><br><span class="line"></span><br><span class="line">Do you want to install a symbolic link at /usr/local/cuda?</span><br><span class="line">(y)es/(n)o/(q)uit: y  # 是否创建软连接， 这个软连接其实就可以用来选择不同的cuda版本，因为bashrc中的cuda路径都是使用该软连接指定的。</span><br><span class="line"></span><br><span class="line">Install the CUDA 9.2 Samples?</span><br><span class="line">(y)es/(n)o/(q)uit: y  # 安装样本代码</span><br></pre></td></tr></table></figure>
-<p>至此<code>cuda10</code>安装成功。</p>
-</li>
-</ul>
-<h4 id="cuda版本切换"><a href="#cuda版本切换" class="headerlink" title="cuda版本切换"></a>cuda版本切换</h4><ul>
-<li>不同版本的cuda都是安装在默认路径<code>/usr/local</code>下的， 而在该路径下还有一个软连接<code>/usr/local/cuda</code></li>
-</ul>
-<p><img src="/2019/06/13/cuda-update/softlink.png" alt="softlink"></p>
-<p>判断当前软连接链接的是哪个版本为cuda:</p>
-<p><img src="/2019/06/13/cuda-update/whichcuda.png" alt="whichcuda"></p>
-<p>可以看到当前软连接采用的是cuda9.0。</p>
-<p>如果想切换成cuda8.0, 直接修改软连接则可</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ln -s /usr/<span class="built_in">local</span>/cuda /usr/<span class="built_in">local</span>/cuda8.0</span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>当然，这么做的前提是配置文件的路径需要设置好</strong></li>
-</ul>
-<p>打开<code>~/.bashrc</code>文件，修改环境变量， 如果没有则添加</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:/usr/<span class="built_in">local</span>/cuda/bin</span><br><span class="line"><span class="built_in">export</span> LD_LIBRARY_PATH=<span class="variable">$LD_LIBRARY_PATH</span>:/usr/<span class="built_in">local</span>/cuda/lib64  </span><br><span class="line"><span class="built_in">export</span> LIBRARY_PATH=<span class="variable">$LIBRARY_PATH</span>:/usr/<span class="built_in">local</span>/cuda/lib64</span><br></pre></td></tr></table></figure>
-<p>每次修改<code>~/.bashrc</code>文件之后都需要重新激活一次。</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>查看当前cuda的版本</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nvcc --version</span><br></pre></td></tr></table></figure>
-<p><img src="/2019/06/13/cuda-update/nvcc_version.png" alt="nvcc_version"></p>
-</li>
-</ul>
-<h4 id="cudnn-安装"><a href="#cudnn-安装" class="headerlink" title="cudnn 安装"></a>cudnn 安装</h4><p>选择cuda版本一致的cudnn版本下载。</p>
-<p><img src="/2019/06/13/cuda-update/cudnn_download.png" alt="cudnn_download"></p>
-<p>下载下来是<code>soliteairetheme8</code>文件， 转换成tgz文件之后进行解压。</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cp cudnn-9.2-linux-x64-v7.4.2.24.solitairetheme8 cudnn-9.2-linux-x64-v7.4.2.24.tgz</span><br><span class="line">tar -xvzf cudnn-9.2-linux-x64-v7.4.2.24.tgz</span><br></pre></td></tr></table></figure>
-<p>然后将里面相应文件拷贝到新安装的cuda中</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo cp include/cudnn.h /usr/<span class="built_in">local</span>/cuda9.0/include/</span><br><span class="line">sudo cp lib64/lib* /usr/<span class="built_in">local</span>/cuda9.0/lib64/</span><br></pre></td></tr></table></figure>
-<p>至此cudnn安装完成。</p>
-<h4 id="cuda卸载"><a href="#cuda卸载" class="headerlink" title="cuda卸载"></a>cuda卸载</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo /usr/<span class="built_in">local</span>/cuda-8.0/bin/uninstall_cuda_8.0.pl</span><br><span class="line">sudo rm -rf /usr/<span class="built_in">local</span>/cuda-8.0</span><br></pre></td></tr></table></figure>
+      <h3 id="安装gitignore插件"><a href="#安装gitignore插件" class="headerlink" title="安装gitignore插件"></a>安装gitignore插件</h3><p>File —-&gt;  Setting —-&gt; PlugIns —&gt; Browse repositories</p>
+<p><img src="/2019/06/16/pycharm-gitignore/plugIns.png" alt="plugIns"></p>
+<p>然后搜索 <code>ignore</code> 并点击安装。</p>
+<p><img src="/2019/06/16/pycharm-gitignore/install.png" alt="install"></p>
+<p>如果下载不成功，可能是资源被墙了， 需要手动<a href="https://plugins.jetbrains.com/plugin/7495--ignore" target="_blank" rel="noopener">下载</a>, 然后如下安装。</p>
+<p><img src="/2019/06/16/pycharm-gitignore/install_from_disk.png" alt="install from disk"></p>
+<p>至此， <code>ignore</code>插件安装完成， 重启pycharm之后生效。</p>
+<h3 id="创建-gitignore文件"><a href="#创建-gitignore文件" class="headerlink" title="创建.gitignore文件"></a>创建<code>.gitignore</code>文件</h3><p>在希望push的项目中创建新文件：</p>
+<p><img src="/2019/06/16/pycharm-gitignore/new_gitignore.png" alt="new_ignore"></p>
+<p>点击之后会提示如何生成， 这里因为用python创建项目，所以通用的模板就能满足我的要求，选择对应语言</p>
+<p><img src="/2019/06/16/pycharm-gitignore/python_default.png" alt="python_default"></p>
+<p>至此，可以发现项目中出现了<code>.gitignore</code> 文件， 文件中默认过滤的后缀。</p>
+<p><img src="/2019/06/16/pycharm-gitignore/new_success.png" alt="new_success"></p>
+<h3 id="添加指定文件到-gitignore中"><a href="#添加指定文件到-gitignore中" class="headerlink" title="添加指定文件到.gitignore中"></a>添加指定文件到<code>.gitignore</code>中</h3><p>选择不想上传的文件， 右键选择 “add to .gitignore”</p>
+<p><img src="/2019/06/16/pycharm-gitignore/add_file.png" alt="add file"></p>
+<h3 id="更新文件"><a href="#更新文件" class="headerlink" title="更新文件"></a>更新文件</h3><p>创建的文件只能过滤之前没有track的文件， 如果项目已经进行了版本控制管理中， 直接修改<code>.gitignore</code>文件是没有作用的，这时候需要将本地版本控制取消，然后重新进行版本控制， 指令如下</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rm -r --cached .</span><br><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">"update .gitignore"</span></span><br></pre></td></tr></table></figure>
+<p>注意， 指令是shell指令，在项目目录下执行。 前两个指令后面有个 <code>.</code> </p>
+<p>然后再push项目。</p>
     </div>
   </div>
   
@@ -262,7 +237,7 @@
         
           本文作者 : zhouzongwei <br>
         
-        原文链接 : <a href>http://yoursite.com/2019/06/13/cuda-update/</a><br>
+        原文链接 : <a href>http://yoursite.com/2019/06/16/pycharm-gitignore/</a><br>
         版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
         </blockquote>
       </div>
@@ -322,14 +297,14 @@
           <i class="iconfont icon-06tags"></i>标签: 
           
           <span class="span--tag">
-            <a href="/tags/cuda-upgrade/">
-              #cuda upgrade
+            <a href="/tags/pycharm/">
+              #pycharm
             </a>
           </span>
           
           <span class="span--tag">
-            <a href="/tags/cudnn-upgrade/">
-              #cudnn upgrade
+            <a href="/tags/gitignore/">
+              #gitignore
             </a>
           </span>
           
@@ -354,15 +329,9 @@
       <div class="nav-pre">
         <i class="iconfont icon-prev"></i>
         上一篇:
-        <a href="/2019/06/13/jupyter-notebook/" target="_self">工具使用-jupyter notebook的安装，卸载，设置不同的conda环境</a>
+        <a href="/2019/06/13/cuda-update/" target="_self">工具使用-Ubuntu16.04下cuda和cudnn的卸载，更新和多版本切换</a>
       </div>
     
-    
-      <div class="nav-next">
-        下一篇:
-        <a href="/2019/06/16/pycharm-gitignore/" target="_self">工具使用-pycharm如何配置 .gitignore 文件</a>
-        <i class="iconfont icon-next"></i>
-      </div>
     
   </nav>
 
