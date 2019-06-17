@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta name="author" content="董沅鑫, yuanxin.me@gmail.com">
+  
+  
+  
+  <title>工具使用-PlotNeuralNet 绘制漂亮深度网络图 | YixiaoZhou&#39;s blog</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="PlotNeuralNet,Latex,">
+  
+
+  <script>
+    console.log('\n%c Hexo-theme-bmw v4.0 ' + '%c 🎉 https://github.com/dongyuanxin/theme-bmw 🎉\n' + '\n%c View demo online ' + '%c 🔍 https://godbmw.com/ 🔍  \n' , 'color: #fadfa3; background: #030307; padding:3px 0;', '', 'color: #fadfa3; background: #030307; padding:3px 0;', '');
+  </script>
+
+  
+    <meta name="description" content="海阔全是浪，天高皆是霾。">
+  
+
+  
+
+  
+    <link rel="icon" href="/images/fvatar2.png">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/icon/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+  <script src="/js/util.js"></script>
+<script src="/js/valine.min.js"></script>
+
+  
+
+  
+    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
+  
+
+  
+    <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
+  
+  
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js" async></script>
+  
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.0/dist/av-min.js"></script>
+  
+
+</head>
+
+  <body>
+
+    
+
+    <div id="app">
+
+      <div class="header-wrap">
+  <header>
+    <div class="site-brand">
+      <div class="site-title">
+        <a href="/">YiXiaoZhou</a>
+      </div>
+    </div>
+    <nav class="site-navigation">
+      <ul class="nav-menu">
+      
+        <li class="nav-item" data-path="/">
+          
+            <a href="/" target="_self">
+              主页
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          
+            <a href="/archives/" target="_self">
+              归档
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          
+            <a href="/friends/" target="_self">
+              友链
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          
+            <a href="/about/" target="_self">
+              关于
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path>
+          
+            <a href="javascript:void(0);" v-else>抓到我</a>
+            <ul class="nav-menu--dropdown">
+              
+                <li>
+                  <a href="https://github.com/ZongweiZhou1" target="_blank">
+                    Github
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://www.facebook.com/duncon.chou" target="_blank">
+                    Facebook
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://weibo.com/u/3231820650/home?wvr=5" target="_self">
+                    weibo
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+      </ul>
+    </nav>
+    <i class="iconfont icon-menu"></i>
+  </header>
+</div>
+
+<script>
+  let links = document.querySelectorAll('.nav-item');
+  for(let link of links){
+    let childrenLink = link.querySelector('ul');
+    link.addEventListener('mouseenter', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown active";
+      }
+    })
+    link.addEventListener('mouseleave', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown";
+      }
+    })
+  }
+  let rootRealPath = getRealPath(window.location.pathname, true);
+  for(let link of links) {
+    let linkPath = link.getAttribute("data-path");
+    if(linkPath && getRealPath(linkPath, true) === rootRealPath) {
+      link.className = "nav-item hover";
+    }
+  }
+
+  let iconMenu = document.querySelector("i.iconfont.icon-menu"),
+    iconMenuClicked = false;
+  let navDOM = document.querySelector("nav.site-navigation");
+  iconMenu.addEventListener("click", () => {
+    iconMenuClicked 
+      ? navDOM.className = "site-navigation active"
+      : navDOM.className = "site-navigation";
+    iconMenuClicked = !iconMenuClicked;
+  })
+</script>
+
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
+  
+
+<div class="post">
+  <h1 class="article-title">
+    <span>工具使用-PlotNeuralNet 绘制漂亮深度网络图</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2019-06-17
+    </span>
+    
+    
+      <span>
+        浏览 : <span class="article-timer" data-identity="PlotNeuralNet"></span>
+      </span>
+    
+  </div>
+
+  
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <p>github 链接<a href="https://github.com/HarisIqbal88/PlotNeuralNet" target="_blank" rel="noopener"><a href="https://github.com/HarisIqbal88/PlotNeuralNet" target="_blank" rel="noopener">https://github.com/HarisIqbal88/PlotNeuralNet</a></a></p>
+<p>项目提供了python的接口， 但python接口感觉不是很好用， 所以我最终选择直接使用latex接口。</p>
+<p>下载项目</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/HarisIqbal88/PlotNeuralNet</span><br></pre></td></tr></table></figure>
+<p>如果使用Latex绘图的话， 只需要layers文件夹就足够了。</p>
+<h3 id="自定义绘图单元"><a href="#自定义绘图单元" class="headerlink" title="自定义绘图单元"></a>自定义绘图单元</h3><p>项目定义了3种绘图单元：<code>Ball.sty</code>, <code>Box.sty</code>和<code>RightBandedBox.sty</code>. 其中<code>Ball.sty</code> 主要用来表示concat操作， 比如element-wise add或者multiple， 或者correlation等操作。 <code>Box.sty</code> 是一个3D box形状 ， 一般可以用来表示conv， pool， 等单独的tensor操作。 <code>RightBandedBox</code>同样是3Dbox 形状，和<code>Box.sty</code>的不同点在于它分为主体部分和右边的banded部分，想象其表示conv+relu整体的模块。</p>
+<p>我们直接分析<code>examples/fcn8s/fcn8.tex</code>中的代码，看看如何通过<code>.tex</code>文件绘制网络结构。</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">\<span class="name">documentclass</span><span class="string">[border=15pt, multi, tikz]</span><span class="string">&#123;standalone&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">&#123;import&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">subimport</span><span class="string">&#123;../../layers/&#125;</span><span class="string">&#123;init&#125;</span></span>  <span class="comment">% 通过init导入自己定义的绘图单元</span></span><br><span class="line"><span class="tag">\<span class="name">usetikzlibrary</span><span class="string">&#123;positioning&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">usetikzlibrary</span><span class="string">&#123;3d&#125;</span></span> <span class="comment">%for including external image </span></span><br><span class="line"></span><br><span class="line"><span class="comment">% 下面6行定义了将要使用的6种结构的表示颜色， 如Conv， ReLU， Pool， Deconv等</span></span><br><span class="line"><span class="tag">\<span class="name">def</span></span><span class="tag">\<span class="name">ConvColor</span><span class="string">&#123;rgb:yellow,5;red,2.5;white,5&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">def</span></span><span class="tag">\<span class="name">ConvReluColor</span><span class="string">&#123;rgb:yellow,5;red,5;white,5&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">def</span></span><span class="tag">\<span class="name">PoolColor</span><span class="string">&#123;rgb:red,1;black,0.3&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">def</span></span><span class="tag">\<span class="name">DcnvColor</span><span class="string">&#123;rgb:blue,5;green,2.5;white,5&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">def</span></span><span class="tag">\<span class="name">SoftmaxColor</span><span class="string">&#123;rgb:magenta,5;black,7&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">def</span></span><span class="tag">\<span class="name">SumColor</span><span class="string">&#123;rgb:blue,5;green,15&#125;</span></span></span><br><span class="line"></span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;document&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;tikzpicture&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">tikzstyle</span><span class="string">&#123;connection&#125;</span>=</span>[ultra thick,every node/.style=&#123;sloped,allow upside down&#125;,draw=<span class="tag">\<span class="name">edgecolor</span></span>,opacity=0.7]</span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line"><span class="comment">%% Draw Layer Blocks， 开始绘制网络， 首先是绘制网络中每一个结构，然后再将结构连接</span></span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line"><span class="comment">% 定义一个node， 在（-3， 0， 0）位置绘制图像， 2D图像对应映射到zy平面。</span></span><br><span class="line"><span class="comment">% 注意这里的坐标系采用的是左手坐标系，具体而言右向是x正轴， 向上是y正轴，往远方是z正轴</span></span><br><span class="line"><span class="tag">\<span class="name">node</span><span class="string">[canvas is zy plane at x=0]</span></span> (temp) at (-3,0,0) &#123;<span class="tag">\<span class="name">includegraphics</span><span class="string">[width=8cm,height=8cm]</span><span class="string">&#123;cats.jpg&#125;</span></span>&#125;;</span><br><span class="line"><span class="comment">% conv1_1,conv1_2,%pool1</span></span><br><span class="line"><span class="comment">% 绘制卷积层， at (0,0,0)表示从空间坐标原点开始， shift表示相对于 at的点的位移， 最终开始绘制的结构中心点坐标是 at+shift, RightBandedBox 表示这是conv+relu结构， RightBandedBoxd的name=cr1， 其标题是con1， 标题一般写在结构的下方，见示意图。xlabel， ylabel， zlabel分别是在3Dbox三个方向边上的label， 这里xlabel中有两个str 是由于width内有两个数值，表示x方向分成两部分， width则分别表示两部分的width， fill表示3D box的填充颜色， bandfill表示banded部分的填充颜色， depth是指z轴方向的长度。</span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(0,0,0)&#125;]</span></span> at (0,0,0) &#123;RightBandedBox=&#123;name=cr1,caption=conv1,<span class="comment">%</span></span><br><span class="line">        xlabel=&#123;&#123;"64","64"&#125;&#125;,zlabel=I,fill=<span class="tag">\<span class="name">ConvColor</span></span>,bandfill=<span class="tag">\<span class="name">ConvReluColor</span></span>,<span class="comment">%</span></span><br><span class="line">        height=40,width=&#123;2,2&#125;,depth=40&#125;&#125;;</span><br><span class="line"><span class="comment">% 这里新出现的是 cr1-east 表示的是， cr1结构的最右面， 上北下南，左西右东， 除了东南西北还有near表示z轴最小的那面，也就是离我们最近的那面，同理far表示离我们最远的那一面， anchor则表示在cr1的中心点位置， 另外任意两个可能的组合都行，比如northwest， 但有些组合不行比如northsouth。 效果图见图1, 新出现的属性opacity=0.5， 默认的上文定义opacity=0.75，所以pool层的透明度更低。</span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(0,0,0)&#125;]</span></span> at (cr1-east) &#123;Box=&#123;name=p1,<span class="comment">%</span></span><br><span class="line">        fill=<span class="tag">\<span class="name">PoolColor</span></span>,opacity=0.5,height=35,width=1,depth=35&#125;&#125;;</span><br><span class="line"><span class="comment">% conv2_1,conv2_2,pool2</span></span><br><span class="line"><span class="comment">% conv2的结构在p1-east基础上右移两个单位 shift=&#123;(2, 0, 0)&#125;</span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(2,0,0)&#125;]</span></span> at (p1-east) &#123;RightBandedBox=&#123;name=cr2,caption=conv2,<span class="comment">%</span></span><br><span class="line">        xlabel=&#123;&#123;"64","64"&#125;&#125;,zlabel=I/2,fill=<span class="tag">\<span class="name">ConvColor</span></span>,bandfill=<span class="tag">\<span class="name">ConvReluColor</span></span>,<span class="comment">%</span></span><br><span class="line">        height=35,width=&#123;3,3&#125;,depth=35&#125;&#125;;</span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(0,0,0)&#125;]</span></span> at (cr2-east) &#123;Box=&#123;name=p2,<span class="comment">%</span></span><br><span class="line">        fill=<span class="tag">\<span class="name">PoolColor</span></span>,opacity=0.5,height=30,width=1,depth=30&#125;&#125;;</span><br><span class="line"><span class="comment">% conv3_1,conv3_2,pool3</span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(2,0,0)&#125;]</span></span> at (p2-east) &#123;RightBandedBox=&#123;name=cr3,caption=conv3,<span class="comment">%</span></span><br><span class="line">        xlabel=&#123;&#123;"256","256","256"&#125;&#125;,zlabel=I/4,fill=<span class="tag">\<span class="name">ConvColor</span></span>,bandfill=<span class="tag">\<span class="name">ConvReluColor</span></span>,<span class="comment">%</span></span><br><span class="line">        height=30,width=&#123;4,4,4&#125;,depth=30&#125;&#125;;</span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(0,0,0)&#125;]</span></span> at (cr3-east) &#123;Box=&#123;name=p3,<span class="comment">%</span></span><br><span class="line">        fill=<span class="tag">\<span class="name">PoolColor</span></span>,opacity=0.5,height=23,width=1,depth=23&#125;&#125;;</span><br><span class="line"><span class="comment">% conv4_1,conv4_2,conv4_3,pool4</span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(1.8,0,0)&#125;]</span></span> at (p3-east) &#123;RightBandedBox=&#123;name=cr4,caption=conv4,<span class="comment">%</span></span><br><span class="line">        xlabel=&#123;&#123;"512","512","512"&#125;&#125;,zlabel=I/8,fill=<span class="tag">\<span class="name">ConvColor</span></span>,bandfill=<span class="tag">\<span class="name">ConvReluColor</span></span>,<span class="comment">%</span></span><br><span class="line">        height=23,width=&#123;7,7,7&#125;,depth=23&#125;&#125;;</span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(0,0,0)&#125;]</span></span> at (cr4-east) &#123;Box=&#123;name=p4,<span class="comment">%</span></span><br><span class="line">        fill=<span class="tag">\<span class="name">PoolColor</span></span>,opacity=0.5,height=15,width=1,depth=15&#125;&#125;;</span><br><span class="line"><span class="comment">% conv5_1,conv5_2,conv5_3,pool5</span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(1.5,0,0)&#125;]</span></span> at (p4-east) &#123;RightBandedBox=&#123;name=cr5,caption=conv5,<span class="comment">%</span></span><br><span class="line">        xlabel=&#123;&#123;"512","512","512"&#125;&#125;,zlabel=I/16,fill=<span class="tag">\<span class="name">ConvColor</span></span>,bandfill=<span class="tag">\<span class="name">ConvReluColor</span></span>,<span class="comment">%</span></span><br><span class="line">        height=15,width=&#123;7,7,7&#125;,depth=15&#125;&#125;;</span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(0,0,0)&#125;]</span></span> at (cr5-east) &#123;Box=&#123;name=p5,<span class="comment">%</span></span><br><span class="line">        fill=<span class="tag">\<span class="name">PoolColor</span></span>,opacity=0.5,height=10,width=1,depth=10&#125;&#125;;    </span><br><span class="line"><span class="comment">%% fc6, fc7 -&gt; cr6, cr7</span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(1,0,0)&#125;]</span></span> at (p5-east) &#123;RightBandedBox=&#123;name=cr6_7,caption=fc to conv,<span class="comment">%</span></span><br><span class="line">        xlabel=&#123;&#123;"4096","4096"&#125;&#125;,fill=<span class="tag">\<span class="name">ConvColor</span></span>,bandfill=<span class="tag">\<span class="name">ConvReluColor</span></span>,<span class="comment">%</span></span><br><span class="line">        height=10,width=&#123;10,10&#125;,depth=10&#125;&#125;;  </span><br><span class="line"><span class="comment">%% fc8 -&gt; cr8 (score32)</span></span><br><span class="line"><span class="comment">% 单独并以conv层的时候，也是绘制的box块，和pool层不同的是颜色</span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(1,0,0)&#125;]</span></span> at (cr6_7-east) &#123;Box=&#123;name=score32,caption=fc8 to conv,<span class="comment">%</span></span><br><span class="line">        xlabel=&#123;&#123;"K","dummy"&#125;&#125;,fill=<span class="tag">\<span class="name">ConvColor</span></span>,<span class="comment">%</span></span><br><span class="line">        height=10,width=2,depth=10,zlabel=I/32&#125;&#125;;</span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line"><span class="comment">%%Joining with previous streams (fcn-16s)</span></span><br><span class="line"><span class="comment">%% Upsampling Deconv Layer</span></span><br><span class="line"><span class="comment">%% Dcnv32    </span></span><br><span class="line"><span class="comment">% 这里xlabel中的dummy加不加效果是一样的</span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(1.5,0,0)&#125;]</span></span> at (score32-east) &#123;Box=&#123;name=d32,<span class="comment">%</span></span><br><span class="line">        xlabel=&#123;&#123;"K","dummy"&#125;&#125;,fill=<span class="tag">\<span class="name">DcnvColor</span></span>,<span class="comment">%</span></span><br><span class="line">        height=15,width=2,depth=15,zlabel=I/16&#125;&#125;;  </span><br><span class="line"><span class="comment">%% score16</span></span><br><span class="line"><span class="comment">% 注意这里的位置是d32-west是为了保证score16和d32是左对齐的</span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(0,-4,0)&#125;]</span></span> at (d32-west) &#123;Box=&#123;name=score16,<span class="comment">%</span></span><br><span class="line">            xlabel=&#123;&#123;"K","dummy"&#125;&#125;,fill=<span class="tag">\<span class="name">ConvColor</span></span>,<span class="comment">%</span></span><br><span class="line">            height=15,width=2,depth=15,zlabel=I/16&#125;&#125;;</span><br><span class="line"><span class="comment">%% Elementwise sum between score16 and up32</span></span><br><span class="line"><span class="comment">% 引入了新的结构 Ball， radius定义了Ball的大小， logo是ball中的文字， 可以替换成$*$等</span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(1.5,0,0)&#125;]</span></span> at (d32-east) &#123;Ball=&#123;name=elt1,<span class="comment">%</span></span><br><span class="line">        fill=<span class="tag">\<span class="name">SumColor</span></span>,opacity=0.6,<span class="comment">%</span></span><br><span class="line">        radius=2.5,logo=<span class="formula">$+$</span>&#125;&#125;;</span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line"><span class="comment">%%Joining with previous streams (fcn-8s)</span></span><br><span class="line"><span class="comment">%% Upsampling Deconv Layer</span></span><br><span class="line"><span class="comment">%% Dcnv16    </span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(1.5,0,0)&#125;]</span></span> at (elt1-east) &#123;Box=&#123;name=d16,<span class="comment">%</span></span><br><span class="line">        xlabel=&#123;&#123;"K","dummy"&#125;&#125;,fill=<span class="tag">\<span class="name">DcnvColor</span></span>,<span class="comment">%</span></span><br><span class="line">        height=23,width=2,depth=23,zlabel=I/8&#125;&#125;;  </span><br><span class="line"><span class="comment">%% score8</span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(0,-6,0)&#125;]</span></span> at (d16-west) &#123;Box=&#123;name=score8,<span class="comment">%</span></span><br><span class="line">        xlabel=&#123;&#123;"K","dummy"&#125;&#125;,fill=<span class="tag">\<span class="name">ConvColor</span></span>,<span class="comment">%</span></span><br><span class="line">        height=23,width=2,depth=23,zlabel=I/8&#125;&#125;;</span><br><span class="line"><span class="comment">%% Elementwise sum between score16 and up32</span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(1.5,0,0)&#125;]</span></span> at (d16-east) &#123;Ball=&#123;name=elt2,<span class="comment">%</span></span><br><span class="line">        fill=<span class="tag">\<span class="name">SumColor</span></span>,opacity=0.6,<span class="comment">%</span></span><br><span class="line">        radius=2.5,logo=<span class="formula">$+$</span>&#125;&#125;;</span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    </span></span><br><span class="line"><span class="comment">%%% Output</span></span><br><span class="line"><span class="comment">%%%%%%%%%%   </span></span><br><span class="line"><span class="comment">%% Dcnv8    </span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(2.5,0,0)&#125;]</span></span> at (elt2-east) &#123;Box=&#123;name=d8,<span class="comment">%</span></span><br><span class="line">        xlabel=&#123;&#123;"K","dummy"&#125;&#125;,fill=<span class="tag">\<span class="name">DcnvColor</span></span>,<span class="comment">%</span></span><br><span class="line">        height=40,width=2,depth=40&#125;&#125;; </span><br><span class="line"><span class="comment">%%%%%%%%%%   </span></span><br><span class="line"><span class="comment">%% softmax    </span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(1,0,0)&#125;]</span></span> at (d8-east) &#123;Box=&#123;name=softmax,caption=softmax,<span class="comment">%</span></span><br><span class="line">        xlabel=&#123;&#123;"K","dummy"&#125;&#125;,fill=<span class="tag">\<span class="name">SoftmaxColor</span></span>,<span class="comment">%</span></span><br><span class="line">        height=40,width=2,depth=40,zlabel=I&#125;&#125;; </span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line"><span class="comment">%% Draw connections</span></span><br><span class="line"><span class="comment">% 在每一个结构都绘制完成后，连接结构</span></span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line"><span class="comment">% 下面7行就是直接连接不同的结构</span></span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (p1-east)    -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (cr2-west);</span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (p2-east)    -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (cr3-west);</span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (p3-east)    -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (cr4-west);</span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (p4-east)    -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (cr5-west);</span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (p5-east)    -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (cr6_7-west);</span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (cr6_7-east)   -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (score32-west);</span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (score32-east) -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (d32-west);</span><br><span class="line"><span class="comment">% 值得注意的是下面绘制分支的过程。</span></span><br><span class="line"><span class="comment">% 下行表示在 p4-east 到 cr5-west的路线中， 选择0.25的部分创建一个新的点 称为 between4_5</span></span><br><span class="line"><span class="tag">\<span class="name">path</span></span> (p4-east) -- (cr5-west) coordinate[pos=0.25] (between4_5) ;</span><br><span class="line"><span class="comment">% 从新创建的点绘制折线到score16-west，分为两段，第一段是由between往下， 然后再由转折点绘制到score16-west. 这里score16-west -| between4_5 表示between4_5在score16-west的中心点法线上的垂足， 不能交换位置， between4_5 -| score16-west则表示score16-west中心点在between4_5x方向射线上的垂足。</span></span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (between4_5)    -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (score16-west-|between4_5) -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (score16-west);</span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (d32-east) -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (elt1-west);</span><br><span class="line"><span class="comment">% 类似的，这里的score16-east -| etl1-south 表示etl1-south点在score16-east射线的垂足</span></span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (score16-east) -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (score16-east -| elt1-south) -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (elt1-south);</span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (elt1-east) -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (d16-west);</span><br><span class="line"></span><br><span class="line"><span class="tag">\<span class="name">path</span></span> (p3-east) -- (cr4-west) coordinate[pos=0.25] (between3_4) ;</span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (between3_4) -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (score8-west-|between3_4) -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (score8-west);</span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (d16-east) -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (elt2-west);</span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (score8-east) -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (score8-east -| elt2-south)-- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (elt2-south);</span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (elt2-east) -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (d8-west);</span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection] (d8-east) -- node&#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (softmax-west);</span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line"></span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;tikzpicture&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;document&#125;</span></span><span class="tag">\<span class="name">grid</span></span></span><br></pre></td></tr></table></figure>
+<p><img src="/2019/06/17/PlotNeuralNet/north.png" alt="north"></p>
+<p>​                                            cr1-north</p>
+<p><img src="/2019/06/17/PlotNeuralNet/south.png" alt="south"></p>
+<p>​                                            cr1-south</p>
+<p><img src="/2019/06/17/PlotNeuralNet/east.png" alt="east"></p>
+<p>​                                            cr1-east</p>
+<p><img src="/2019/06/17/PlotNeuralNet/west.png" alt="west"></p>
+<p>​                                            cr1-west</p>
+<p><img src="/2019/06/17/PlotNeuralNet/near.png" alt="near"></p>
+<p>​                                            cr1-near</p>
+<p><img src="/2019/06/17/PlotNeuralNet/far.png" alt="far"></p>
+<p>​                                            cr1-far</p>
+<p><img src="/2019/06/17/PlotNeuralNet/anchor.png" alt="anchor"></p>
+<p>​                                            cr5-anchor</p>
+<p>在<code>Unet.tex</code>中重要的部分代码</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="tag">\<span class="name">path</span></span> (cr4-southeast) -- (cr4-northeast) coordinate[pos=1.25] (cr4-top) ;</span><br><span class="line"><span class="tag">\<span class="name">path</span></span> (cr3-southeast) -- (cr3-northeast) coordinate[pos=1.25] (cr3-top) ;</span><br><span class="line"><span class="tag">\<span class="name">path</span></span> (cr2-southeast) -- (cr2-northeast) coordinate[pos=1.25] (cr2-top) ;</span><br><span class="line"><span class="tag">\<span class="name">path</span></span> (cr1-southeast) -- (cr1-northeast) coordinate[pos=1.25] (cr1-top) ;</span><br><span class="line"></span><br><span class="line"><span class="tag">\<span class="name">path</span></span> (cat4-south)  -- (cat4-north)  coordinate[pos=1.25] (cat4-top) ;</span><br><span class="line"><span class="tag">\<span class="name">path</span></span> (cat3-south)  -- (cat3-north)  coordinate[pos=1.25] (cat3-top) ;</span><br><span class="line"><span class="tag">\<span class="name">path</span></span> (cat2-south)  -- (cat2-north)  coordinate[pos=1.25] (cat2-top)  ;</span><br><span class="line"><span class="tag">\<span class="name">path</span></span> (cat1-south)  -- (cat1-north)  coordinate[pos=1.25] (cat1-top)  ;</span><br><span class="line"><span class="comment">%</span></span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [copyconnection]  (cr4-northeast)  </span><br><span class="line">-- node &#123;<span class="tag">\<span class="name">copymidarrow</span></span>&#125;(cr4-top)</span><br><span class="line">-- node &#123;<span class="tag">\<span class="name">copymidarrow</span></span>&#125;(cat4-top)</span><br><span class="line">-- node &#123;<span class="tag">\<span class="name">copymidarrow</span></span>&#125; (cat4-north);</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>这部分和前面提到fcn8的代码中创建新的点的过程是一样的。 <code>\path (cr4-southeast) -- (cr4-northest)</code>表示两点之间的连线， <code>coordinate[pos=1.25](cr4-top)</code>表示在这条连线方向， 从<code>cr4-southeast</code> 1.25倍线段长度的地方创建一个点命名为<code>cr4-top</code></p>
+<p><code>\copyconnection, \copymidarraw</code>和前文的<code>\connection, \midarraw</code>只是颜色的定义不同，在<code>.tex</code>头部定义过。</p>
+<p><img src="/2019/06/17/PlotNeuralNet/unet.png" alt="unet"></p>
+<h3 id="在图中添加公式注释"><a href="#在图中添加公式注释" class="headerlink" title="在图中添加公式注释"></a>在图中添加公式注释</h3><p><img src="/2019/06/17/PlotNeuralNet/softmax.png" alt="softmax"></p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">\<span class="name">documentclass</span><span class="string">[border=15pt, multi, tikz]</span><span class="string">&#123;standalone&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">&#123;import&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">subimport</span><span class="string">&#123;../../layers/&#125;</span><span class="string">&#123;init&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">usetikzlibrary</span><span class="string">&#123;positioning&#125;</span></span></span><br><span class="line"></span><br><span class="line"><span class="tag">\<span class="name">newcommand</span><span class="string">&#123;\up&#125;</span><span class="string">&#123;0.25&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">newcommand</span><span class="string">&#123;\down&#125;</span><span class="string">&#123;0.25&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">newcommand</span><span class="string">&#123;\arrowlength&#125;</span><span class="string">&#123;4&#125;</span></span></span><br><span class="line"></span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;document&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;tikzpicture&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">tikzstyle</span><span class="string">&#123;connection&#125;</span>=</span>[ultra thick,every node/.style=&#123;sloped,allow upside down&#125;,draw=<span class="tag">\<span class="name">edgecolor</span></span>,opacity=0.7]</span><br><span class="line"></span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line"><span class="comment">%% Draw previous connections</span></span><br><span class="line"><span class="comment">% 绘制箭头并在箭头上标注， (-\arrowlength, \up, 0)等都表示的是位置。</span></span><br><span class="line"><span class="comment">% 在起点，线段（--）, 和终点后面的node表示添加标注。比如node[anchor=south west, scale=2.1]&#123;$p(x^&#123;(t)&#125;)$&#125;表示在起点处添加label， south west表示label的左下角和起点对齐</span></span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (-<span class="tag">\<span class="name">arrowlength</span></span>,<span class="tag">\<span class="name">up</span></span>,0) </span><br><span class="line">node[anchor=south west,scale=2.1]&#123;<span class="formula">$p(x^&#123;(t)&#125;)$</span>&#125;   </span><br><span class="line">-- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (0,<span class="tag">\<span class="name">up</span></span>,0);  </span><br><span class="line"><span class="comment">% 同理 north west表示label的左上角和终点对齐</span></span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (0,-<span class="tag">\<span class="name">down</span></span>,0)  -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; (-<span class="tag">\<span class="name">arrowlength</span></span>, -<span class="tag">\<span class="name">down</span></span>,0)</span><br><span class="line">node[anchor=north west,inner sep = 10, xshift=-25,scale=2.3]</span><br><span class="line">&#123;</span><br><span class="line">    <span class="formula">$<span class="tag">\<span class="name">frac</span><span class="string">&#123;\partial L&#125;</span><span class="string">&#123;\partial E_\mathcal&#123;S&#125;</span></span>&#125;<span class="tag">\<span class="name">frac</span><span class="string">&#123;\partial E_\mathcal&#123;S&#125;</span></span>&#125;&#123;<span class="tag">\<span class="name">partial</span></span> p&#125;$</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line"><span class="comment">%% Draw Layer Blocks</span></span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line"><span class="tag">\<span class="name">pic</span><span class="string">[shift=&#123;(0,0,0)&#125;]</span></span> at (0,0,0) &#123;Box=&#123;name=crp1,caption=SoftmaxLoss: <span class="formula">$E_<span class="tag">\<span class="name">mathcal</span><span class="string">&#123;S&#125;</span></span>$</span> ,<span class="comment">%</span></span><br><span class="line">        fill=&#123;rgb:blue,1.5;red,3.5;green,3.5;white,5&#125;,opacity=0.5,height=20,width=7,depth=20&#125;&#125;;</span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line"><span class="comment">%% Draw next connections</span></span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (crp1-east)++(0,<span class="tag">\<span class="name">up</span></span>,0) -- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; ++(<span class="tag">\<span class="name">arrowlength</span></span>.0,0) </span><br><span class="line">node [anchor=south east,scale=2.1]&#123;<span class="formula">$E_<span class="tag">\<span class="name">mathcal</span><span class="string">&#123;S&#125;</span></span> [p;<span class="tag">\<span class="name">theta</span></span>]$</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="tag">\<span class="name">draw</span></span> [connection]  (crp1-east)++(<span class="tag">\<span class="name">arrowlength</span></span>,-<span class="tag">\<span class="name">down</span></span>,0)  </span><br><span class="line">node[anchor=north east,inner sep = 10, xshift=25,scale=2.3]</span><br><span class="line">&#123;</span><br><span class="line">    <span class="formula">$<span class="tag">\<span class="name">frac</span><span class="string">&#123;\partial L&#125;</span><span class="string">&#123;\partial E_\mathcal&#123;S&#125;</span></span>&#125; = <span class="tag">\<span class="name">lambda</span></span>_<span class="tag">\<span class="name">mathcal</span><span class="string">&#123;S&#125;</span></span>$</span></span><br><span class="line">&#125;   </span><br><span class="line">-- node &#123;<span class="tag">\<span class="name">midarrow</span></span>&#125; ++(-<span class="tag">\<span class="name">arrowlength</span></span>,0,0);</span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line"></span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;tikzpicture&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;document&#125;</span></span></span><br></pre></td></tr></table></figure>
+<h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><p>在绘制自己的网络时， 复制文件头， 修改网络定义部分的代码</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">\<span class="name">documentclass</span><span class="string">[border=15pt, multi, tikz]</span><span class="string">&#123;standalone&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">usepackage</span><span class="string">&#123;import&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">subimport</span><span class="string">&#123;../../layers/&#125;</span><span class="string">&#123;init&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">usetikzlibrary</span><span class="string">&#123;positioning&#125;</span></span></span><br><span class="line"></span><br><span class="line"><span class="tag">\<span class="name">newcommand</span><span class="string">&#123;\up&#125;</span><span class="string">&#123;0.25&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">newcommand</span><span class="string">&#123;\down&#125;</span><span class="string">&#123;0.25&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">newcommand</span><span class="string">&#123;\arrowlength&#125;</span><span class="string">&#123;4&#125;</span></span></span><br><span class="line"></span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;document&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">begin</span><span class="string">&#123;tikzpicture&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">tikzstyle</span><span class="string">&#123;connection&#125;</span>=</span>[ultra thick,every node/.style=&#123;sloped,allow upside down&#125;,draw=<span class="tag">\<span class="name">edgecolor</span></span>,opacity=0.7]</span><br><span class="line"></span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line"><span class="comment">%% 绘制自己的网络</span></span><br><span class="line"><span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span></span><br><span class="line">   		</span><br><span class="line"></span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;tikzpicture&#125;</span></span></span><br><span class="line"><span class="tag">\<span class="name">end</span><span class="string">&#123;document&#125;</span></span></span><br></pre></td></tr></table></figure>
+<p>然后使用<code>pdflatex</code>生成pdf文件，</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">pdflatex test.tex</span><br></pre></td></tr></table></figure>
+<p>当然也可以使用rep提供的sh文件</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash ../../tikzmake.sh <span class="built_in">test</span></span><br></pre></td></tr></table></figure>
+<p>但是这个提供的文件需要有<code>test.py</code> 和<code>test.tex</code>两个文件， 但我们只是用<code>.tex</code>文件，则需要进行修改指令</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#python $1.py </span></span><br><span class="line">pdflatex <span class="variable">$1</span>.tex</span><br><span class="line"></span><br><span class="line">rm *.aux *.<span class="built_in">log</span> </span><br><span class="line"><span class="comment">#rm *.tex    # 这个注释掉是为了保留源文件以方便我们修改</span></span><br><span class="line"></span><br><span class="line">xdg-open <span class="variable">$1</span>.pdf</span><br></pre></td></tr></table></figure>
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : zhouzongwei <br>
+        
+        原文链接 : <a href>http://yoursite.com/2019/06/17/PlotNeuralNet/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
+    </div>
+  
+  
+  
+    <div class="social-share" style="margin-top: -2rem" data-wechat-qrcode-title="<p>微信扫一扫</p>" data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>" data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter">
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
+</div>
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async></script>
+  
+
+  
+    <div id="reward">
+  
+    <p id="reward-meta">知识 & 情怀 | 赏或者不赏，我都在这，不声不响</p>
+  
+  <button id="reward-btn">
+    
+    <span>打赏</span>
+  </button>
+  <div id="reward-qrcode">
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/wechatimg.jpg" alt="微信扫一扫, 以资鼓励">
+        <p class="qrcode-meta">微信扫一扫, 以资鼓励</p>
+      </div>
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/alipayimg.jpg" alt="支付宝扫一扫, 再接再厉">
+        <p class="qrcode-meta">支付宝扫一扫, 再接再厉</p>
+      </div>
+    
+  </div>
+
+</div>
+
+<script>
+  (() => {
+    let button = document.querySelector('#reward-btn'),
+      qrcode = document.querySelector('#reward-qrcode'),
+      display = false;
+    
+    button.addEventListener('click', () => {
+      qrcode.style.display = display ? 'none' : 'block'
+      display = !display
+    }, false)
+  })()
+</script>
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+          <i class="iconfont icon-06tags"></i>标签: 
+          
+          <span class="span--tag">
+            <a href="/tags/PlotNeuralNet/">
+              #PlotNeuralNet
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/Latex/">
+              #Latex
+            </a>
+          </span>
+          
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
+    
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2019/06/16/pycharm-gitignore/" target="_self">工具使用-pycharm如何配置 .gitignore 文件</a>
+      </div>
+    
+    
+  </nav>
+
+  
+    <a href="#comment" class="comment-anchor"></a>
+<div class="comment-title"><i class="iconfont icon-footprint"></i> 留下足迹 <i class="iconfont icon-footprint"></i></div>
+<div id="vcomments"></div>
+
+<script defer>
+  if( true ) {
+    let path = getRealPath()
+    new Valine({
+      el: "#vcomments",
+      appId: "oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz",
+      appKey: "fWABYGLTAoV1LT4LYzh1PNmQ",
+      notify: false,
+      verify: false,
+      avatar: "robohash",
+      placeholder: "正确填写邮箱, 才能及时收到回复哦♪(^∇^*)",
+      path
+    });
+  }
+</script>
+   
+
+  
+    <script defer>
+const valineAPI = (() => {
+  try {
+    AV.init("oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz", "fWABYGLTAoV1LT4LYzh1PNmQ");
+  } catch(error) {}
+  const isExist = (identity) => {
+    identity = identity || getRealPath();
+    let query = new AV.Query('Timer');
+    return new Promise((resolve, reject) => {
+      query.equalTo("identity", identity);
+      query.find().then(results => {
+        resolve(results.length > 0);
+      }, error => reject(error));
+    })
+  }
+
+  const _get = (identity) => {
+    let query = null;
+    if(identity && identity instanceof Array){
+      let querys = [];
+      for(let i = 0; i < identity.length; ++i) {
+        querys[i] = new AV.Query('Timer');
+        querys[i].equalTo('identity', identity[i]);
+      }
+      query = AV.Query.or.apply(null ,querys);
+    } else {
+      identity = identity || getRealPath();
+      query = new AV.Query("Timer");
+      query.equalTo("identity", identity);
+    }
+
+    return new Promise((resolve, reject) => {
+      query.find()
+      .then(results => resolve(results))
+      .catch(error => reject(error))
+    })
+  }
+
+  const create = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let Todo = AV.Object.extend('Timer');
+      let todo = new Todo();
+      todo.set("times", 1);
+      todo.set("identity", identity);
+      todo.save().then(res => resolve(true), error => reject(error));
+    })
+  }
+
+  const update = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let query = new AV.Query('Timer');
+      query.equalTo("identity", identity);
+      query.find().then(todos => {
+        todos.forEach(todo => {
+          todo.set("times", todo.attributes.times + 1);
+        });
+        return AV.Object.saveAll(todos);
+      }).then(todos => resolve(true), error => reject(error));
+    })
+  }
+
+  return {
+    isExist,
+    _get,
+    update,
+    create
+  }
+})()
+
+const calcAndWriteTimes = () => {
+  let isPost = true;
+
+  let timerAllDOM = document.querySelectorAll(".article-timer");
+
+  if(isPost) {
+    let identity = timerAllDOM[0].getAttribute("data-identity");
+    valineAPI.isExist(identity)
+    .then(exist => {
+      if(exist) {
+        return valineAPI.update(identity);
+      }
+      return new Promise(resolve => resolve(true));
+    })
+    .then( succuess => valineAPI._get(identity))
+    .then( result => timerAllDOM[0].innerText = result[0].attributes.times)
+    .catch(error => console.log(error.message))
+    return ;
+  }
+
+  let timerDOMCache = {};
+
+  for(let timerDOM of timerAllDOM) {
+    let identity = timerDOM.getAttribute("data-identity");
+    if(timerDOMCache.hasOwnProperty(identity)){
+      timerDOMCache[identity].dom.push(timerDOM);
+    }else{
+      timerDOMCache[identity] = {
+        dom: [timerDOM],
+        times: undefined
+      };
+    }
+  }
+
+  let identities = Object.keys(timerDOMCache);
+  valineAPI._get(identities).then(results => {
+    for(let result of results) {
+      let {identity, times} = result.attributes;
+      timerDOMCache[identity].times = times;
+      timerDOMCache[identity].dom.map(item => item.innerText = times);
+    }
+    for(let identity of identities) {
+      if(timerDOMCache[identity].times){
+        continue;
+      }
+      timerDOMCache[identity].dom.map(item => item.innerText = 1);
+      valineAPI.create(identity);
+    }
+  }).catch(error => console.log(error.message))
+}
+
+if(true){
+  calcAndWriteTimes();
+}
+</script>
+   
+
+</div>
+
+
+      <footer>
+  <p class="site-info">
+    博客已萌萌哒运行<span id="time-to-now"></span><span class="my-face">(●'◡'●)ﾉ♥</span>
+    <br>
+    Theme - <a href="https://github.com/dongyuanxin/theme-bmw">BMW</a> | Made With 💗 | Powered by <a href="https://godbmw.com/">GodBMW</a>
+    <br>
+    
+  </p>
+</footer>
+
+
+
+<script>
+const timeToNowDOM = document.querySelector("#time-to-now");
+const startTimestamp = new Date(2018, 1, 10).getTime();
+
+const updateTimeStr = () => {
+  let offset = parseInt(
+      (new Date().getTime() - startTimestamp) / 1000,
+      10
+    ),
+    day = Math.floor(offset / 86400),
+    hour = Math.floor((offset % 86400) / 3600),
+    minute = Math.floor(((offset % 86400) % 3600) / 60),
+    second = Math.floor(((offset % 86400) % 3600) % 60);
+  timeToNowDOM.innerHTML =
+    day + "天" + hour + "小时" + minute + "分钟" + second + "秒";
+  setTimeout(updateTimeStr, 500);
+}
+
+setTimeout(updateTimeStr, 500);
+</script>
+
+
+      <div class="back-to-top hidden">
+  <span>
+    <i class="iconfont icon-60"></i><span></span>%
+  </span>
+</div>
+
+<script>
+const updateIconToTop = percent => {
+  let dom = document.querySelector(".back-to-top span span");
+  dom.innerText = percent;
+  if(percent < 1) {
+    document.querySelector(".back-to-top").className = "back-to-top hidden";
+  } else {
+    document.querySelector(".back-to-top").className = "back-to-top";
+  }
+}
+
+const handleScoll = () => {
+  let isRunning = false;
+  return () => {
+    if (isRunning) return;
+    isRunning = true;
+    window.requestAnimationFrame(timestamp => {
+      let scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop,
+        scrollHeight =
+          document.documentElement.scrollHeight ||
+          document.body.scrollHeight,
+        clientHeight =
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+      isRunning = false;
+      if (scrollTop <= 1) {
+        updateIconToTop(0);
+        return;
+      }
+      if (scrollTop + clientHeight >= scrollHeight) {
+        updateIconToTop(100);
+      } else {
+        updateIconToTop(parseInt(
+          100 * scrollTop / (scrollHeight - clientHeight),
+          10
+        ));
+      }
+    });
+  };
+}
+
+const backToTop = () => {
+  let scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop,
+    delay = 10,
+    time = 200;
+  if (scrollTop <= 20) {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    return;
+  }
+  let step = Math.ceil(scrollTop * delay / time);
+  let timer = setInterval(() => {
+    scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollTop - step <= 0) {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      clearInterval(timer);
+    } else {
+      document.documentElement.scrollTop = scrollTop - step;
+      document.body.scrollTop = scrollTop - step;
+    }
+  }, delay);
+}
+
+document.addEventListener("scroll", handleScoll(), false);
+
+document.querySelector(".back-to-top").addEventListener("click", backToTop, false);
+
+</script>
+
+    </div>
+
+    
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+<script>
+  (() => {
+    const mathjaxConfig = {
+      showProcessingMessages: false, //关闭js加载过程信息
+      messageStyle: "none", //不显示信息
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]], //行内公式选择符
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]], //段内公式选择符
+        skipTags: ["script", "noscript", "style", "textarea", "pre", "code", "a"] //避开某些标签
+      },
+      "HTML-CSS": {
+        availableFonts: ["STIX", "TeX"], //可选字体
+        showMathMenu: false //关闭右击菜单显示
+      }
+    }
+
+    let mathjaxInterval = setInterval(() => {
+      if(!window.MathJax){
+        return;
+      }
+      window.MathJax.Hub.Config(mathjaxConfig)
+      window.MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById('app')])
+
+      clearInterval(mathjaxInterval)
+    }, 10)    
+  })()
+</script>
+    
+
+    <script src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script>
+<script async>
+  let fancyTimer = setInterval(function(){
+    if(!window.$){
+      return;
+    }
+    $(document).ready(function() {
+      $(".post img").each(function () {
+        if($(this).parent().get(0).tagName.toLowerCase() === "a") {
+          return;
+        }
+        // $(this).attr("data-fancybox", "gallery"); // if you add 'data-fancybox', img will display after showed
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "gallery");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      });
+      
+      clearInterval(fancyTimer);
+    });
+  }, 10);
+</script>
+
+    
+  </body>
+
+</html>

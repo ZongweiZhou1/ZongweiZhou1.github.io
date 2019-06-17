@@ -181,6 +181,86 @@
   
   <div class="post">
     <h1 class="article-title">
+      <a href="/2019/05/28/mAP/">
+        <span>深度学习-检测器的评价指标 mAP [代码]</span>
+      </a>
+    </h1>
+    <!-- PC端文章信息 -->
+    <div class="article-top-meta pc-view">
+      <span>
+        发布时间 : 2019-05-28
+      </span>
+    </div>
+    <!-- 移动端文章信息 -->
+    <div class="article-top-meta mobile-view">
+      <span>
+        发布 : 2019-05-28
+      </span>
+      
+      
+        <span>
+          浏览 : <span class="article-timer" data-identity="mAP"></span>
+        </span>
+      
+    </div>
+    
+    <!-- 文章简介 -->
+    <div class="article-content">
+      <div class="markdown-body article-content--inner" v-html="mdToHtml(psg.summary)">
+        <p>对于大多数利用机器学习方法求解的问题来说一般都会存在多个可用模型。 每一个模型都有自己的特点，从而在不同的因素作用下，其表现性能也会出现差异。</p>
+<p>模型的性能一般通过其在某个数据集上的表现来评价， 一般这个数据集是对应于训练集的“验证集”或者“测试集”。 性能的定量评价可以有多重指标，比如 acc， pre和recall等。具体选择哪一种指标取决于具体应用和场景。而对于同一种应用，找到一个能够公正合理的比较不同模型的指标则非常重要。</p>
+<p>这篇文章我们将会讲一讲目标检测问题中最常见的评价指标 mAP, (The Mean Average Precision)</p>
+<p>原文：<a href="https://tarangshah.com/blog/2018-01-27/what-is-map-understanding-the-statistic-of-choice-for-comparing-object-detection-models/" target="_blank" rel="noopener">Measuring Object Detection models - mAP - What is Mean Average Precision?</a></p>
+      </div>
+    </div>
+    <div class="article-footer">
+      <div class="article-meta pull-left">
+        <!-- 分类pc端可见 -->
+        <span class="pc-view">
+          
+        <span>
+          
+            <i class="iconfont icon-06tags"></i>标签:
+            
+              <span class="span--tag">
+                <a href="/tags/deep-learning/">
+                  #deep-learning
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/object-detection/">
+                  #object-detection
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/metric/">
+                  #metric
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/mAP/">
+                  #mAP
+                </a>
+              </span>
+            
+                    
+        </span>
+      </span></div>
+      
+        <div class="article-meta pull-right">
+          <span class="pc-view">
+            <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="mAP"></span>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+  
+  <div class="post">
+    <h1 class="article-title">
       <a href="/2019/05/28/normalization-layers/">
         <span>深度学习-Normalization layers</span>
       </a>
@@ -817,73 +897,6 @@
         <div class="article-meta pull-right">
           <span class="pc-view">
             <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="relationNetwork"></span>
-          </span>
-        </div>
-      
-    </div>
-  </div>
-  
-  <div class="post">
-    <h1 class="article-title">
-      <a href="/2019/05/21/repulsion-loss/">
-        <span>阅读笔记-Repulsion loss:Detecting Pedestrians in a Crowd</span>
-      </a>
-    </h1>
-    <!-- PC端文章信息 -->
-    <div class="article-top-meta pc-view">
-      <span>
-        发布时间 : 2019-05-21
-      </span>
-    </div>
-    <!-- 移动端文章信息 -->
-    <div class="article-top-meta mobile-view">
-      <span>
-        发布 : 2019-05-21
-      </span>
-      
-      
-        <span>
-          浏览 : <span class="article-timer" data-identity="repulsion-loss"></span>
-        </span>
-      
-    </div>
-    
-    <!-- 文章简介 -->
-    <div class="article-content">
-      <div class="markdown-body article-content--inner" v-html="mdToHtml(psg.summary)">
-        <p>尽管目标检测目前已经取得了非常好的性能，但是针对于特定领域内的跟踪方法还可以进一步探讨。本篇文章的研究重点在于更好的检测拥挤场景下的行人。</p>
-<p>文章首先分析了拥挤场景下SOTA检测方法存在的问题，然后提出了一种针对于拥挤场景专门设计的回归损失。该损失函数的启发源主要有两点：预测框应该尽可能和目标接近；同时预测框应尽可能地与surrounding目标区分。</p>
-<p>实验证明本文提出的损失函数能够在拥挤场景中很大提升SOTA方法的性能。</p>
-      </div>
-    </div>
-    <div class="article-footer">
-      <div class="article-meta pull-left">
-        <!-- 分类pc端可见 -->
-        <span class="pc-view">
-          
-        <span>
-          
-            <i class="iconfont icon-06tags"></i>标签:
-            
-              <span class="span--tag">
-                <a href="/tags/Pedestrian-Detection/">
-                  #Pedestrian Detection
-                </a>
-              </span>
-            
-              <span class="span--tag">
-                <a href="/tags/Repulsion-Loss/">
-                  #Repulsion Loss
-                </a>
-              </span>
-            
-                    
-        </span>
-      </span></div>
-      
-        <div class="article-meta pull-right">
-          <span class="pc-view">
-            <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="repulsion-loss"></span>
           </span>
         </div>
       
