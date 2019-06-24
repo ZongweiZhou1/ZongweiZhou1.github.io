@@ -179,6 +179,149 @@
   
   <div class="post">
     <h1 class="article-title">
+      <a href="/2019/06/24/ros-server-client/">
+        <span>工具使用-ROS中server、client消息传递</span>
+      </a>
+    </h1>
+    <!-- PC端文章信息 -->
+    <div class="article-top-meta pc-view">
+      <span>
+        发布时间 : 2019-06-24
+      </span>
+    </div>
+    <!-- 移动端文章信息 -->
+    <div class="article-top-meta mobile-view">
+      <span>
+        发布 : 2019-06-24
+      </span>
+      
+      
+        <span>
+          浏览 : <span class="article-timer" data-identity="ros-server-client"></span>
+        </span>
+      
+    </div>
+    
+    <!-- 文章简介 -->
+    <div class="article-content">
+      <div class="markdown-body article-content--inner" v-html="mdToHtml(psg.summary)">
+        <p>不同于topic中的异步消息传递， ros中还有一种信息传递的过程：server-client， 消息的同步传递过程。server提供一个接收消息的接口，接收到消息之后进行处理，然后在返回给client，在在这个过程中client则一直中断等待server返回消息。server-client的传递消息格式使用srv文件定义。</p>
+<p>这里记录下如何使用python创建server和client。</p>
+      </div>
+    </div>
+    <div class="article-footer">
+      <div class="article-meta pull-left">
+        <!-- 分类pc端可见 -->
+        <span class="pc-view">
+          
+        <span>
+          
+            <i class="iconfont icon-06tags"></i>标签:
+            
+              <span class="span--tag">
+                <a href="/tags/ROS/">
+                  #ROS
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/server/">
+                  #server
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/client/">
+                  #client
+                </a>
+              </span>
+            
+                    
+        </span>
+      </span></div>
+      
+        <div class="article-meta pull-right">
+          <span class="pc-view">
+            <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="ros-server-client"></span>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+  
+  <div class="post">
+    <h1 class="article-title">
+      <a href="/2019/06/24/ros-publisher-subscriber/">
+        <span>工具使用-ROS中使用publisher、subscriber发布订阅topic</span>
+      </a>
+    </h1>
+    <!-- PC端文章信息 -->
+    <div class="article-top-meta pc-view">
+      <span>
+        发布时间 : 2019-06-24
+      </span>
+    </div>
+    <!-- 移动端文章信息 -->
+    <div class="article-top-meta mobile-view">
+      <span>
+        发布 : 2019-06-24
+      </span>
+      
+      
+        <span>
+          浏览 : <span class="article-timer" data-identity="ros-publisher-subscriber"></span>
+        </span>
+      
+    </div>
+    
+    <!-- 文章简介 -->
+    <div class="article-content">
+      <div class="markdown-body article-content--inner" v-html="mdToHtml(psg.summary)">
+        <p>publisher和subscriber是topic的配套node， node是ros中进程的定义。 publisher用于node发布消息到master， subscriber用于node从master订阅消息。这里的master相当于中间服务器， nodes相当于不同的clients， 通过中间服务器实现p2p的通信。 publisher和subscriber是异步通信方式，也就是说publisher发布消息时不用考虑subscriber的状态，只有master中有存储空间就放进去，或者将原先存储消息覆盖掉。subscriber则是需要的时候从master中读取消息，只要有消息就行，不关心publisher的状态。  publisher和subscriber还是多对多的通信关系，可以多个发布源和多个订阅源。本文记录下如何使用python写publisher和subscriber。</p>
+      </div>
+    </div>
+    <div class="article-footer">
+      <div class="article-meta pull-left">
+        <!-- 分类pc端可见 -->
+        <span class="pc-view">
+          
+        <span>
+          
+            <i class="iconfont icon-06tags"></i>标签:
+            
+              <span class="span--tag">
+                <a href="/tags/ros-topic/">
+                  #ros topic
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/publisher/">
+                  #publisher
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/subscriber/">
+                  #subscriber
+                </a>
+              </span>
+            
+                    
+        </span>
+      </span></div>
+      
+        <div class="article-meta pull-right">
+          <span class="pc-view">
+            <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="ros-publisher-subscriber"></span>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+  
+  <div class="post">
+    <h1 class="article-title">
       <a href="/2019/06/23/ros-msg-srv/">
         <span>工具使用-ROS中创建和配置msg及srv</span>
       </a>
@@ -725,118 +868,6 @@
         <div class="article-meta pull-right">
           <span class="pc-view">
             <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="conda"></span>
-          </span>
-        </div>
-      
-    </div>
-  </div>
-  
-  <div class="post">
-    <h1 class="article-title">
-      <a href="/2019/06/08/MOTS/">
-        <span>MOTS</span>
-      </a>
-    </h1>
-    <!-- PC端文章信息 -->
-    <div class="article-top-meta pc-view">
-      <span>
-        发布时间 : 2019-06-08
-      </span>
-    </div>
-    <!-- 移动端文章信息 -->
-    <div class="article-top-meta mobile-view">
-      <span>
-        发布 : 2019-06-08
-      </span>
-      
-      
-        <span>
-          浏览 : <span class="article-timer" data-identity="MOTS"></span>
-        </span>
-      
-    </div>
-    
-    <!-- 文章简介 -->
-    <div class="article-content">
-      <div class="markdown-body article-content--inner" v-html="mdToHtml(psg.summary)">
-        
-      </div>
-    </div>
-    <div class="article-footer">
-      <div class="article-meta pull-left">
-        <!-- 分类pc端可见 -->
-        <span class="pc-view">
-          
-        <span>
-                    
-        </span>
-      </span></div>
-      
-        <div class="article-meta pull-right">
-          <span class="pc-view">
-            <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="MOTS"></span>
-          </span>
-        </div>
-      
-    </div>
-  </div>
-  
-  <div class="post">
-    <h1 class="article-title">
-      <a href="/2019/06/07/ZiChuan/">
-        <span>读书感悟-《紫川》</span>
-      </a>
-    </h1>
-    <!-- PC端文章信息 -->
-    <div class="article-top-meta pc-view">
-      <span>
-        发布时间 : 2019-06-07
-      </span>
-    </div>
-    <!-- 移动端文章信息 -->
-    <div class="article-top-meta mobile-view">
-      <span>
-        发布 : 2019-06-07
-      </span>
-      
-      
-        <span>
-          浏览 : <span class="article-timer" data-identity="ZiChuan"></span>
-        </span>
-      
-    </div>
-    
-    <!-- 文章简介 -->
-    <div class="article-content">
-      <div class="markdown-body article-content--inner" v-html="mdToHtml(psg.summary)">
-        <p>最近事情太多，压力有点大，想找本书看看逃避一下，于是就搜到了这本书&lt;紫川&gt;。</p>
-<p><img src="/2019/06/07/ZiChuan/map.png" alt="map"></p>
-<p>我不是那种揪细节的人，所以总的感觉这本书还是非常不错的，基本所有坑都被填上了。</p>
-<p>大约花了5天时间看完吧，感觉好久没读书了，阅读速度太慢。合上书本搜索下脑海中的记忆。</p>
-      </div>
-    </div>
-    <div class="article-footer">
-      <div class="article-meta pull-left">
-        <!-- 分类pc端可见 -->
-        <span class="pc-view">
-          
-        <span>
-          
-            <i class="iconfont icon-06tags"></i>标签:
-            
-              <span class="span--tag">
-                <a href="/tags/读书，-感悟/">
-                  #读书， 感悟
-                </a>
-              </span>
-            
-                    
-        </span>
-      </span></div>
-      
-        <div class="article-meta pull-right">
-          <span class="pc-view">
-            <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="ZiChuan"></span>
           </span>
         </div>
       
