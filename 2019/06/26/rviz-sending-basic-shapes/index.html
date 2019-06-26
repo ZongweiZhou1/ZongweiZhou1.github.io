@@ -208,9 +208,7 @@
 
   <div class="article-content">
     <div class="markdown-body">
-      <p><img src="/2019/06/26/rviz-sending-basic-shapes/rviz_markers.png" alt="rviz_markers"></p>
-<p>这篇文章将展示如何传递基本的形状消息给rviz，并展示。</p>
-<h4 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h4><p>这个过程中，其实只是在定义publisher的node， 而rviz已经注册好的订阅器，指定了需要订阅的topic主题和消息类型，所以定义的node只需要写好发布器就行。</p>
+      <h4 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h4><p>这个过程中，其实只是在定义publisher的node， 而rviz已经注册好的订阅器，指定了需要订阅的topic主题和消息类型，所以定义的node只需要写好发布器就行。</p>
 <p>教程中给了如何使用cpp实现该功能，<a href="http://wiki.ros.org/rviz/Tutorials/Markers%3A%20Basic%20Shapes" target="_blank" rel="noopener">Markers:Sending Basic Shapes</a></p>
 <p>所以我们这里使用python实现一遍。</p>
 <h4 id="Create-Package"><a href="#Create-Package" class="headerlink" title="Create Package"></a>Create Package</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ~/catkin_ws</span></span><br><span class="line">catkin_create_pkg using_markers rospy visualization_msgs</span><br><span class="line">catkin_make</span><br><span class="line">. devel/setup.bash</span><br></pre></td></tr></table></figure>
@@ -229,7 +227,6 @@
 <p><img src="/2019/06/26/rviz-sending-basic-shapes/rviz_add_type.png" alt="rviz_add_type"></p>
 <p>然后就能看到结果了。</p>
 <p><img src="/2019/06/26/rviz-sending-basic-shapes/rviz_markers.png" alt="results"></p>
-
     </div>
   </div>
   
