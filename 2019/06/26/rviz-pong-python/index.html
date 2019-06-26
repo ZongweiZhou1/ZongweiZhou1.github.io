@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta name="author" content="董沅鑫, yuanxin.me@gmail.com">
+  
+  
+  
+  <title>工具使用-ROS在RVIZ中关于InteractivaMarker的实例（python 版 pong） | YixiaoZhou&#39;s blog</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="rviz,python,ros,interactiveMarker,pong,">
+  
+
+  <script>
+    console.log('\n%c Hexo-theme-bmw v4.0 ' + '%c 🎉 https://github.com/dongyuanxin/theme-bmw 🎉\n' + '\n%c View demo online ' + '%c 🔍 https://godbmw.com/ 🔍  \n' , 'color: #fadfa3; background: #030307; padding:3px 0;', '', 'color: #fadfa3; background: #030307; padding:3px 0;', '');
+  </script>
+
+  
+    <meta name="description" content="海阔全是浪，天高皆是霾。">
+  
+
+  
+
+  
+    <link rel="icon" href="/images/fvatar2.png">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/icon/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+  <script src="/js/util.js"></script>
+<script src="/js/valine.min.js"></script>
+
+  
+
+  
+    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
+  
+
+  
+    <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
+  
+  
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js" async></script>
+  
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.0/dist/av-min.js"></script>
+  
+
+</head>
+
+  <body>
+
+    
+
+    <div id="app">
+
+      <div class="header-wrap">
+  <header>
+    <div class="site-brand">
+      <div class="site-title">
+        <a href="/">YiXiaoZhou</a>
+      </div>
+    </div>
+    <nav class="site-navigation">
+      <ul class="nav-menu">
+      
+        <li class="nav-item" data-path="/">
+          
+            <a href="/" target="_self">
+              主页
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          
+            <a href="/archives/" target="_self">
+              归档
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          
+            <a href="/friends/" target="_self">
+              友链
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          
+            <a href="/about/" target="_self">
+              关于
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path>
+          
+            <a href="javascript:void(0);" v-else>抓到我</a>
+            <ul class="nav-menu--dropdown">
+              
+                <li>
+                  <a href="https://github.com/ZongweiZhou1" target="_blank">
+                    Github
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://www.facebook.com/duncon.chou" target="_blank">
+                    Facebook
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://weibo.com/u/3231820650/home?wvr=5" target="_self">
+                    weibo
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+      </ul>
+    </nav>
+    <i class="iconfont icon-menu"></i>
+  </header>
+</div>
+
+<script>
+  let links = document.querySelectorAll('.nav-item');
+  for(let link of links){
+    let childrenLink = link.querySelector('ul');
+    link.addEventListener('mouseenter', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown active";
+      }
+    })
+    link.addEventListener('mouseleave', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown";
+      }
+    })
+  }
+  let rootRealPath = getRealPath(window.location.pathname, true);
+  for(let link of links) {
+    let linkPath = link.getAttribute("data-path");
+    if(linkPath && getRealPath(linkPath, true) === rootRealPath) {
+      link.className = "nav-item hover";
+    }
+  }
+
+  let iconMenu = document.querySelector("i.iconfont.icon-menu"),
+    iconMenuClicked = false;
+  let navDOM = document.querySelector("nav.site-navigation");
+  iconMenu.addEventListener("click", () => {
+    iconMenuClicked 
+      ? navDOM.className = "site-navigation active"
+      : navDOM.className = "site-navigation";
+    iconMenuClicked = !iconMenuClicked;
+  })
+</script>
+
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
+  
+
+<div class="post">
+  <h1 class="article-title">
+    <span>工具使用-ROS在RVIZ中关于InteractivaMarker的实例（python 版 pong）</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2019-06-26
+    </span>
+    
+    
+      <span>
+        浏览 : <span class="article-timer" data-identity="rviz-pong-python"></span>
+      </span>
+    
+  </div>
+
+  
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <h4 id="头文件"><a href="#头文件" class="headerlink" title="头文件"></a>头文件</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">import</span> rospy   <span class="comment"># python script必须导入该包</span></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np  <span class="comment"># python 环境的包，用于数学运算</span></span><br><span class="line"><span class="keyword">from</span> visualization_msgs.msg <span class="keyword">import</span> *  <span class="comment"># 一般的消息类型， 包括Marker也属于此包</span></span><br><span class="line"><span class="keyword">from</span> interactive_markers.interactive_marker_server <span class="keyword">import</span> *  <span class="comment"># 可交互的消息类型，</span></span><br><span class="line"><span class="comment"># 包括 InteractiveMarker</span></span><br><span class="line"><span class="comment"># InteractiveMarkerServer 这是个构造函数，具体见上一篇blog</span></span><br><span class="line"><span class="comment"># InteractiveMarkerControl</span></span><br><span class="line"><span class="comment"># InteractiveMarkerFeedback</span></span><br><span class="line"><span class="keyword">from</span> geometry_msgs.msg <span class="keyword">import</span> Pose  <span class="comment"># 用于修改marker的position</span></span><br></pre></td></tr></table></figure>
+<h4 id="常量定义"><a href="#常量定义" class="headerlink" title="常量定义"></a>常量定义</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># const </span></span><br><span class="line">FIELD_HEIGHT = <span class="number">8.0</span>   <span class="comment"># 游戏桌面的高度</span></span><br><span class="line">FIELD_WIDTH = <span class="number">12.0</span>   <span class="comment"># 游戏桌面的宽度</span></span><br><span class="line">BORDER_SIZE = <span class="number">0.5</span>    <span class="comment"># 边缘的宽度</span></span><br><span class="line">PADDLE_SIZE = <span class="number">2.0</span>    <span class="comment"># Paddle的长度</span></span><br><span class="line">UPDATE_RATE = <span class="number">1.0</span>/<span class="number">30</span> <span class="comment"># 刷新频率</span></span><br><span class="line">PLAYER_X = FIELD_WIDTH * <span class="number">0.5</span> + BORDER_SIZE  <span class="comment"># 双方paddle的位置</span></span><br><span class="line">AI_SPEED_LIMIT = <span class="number">0.25</span>  <span class="comment"># ball的初始运动速度</span></span><br></pre></td></tr></table></figure>
+<h4 id="Marker封装"><a href="#Marker封装" class="headerlink" title="Marker封装"></a>Marker封装</h4><p>因为该项目中多次创建marker，设置各种属性，代码重复量较大，所以我把marker的创建设置单独提了出来。<strong>值得注意的是：C++中pushback操作是进行了copy， 而python中list的append是存储的指针，后面修改了该量，前面已经append的也会发生改变，所以不同的marker在python中需要新创建，而不能像C++那样直接原marker上修改。</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WrapMarker</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.marker = Marker()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_color</span><span class="params">(self, r=<span class="number">1.0</span>, g=<span class="number">1.0</span>, b=<span class="number">1.0</span>, a=<span class="number">1.0</span>)</span>:</span> <span class="comment"># 设置颜色</span></span><br><span class="line">        self.marker.color.r = r</span><br><span class="line">        self.marker.color.g = g</span><br><span class="line">        self.marker.color.b = b</span><br><span class="line">        self.marker.color.a = a</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_type</span><span class="params">(self, type_name)</span>:</span>  <span class="comment"># 设置类型， Marker.CUBE</span></span><br><span class="line">        self.marker.type = type_name</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_scale</span><span class="params">(self, x=<span class="number">0.0</span>, y=<span class="number">0.0</span>, z=<span class="number">0.0</span>)</span>:</span>  <span class="comment"># 设置尺度</span></span><br><span class="line">        self.marker.scale.x = x</span><br><span class="line">        self.marker.scale.y = y</span><br><span class="line">        self.marker.scale.z = z</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_position</span><span class="params">(self, x=<span class="number">0.0</span>, y=<span class="number">0.0</span>, z=<span class="number">0.0</span>)</span>:</span> <span class="comment"># 设置位置</span></span><br><span class="line">        self.marker.pose.position.x = x </span><br><span class="line">        self.marker.pose.position.y = y</span><br><span class="line">        self.marker.pose.position.z = z</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_marker</span><span class="params">(self)</span>:</span> <span class="comment"># 得到marker实例</span></span><br><span class="line">        <span class="keyword">return</span> self.marker</span><br></pre></td></tr></table></figure>
+<p>当然， marker还有许多其它的属性可以设置，比如pose的方向等，这里仅定义了能用到的函数。</p>
+<h4 id="选手信息"><a href="#选手信息" class="headerlink" title="选手信息"></a>选手信息</h4><p>每一个选手都要存储一些自己的状态量，比如当前位置，自己的分数，自己状态，所以定义一个结构体</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PlayerContext</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, pos=<span class="number">0</span>, active=False, score=<span class="number">0</span>)</span>:</span></span><br><span class="line">        self.pos=pos</span><br><span class="line">        self.active = active</span><br><span class="line">        self.score = score</span><br></pre></td></tr></table></figure>
+<h4 id="游戏主代码"><a href="#游戏主代码" class="headerlink" title="游戏主代码"></a>游戏主代码</h4><p>我们先来介绍下游戏主要的部分，也是最顶层的东西，然后再介绍每一块的功能实现。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PongGame</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ns=<span class="string">'pong'</span>)</span>:</span>  </span><br><span class="line">        self.server_ = InteractiveMarkerServer(ns)  <span class="comment"># 创建一个交互的后台进程，命名空间ns</span></span><br><span class="line">        self.player_contexts_ = [PlayerContext() <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">2</span>)] <span class="comment"># 两名选手 </span></span><br><span class="line">        <span class="comment"># 下面几个量定义球的状态</span></span><br><span class="line">        self.last_ball_pos_x_ = <span class="number">0</span>  <span class="comment"># 球在上一时刻的位置x  </span></span><br><span class="line">        self.last_ball_pos_y_ = <span class="number">0</span>  <span class="comment"># 球在上一时刻的位置y</span></span><br><span class="line">        self.ball_pos_x_ = <span class="number">0</span>  	   <span class="comment"># 球当前的位置x</span></span><br><span class="line">        self.ball_pos_y_ = <span class="number">0</span>       <span class="comment"># 球当前的位置y</span></span><br><span class="line">        self.ball_dir_x_ = <span class="number">0</span> 	   <span class="comment"># dir两个量是归一化后的球的运动方向</span></span><br><span class="line">        self.ball_dir_y_ = <span class="number">0</span></span><br><span class="line">        self.speed_ = <span class="number">0</span> 			<span class="comment"># 球的运动速度</span></span><br><span class="line"></span><br><span class="line">        self.makeFieldMarker()     <span class="comment"># 初始化运动场地</span></span><br><span class="line">        self.makePaddleMarkers()   <span class="comment"># 初始化选手的paddle</span></span><br><span class="line">        self.makeBallMarker()      <span class="comment"># 初始化球的位置</span></span><br><span class="line"></span><br><span class="line">        self.reset()               <span class="comment"># 重置</span></span><br><span class="line">        self.updateScore()         <span class="comment"># 每个选手的分数更新</span></span><br><span class="line">        rospy.Timer(rospy.Duration(UPDATE_RATE), self.spinOnce)</span><br><span class="line">        <span class="comment"># 这是一个时钟循环函数，每隔固定的间隔调用函数spinOnce， 所以刷新频率也是这里设置的</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">spinOnce</span><span class="params">(self, event)</span>:</span>  <span class="comment"># 注意这里有两个输入参数， event是TimerEvent类型</span></span><br><span class="line">        <span class="keyword">if</span> self.player_contexts_[<span class="number">0</span>].active <span class="keyword">or</span> self.player_contexts_[<span class="number">1</span>].active:</span><br><span class="line">            ball_dx, ball_dy = self.speed_ * self.ball_dir_x_, self.speed_ * self.ball_dir_y_  <span class="comment"># 下一步球的绝对位移</span></span><br><span class="line">            self.ball_pos_x_ += ball_dx  <span class="comment"># 下一步球的位置</span></span><br><span class="line">            self.ball_pos_y_ += ball_dy</span><br><span class="line">            </span><br><span class="line">            out_border, t = self.reflect(self.ball_pos_y_, self.last_ball_pos_y_, FIELD_HEIGHT*<span class="number">0.5</span>)  <span class="comment"># 判断球是否超出范围，超出的话超出了多少，这个t就是超出比例，用于reflect时退回超出部分</span></span><br><span class="line">            <span class="keyword">if</span> out_border:<span class="comment"># 超出范围</span></span><br><span class="line">                self.ball_pos_x_ -= t * ball_dx <span class="comment"># 退回</span></span><br><span class="line">                self.ball_pos_y_ -= t * ball_dy</span><br><span class="line">                self.ball_dir_y_ *= <span class="number">-1.0</span>  <span class="comment"># 这部分判断是超出y方向的边界，所以换方向应该是y分量取反</span></span><br><span class="line">                ball_dx, ball_dy = self.speed_ * self.ball_dir_x_, self.speed_*self.ball_dir_y_  <span class="comment"># 重新计算x，y轴运动量</span></span><br><span class="line">                self.ball_pos_x_ += t * ball_dx  <span class="comment"># 新的位置</span></span><br><span class="line">                self.ball_pos_y_ += t * ball_dy</span><br><span class="line"></span><br><span class="line">            player = <span class="number">1</span> <span class="keyword">if</span> self.ball_pos_x_ &gt; <span class="number">0</span> <span class="keyword">else</span> <span class="number">0</span> <span class="comment"># 判断当前球在哪一侧，右边运动员为1</span></span><br><span class="line">            <span class="comment"># reflect on paddles</span></span><br><span class="line">            <span class="keyword">if</span> abs(self.last_ball_pos_x_) &lt; FIELD_WIDTH * <span class="number">0.5</span> <span class="keyword">and</span> abs(self.ball_pos_x_) &gt;= FIELD_WIDTH * <span class="number">0.5</span>:  <span class="comment"># 上一时刻在paddle的内测，当前时刻在paddle的外侧，这时候需要判断是否打在paddle上</span></span><br><span class="line">                <span class="keyword">if</span> self.ball_pos_y_ &gt; self.player_contexts_[player].pos - (PADDLE_SIZE + BORDER_SIZE) *<span class="number">0.5</span> <span class="keyword">and</span> \</span><br><span class="line">                    self.ball_pos_y_ &lt; self.player_contexts_[player].pos + (PADDLE_SIZE + BORDER_SIZE)*<span class="number">0.5</span>:  <span class="comment"># 在paddle区间上，认为打在paddle上，进行反弹，反弹和打到上下边缘一样</span></span><br><span class="line">                    _, t = self.reflect(self.ball_pos_x_, self.last_ball_pos_x_, FIELD_WIDTH*<span class="number">0.5</span>)</span><br><span class="line">                    self.ball_pos_x_ -= t* ball_dx</span><br><span class="line">                    self.ball_pos_y_ -= t* ball_dy</span><br><span class="line">                    <span class="comment"># change direction based on distance to paddle center， 一定规律修改反射方向</span></span><br><span class="line">                    offset = (self.ball_pos_y_ - self.player_contexts_[player].pos)/PADDLE_SIZE</span><br><span class="line">                    self.ball_dir_x_ *= <span class="number">-1.0</span></span><br><span class="line">                    self.ball_dir_y_ += offset * <span class="number">2.0</span></span><br><span class="line">                    self.normalizeVel()  <span class="comment"># 速度归一化</span></span><br><span class="line">                    <span class="keyword">if</span> abs(self.ball_dir_y_) &gt; np.sqrt(<span class="number">2</span>)/<span class="number">2.0</span>:</span><br><span class="line">                        <span class="comment"># 处理速度异常，如果速度过大，就重置45度角</span></span><br><span class="line">                        self.ball_dir_x_ = <span class="number">1.0</span> <span class="keyword">if</span> self.ball_dir_x_ &gt; <span class="number">0</span> <span class="keyword">else</span> <span class="number">-1.0</span></span><br><span class="line">                        self.ball_dir_y_ = <span class="number">1.0</span> <span class="keyword">if</span> self.ball_dir_y_ &gt; <span class="number">0</span> <span class="keyword">else</span> <span class="number">-1.0</span></span><br><span class="line">                        self.normalizeVel()</span><br><span class="line">                    ball_dx, ball_dy = self.speed_*self.ball_dir_x_, self.speed_*self.ball_dir_y_</span><br><span class="line">                    self.ball_pos_x_ += t * ball_dx</span><br><span class="line">                    self.ball_pos_y_ += t * ball_dy</span><br><span class="line">            <span class="comment"># not hit the paddles， 球没有被paddle接到，这个时候认为一个回合结束</span></span><br><span class="line">            <span class="keyword">if</span> abs(self.ball_pos_x_) &gt;= FIELD_WIDTH*<span class="number">0.5</span> + <span class="number">1.5</span> * BORDER_SIZE:</span><br><span class="line">                _, t = self.reflect(self.ball_pos_x_, self.last_ball_pos_x_, FIELD_WIDTH*<span class="number">0.5</span>+<span class="number">1.5</span>*BORDER_SIZE)</span><br><span class="line">                self.ball_pos_x_ -= t * ball_dx</span><br><span class="line">                self.ball_pos_y_ -= t * ball_dy</span><br><span class="line">                self.updateBall()  <span class="comment"># 更新求得位置</span></span><br><span class="line">                self.player_contexts_[<span class="number">1</span>-player].score += <span class="number">1</span>  <span class="comment"># 对方得分</span></span><br><span class="line">                self.updateScore()  <span class="comment"># 更新分数</span></span><br><span class="line">                self.server_.applyChanges() <span class="comment"># 让交互后台开始动起来</span></span><br><span class="line">                self.reset() <span class="comment"># 重置桌面，paddle位置并没变化</span></span><br><span class="line">                rospy.sleep(rospy.Duration(<span class="number">1.0</span>))</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                self.updateBall() <span class="comment"># ball在运动中，更新位置即可</span></span><br><span class="line"></span><br><span class="line">            self.last_ball_pos_x_ = self.ball_pos_x_  <span class="comment"># 更新上一时刻球的位置</span></span><br><span class="line">            self.last_ball_pos_y_ = self.ball_pos_y_</span><br><span class="line"></span><br><span class="line">            <span class="comment"># control computer player  控制AI选手</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> self.player_contexts_[<span class="number">0</span>].active <span class="keyword">or</span> <span class="keyword">not</span> self.player_contexts_[<span class="number">1</span>].active:</span><br><span class="line">                player = <span class="number">1</span> <span class="keyword">if</span> self.player_contexts_[<span class="number">0</span>].active <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">                delta = self.ball_pos_y_ - self.player_contexts_[player].pos</span><br><span class="line">                delta = max(min(delta, AI_SPEED_LIMIT), -AI_SPEED_LIMIT)</span><br><span class="line">                <span class="comment"># paddle的速度是有上限的，所以只要求得速度够快，AI就会失败，这个其实应该加些扰动</span></span><br><span class="line">                <span class="comment"># AI 选手自动更新paddle位置，此时只有某些特殊情形下AI才会输</span></span><br><span class="line">                self.setPaddlePos(player, self.player_contexts_[player].pos + delta)</span><br><span class="line">            </span><br><span class="line">            self.speed_ += <span class="number">0.0003</span></span><br><span class="line">        self.server_.applyChanges()</span><br></pre></td></tr></table></figure>
+<p>TimerEvent的属性：</p>
+<blockquote>
+<p>last_expected:               上一次调用的期望时间    </p>
+<p>last_real：                      上一次调用的真实时间</p>
+<p>current_expected：       当前调用的期望时间</p>
+<p>current_real：                 当前调用的真实时间</p>
+<p>last_duration：               两次调用的时间间隔</p>
+</blockquote>
+<h4 id="静态场景"><a href="#静态场景" class="headerlink" title="静态场景"></a>静态场景</h4><p>静态场景包括桌面的搭建，paddle和ball的位置。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">makeFieldMarker</span><span class="params">(self)</span>:</span></span><br><span class="line">        init_marker = InteractiveMarker()</span><br><span class="line">        init_marker.header.frame_id = <span class="string">"base_link"</span></span><br><span class="line">        init_marker.name = <span class="string">"field"</span></span><br><span class="line"></span><br><span class="line">        control = InteractiveMarkerControl()</span><br><span class="line">        control.always_visible = <span class="literal">True</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">4</span>):</span><br><span class="line">            wrap_marker = WrapMarker()</span><br><span class="line">            wrap_marker.set_type(Marker.CUBE)</span><br><span class="line">            wrap_marker.set_color()</span><br><span class="line">            <span class="keyword">if</span> i&lt;<span class="number">2</span>: <span class="comment"># i=0 上边， i=1 下边</span></span><br><span class="line">                wrap_marker.set_scale(FIELD_WIDTH + <span class="number">6.0</span> * BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)</span><br><span class="line">                y = FIELD_HEIGHT * <span class="number">0.5</span> + BORDER_SIZE <span class="keyword">if</span> i == <span class="number">0</span> <span class="keyword">else</span> -(FIELD_HEIGHT * <span class="number">0.5</span> + BORDER_SIZE) </span><br><span class="line">                wrap_marker.set_position(y=y)</span><br><span class="line">            <span class="keyword">else</span>: <span class="comment"># i=2 右边， i=3 左边</span></span><br><span class="line">                wrap_marker.set_scale(BORDER_SIZE, FIELD_HEIGHT + <span class="number">3.0</span> * BORDER_SIZE, BORDER_SIZE)</span><br><span class="line">                x = FIELD_WIDTH*<span class="number">0.5</span> + <span class="number">2.5</span> * BORDER_SIZE <span class="keyword">if</span> i==<span class="number">2</span> <span class="keyword">else</span> -(FIELD_WIDTH*<span class="number">0.5</span> + <span class="number">2.5</span> * BORDER_SIZE)</span><br><span class="line">                wrap_marker.set_position(x=x)</span><br><span class="line"></span><br><span class="line">            control.markers.append(wrap_marker.get_marker())</span><br><span class="line">        init_marker.controls.append(control)</span><br><span class="line">        self.server_.insert(init_marker)  <span class="comment"># 一个interactiveMarker接收一个消息</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">makeBallMarker</span><span class="params">(self)</span>:</span></span><br><span class="line">        int_marker = InteractiveMarker()</span><br><span class="line">        int_marker.header.frame_id = <span class="string">"base_link"</span></span><br><span class="line">        int_marker.name = <span class="string">'ball'</span></span><br><span class="line">        </span><br><span class="line">        control = InteractiveMarkerControl()</span><br><span class="line">        control.always_visible = <span class="literal">True</span></span><br><span class="line">        control.interaction_mode = InteractiveMarkerControl.NONE</span><br><span class="line">        control.orientation.w = <span class="number">1</span></span><br><span class="line">        control.orientation.y = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">        wrap_marker = WrapMarker()</span><br><span class="line">        wrap_marker.set_color()</span><br><span class="line">        wrap_marker.set_type(Marker.CYLINDER)</span><br><span class="line">        wrap_marker.set_scale(BORDER_SIZE, BORDER_SIZE, BORDER_SIZE) <span class="comment"># 圆柱</span></span><br><span class="line"></span><br><span class="line">        control.markers.append(wrap_marker.get_marker())</span><br><span class="line">        int_marker.controls.append(control)</span><br><span class="line">        self.server_.insert(int_marker)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">makePaddleMarkers</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">create_int_marker</span><span class="params">(name, visible=False, control_mode=<span class="number">0</span>, PPX=PLAYER_X,</span></span></span><br><span class="line"><span class="function"><span class="params">                            r=<span class="number">0.0</span>, g=<span class="number">1.0</span>, b=<span class="number">1.0</span>, a=<span class="number">1.0</span>, sx=<span class="number">0.</span>, sy=<span class="number">0.</span>, sz=<span class="number">0.</span>, px=<span class="number">0</span>, py=<span class="number">0</span>, pz=<span class="number">0</span>)</span>:</span></span><br><span class="line">            int_marker = InteractiveMarker()</span><br><span class="line">            int_marker.header.frame_id = <span class="string">"base_link"</span></span><br><span class="line">            int_marker.name = name</span><br><span class="line">            </span><br><span class="line">            control = InteractiveMarkerControl()</span><br><span class="line">            control.always_visible = visible</span><br><span class="line">            control.interaction_mode = control_mode</span><br><span class="line">            control.orientation.w = <span class="number">1</span></span><br><span class="line">            control.orientation.z = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">            wrap_marker = WrapMarker()</span><br><span class="line">            wrap_marker.set_type(Marker.CUBE)</span><br><span class="line">            wrap_marker.set_color(r=r, g=g, b=b, a=a)</span><br><span class="line">            wrap_marker.set_scale(sx, sy, sz)</span><br><span class="line">            wrap_marker.set_position(x=px, y=py, z=pz)</span><br><span class="line">            control.markers.append(wrap_marker.get_marker())</span><br><span class="line">            int_marker.controls.append(control)</span><br><span class="line">            int_marker.pose.position.x = PPX</span><br><span class="line">            <span class="keyword">return</span> int_marker</span><br><span class="line"></span><br><span class="line">        paddle0_marker = create_int_marker(<span class="string">"paddle0"</span>, visible=<span class="literal">False</span>, control_mode=InteractiveMarkerControl.MOVE_AXIS,</span><br><span class="line">                        r=<span class="number">1.</span>, g=<span class="number">1</span>, b=<span class="number">1</span>, a=<span class="number">0</span>, sx=BORDER_SIZE+<span class="number">0.1</span>, sy=PADDLE_SIZE+<span class="number">0.1</span>, sz=BORDER_SIZE+<span class="number">0.1</span>,</span><br><span class="line">                        PPX=-PLAYER_X, px=<span class="number">0</span>, py=<span class="number">0</span>, pz=<span class="number">0</span>)</span><br><span class="line">        self.server_.insert(paddle0_marker, self.processPaddleFeedback)</span><br><span class="line"></span><br><span class="line">        paddle1_marker = create_int_marker(<span class="string">"paddle1"</span>, visible=<span class="literal">False</span>, control_mode=InteractiveMarkerControl.MOVE_AXIS,</span><br><span class="line">                        r=<span class="number">1.</span>, g=<span class="number">1</span>, b=<span class="number">1</span>, a=<span class="number">0</span>, PPX=PLAYER_X, px=<span class="number">0</span>, py=<span class="number">0</span>, pz=<span class="number">0</span>,</span><br><span class="line">                        sx = BORDER_SIZE+<span class="number">0.1</span>, sy=PADDLE_SIZE+<span class="number">0.1</span>, sz=BORDER_SIZE+<span class="number">0.1</span>)</span><br><span class="line">        self.server_.insert(paddle1_marker, self.processPaddleFeedback)</span><br><span class="line"></span><br><span class="line">        paddle0_marker_disp = create_int_marker(<span class="string">"paddle0_display"</span>, visible=<span class="literal">True</span>, control_mode=InteractiveMarkerControl.NONE,</span><br><span class="line">                        r=<span class="number">0.5</span>, g=<span class="number">1</span>, b=<span class="number">0.5</span>, a=<span class="number">1</span>, PPX=-PLAYER_X, px=<span class="number">0</span>, py=<span class="number">0</span>, pz=<span class="number">0</span>,</span><br><span class="line">                        sx = BORDER_SIZE, sy=PADDLE_SIZE, sz=BORDER_SIZE)</span><br><span class="line">        self.server_.insert(paddle0_marker_disp)</span><br><span class="line"></span><br><span class="line">        paddle1_marker_disp = create_int_marker(<span class="string">"paddle1_display"</span>, visible=<span class="literal">True</span>, control_mode=InteractiveMarkerControl.NONE,</span><br><span class="line">                        r=<span class="number">0.5</span>, g=<span class="number">0.5</span>, b=<span class="number">1.0</span>, a=<span class="number">1</span>, PPX=PLAYER_X, px=<span class="number">0</span>, py=<span class="number">0</span>, pz=<span class="number">0</span>,</span><br><span class="line">                        sx = BORDER_SIZE, sy=PADDLE_SIZE, sz=BORDER_SIZE)</span><br><span class="line">        self.server_.insert(paddle1_marker_disp)</span><br></pre></td></tr></table></figure>
+<p>这个里面其实需要特别注意。我们会发现每一个paddle都定义了两个交互marker，其中绑定回调函数的透明度为0，即看不到，而没绑回调函数的透明度为1.这是因为当使用鼠标控制InteractiveMarker时，marker是随着鼠标运动的，没办法控制她在某个区域内运动，即在这个例子中没法限制该marker在桌面内。</p>
+<p>比如我们将paddle0设置代码修改为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">paddle0_marker = create_int_marker(<span class="string">"paddle0"</span>, visible=<span class="literal">False</span>, control_mode=InteractiveMarkerControl.MOVE_3D,</span><br><span class="line">                        r=<span class="number">1.</span>, g=<span class="number">1</span>, b=<span class="number">1</span>, a=<span class="number">1.0</span>, sx=BORDER_SIZE+<span class="number">0.1</span>, sy=PADDLE_SIZE+<span class="number">0.1</span>, sz=BORDER_SIZE+<span class="number">0.1</span>,</span><br><span class="line">                        PPX=-PLAYER_X, px=<span class="number">0</span>, py=<span class="number">0</span>, pz=<span class="number">0</span>)</span><br><span class="line">        self.server_.insert(paddle0_marker, self.processPaddleFeedback)</span><br></pre></td></tr></table></figure>
+<p>然后，就会发现paddle0会随着鼠标3D空间跑。</p>
+<p><img src="/2019/06/26/rviz-pong-python/rviz_pong_move_3d.png" alt="rviz_pong_3d"></p>
+<p>另外 <code>visible</code>这个参数不是说该marker是否可见，而是说当别的control发生时，该marker是否可见，比如将paddle0的visible=Flase， 那么当拖动paddle1时， paddle0就看不见了。可以试试看。</p>
+<h4 id="回调函数"><a href="#回调函数" class="headerlink" title="回调函数"></a>回调函数</h4><p>这部分主要是paddle marker发生变化是对应的paddle的位置如何变化，值得注意的是可见的paddle是有边界限制的，即必须在球台上。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">setPaddlePos</span><span class="params">(self, player, pos)</span>:</span></span><br><span class="line">       <span class="keyword">if</span> player &gt; <span class="number">1</span>:</span><br><span class="line">           <span class="keyword">return</span></span><br><span class="line">       pos = min(pos, (FIELD_HEIGHT - PADDLE_SIZE) * <span class="number">0.5</span>)</span><br><span class="line">       pos = max(pos, -(FIELD_HEIGHT - PADDLE_SIZE) * <span class="number">0.5</span>)</span><br><span class="line">       self.player_contexts_[player].pos = pos</span><br><span class="line"></span><br><span class="line">       pose = Pose()</span><br><span class="line">       pose.position.x = -PLAYER_X <span class="keyword">if</span> player==<span class="number">0</span> <span class="keyword">else</span> PLAYER_X</span><br><span class="line">       pose.position.y = pos</span><br><span class="line"></span><br><span class="line">       marker_name = <span class="string">"paddle0"</span> <span class="keyword">if</span> player==<span class="number">0</span> <span class="keyword">else</span> <span class="string">"paddle1"</span></span><br><span class="line">       self.server_.setPose(marker_name, pose) <span class="comment"># 影子和对应的paddle都变化</span></span><br><span class="line">       self.server_.setPose(marker_name+<span class="string">"_display"</span>, pose)</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">def</span> <span class="title">processPaddleFeedback</span><span class="params">(self, feedback)</span>:</span></span><br><span class="line">       <span class="keyword">if</span> feedback.marker_name == <span class="string">'paddle0'</span>:</span><br><span class="line">           player=<span class="number">0</span>  <span class="comment"># 当前选择的是那个选手</span></span><br><span class="line">       <span class="keyword">elif</span> feedback.marker_name == <span class="string">'paddle1'</span>:</span><br><span class="line">           player = <span class="number">1</span></span><br><span class="line">       <span class="keyword">else</span>:</span><br><span class="line">           <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">       control_marker_name = feedback.marker_name</span><br><span class="line">       pose = feedback.pose</span><br><span class="line"></span><br><span class="line">       self.setPaddlePos(player, pose.position.y)</span><br><span class="line">       <span class="keyword">if</span> feedback.event_type == InteractiveMarkerFeedback.MOUSE_DOWN:</span><br><span class="line">           self.player_contexts_[player].active = <span class="literal">True</span>  <span class="comment"># 表示paddle是否按下</span></span><br><span class="line">       <span class="keyword">if</span> feedback.event_type == InteractiveMarkerFeedback.MOUSE_UP:</span><br><span class="line">           self.player_contexts_[player].active = <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+<h4 id="重新开始"><a href="#重新开始" class="headerlink" title="重新开始"></a>重新开始</h4><p>重新开始是将球放回中间位置，然后求得初始速度重新设定。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">reset</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.speed_ = <span class="number">6.</span> * UPDATE_RATE</span><br><span class="line">        self.ball_pos_x_, self.ball_pos_y_ = <span class="number">0.0</span>, <span class="number">0.0</span></span><br><span class="line">        self.ball_dir_x_ = <span class="number">1.0</span> <span class="keyword">if</span> self.ball_pos_x_ &gt; <span class="number">0</span> <span class="keyword">else</span> <span class="number">-1.0</span></span><br><span class="line">        self.ball_dir_y_ = <span class="number">1.0</span> <span class="keyword">if</span> np.random.randint(<span class="number">100</span>)%<span class="number">2</span>==<span class="number">0</span> <span class="keyword">else</span> <span class="number">-1.0</span></span><br><span class="line">        self.normalizeVel()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">normalizeVel</span><span class="params">(self)</span>:</span></span><br><span class="line">        l = np.sqrt(self.ball_dir_x_**<span class="number">2</span> + self.ball_dir_y_**<span class="number">2</span>)</span><br><span class="line">        self.ball_dir_x_ /= l </span><br><span class="line">        self.ball_dir_y_ /= l</span><br></pre></td></tr></table></figure>
+<h4 id="更新状态"><a href="#更新状态" class="headerlink" title="更新状态"></a>更新状态</h4><p>这部分主要更新球的状态，当前分数和判断是否碰到边界。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">reflect</span><span class="params">(self, pos, last_pos, limit)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> pos &gt; limit <span class="keyword">or</span> pos &lt; -limit:</span><br><span class="line">             t = (pos - np.sign(pos) * limit) / (pos - last_pos)</span><br><span class="line">             <span class="keyword">return</span> <span class="literal">True</span>, t</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span>, <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">updateBall</span><span class="params">(self)</span>:</span></span><br><span class="line">        pose = Pose()</span><br><span class="line">        pose.position.x, pose.position.y = self.ball_pos_x_, self.ball_pos_y_</span><br><span class="line">        self.server_.setPose(<span class="string">"ball"</span>, pose)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">updateScore</span><span class="params">(self)</span>:</span></span><br><span class="line">        int_marker = InteractiveMarker()</span><br><span class="line">        int_marker.header.frame_id = <span class="string">"base_link"</span></span><br><span class="line">        int_marker.name = <span class="string">'score'</span></span><br><span class="line">        control = InteractiveMarkerControl() </span><br><span class="line">        control.always_visible = <span class="literal">True</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">2</span>):</span><br><span class="line">            wrap_marker = WrapMarker()</span><br><span class="line">            wrap_marker.set_type(Marker.TEXT_VIEW_FACING)</span><br><span class="line">            wrap_marker.set_color()</span><br><span class="line">            wrap_marker.set_scale(<span class="number">1.5</span>, <span class="number">1.5</span>, <span class="number">1.5</span>)</span><br><span class="line">            wrap_marker.set_position(x=(<span class="number">2</span>*i<span class="number">-1</span>)*(FIELD_WIDTH * <span class="number">0.5</span> + BORDER_SIZE), y=FIELD_HEIGHT*<span class="number">0.5</span> + <span class="number">4</span>* BORDER_SIZE)</span><br><span class="line">            marker = wrap_marker.get_marker()</span><br><span class="line">            marker.text = str(self.player_contexts_[i].score)</span><br><span class="line">            control.markers.append(marker)</span><br><span class="line"></span><br><span class="line">        int_marker.controls.append(control)</span><br><span class="line">        self.server_.insert(int_marker)</span><br></pre></td></tr></table></figure>
+<h4 id="函数入口"><a href="#函数入口" class="headerlink" title="函数入口"></a>函数入口</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> __name__==<span class="string">'__main__'</span>:</span><br><span class="line">    rospy.init_node(<span class="string">'pong'</span>)</span><br><span class="line">    pong_game = PongGame()</span><br><span class="line">    rospy.spin()  <span class="comment"># 这个必须调用，只有它调用的时候， Timer才会定时启动刷新</span></span><br><span class="line">    rospy.loginfo(<span class="string">"Exiting.."</span>)</span><br></pre></td></tr></table></figure>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>实现起来还是比较简单的。通过将C++代码转成python代码，更好的理解了中间代码执行过程。尤其值得注意的地方就是该代码设置paddle过程中分别配置了影子paddle，用于处理接收响应。</p>
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : zhouzongwei <br>
+        
+        原文链接 : <a href>http://yoursite.com/2019/06/26/rviz-pong-python/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
+    </div>
+  
+  
+  
+    <div class="social-share" style="margin-top: -2rem" data-wechat-qrcode-title="<p>微信扫一扫</p>" data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>" data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter">
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
+</div>
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async></script>
+  
+
+  
+    <div id="reward">
+  
+    <p id="reward-meta">知识 & 情怀 | 赏或者不赏，我都在这，不声不响</p>
+  
+  <button id="reward-btn">
+    
+    <span>打赏</span>
+  </button>
+  <div id="reward-qrcode">
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/wechatimg.jpg" alt="微信扫一扫, 以资鼓励">
+        <p class="qrcode-meta">微信扫一扫, 以资鼓励</p>
+      </div>
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/alipayimg.jpg" alt="支付宝扫一扫, 再接再厉">
+        <p class="qrcode-meta">支付宝扫一扫, 再接再厉</p>
+      </div>
+    
+  </div>
+
+</div>
+
+<script>
+  (() => {
+    let button = document.querySelector('#reward-btn'),
+      qrcode = document.querySelector('#reward-qrcode'),
+      display = false;
+    
+    button.addEventListener('click', () => {
+      qrcode.style.display = display ? 'none' : 'block'
+      display = !display
+    }, false)
+  })()
+</script>
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+          <i class="iconfont icon-06tags"></i>标签: 
+          
+          <span class="span--tag">
+            <a href="/tags/rviz/">
+              #rviz
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/python/">
+              #python
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/ros/">
+              #ros
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/interactiveMarker/">
+              #interactiveMarker
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/pong/">
+              #pong
+            </a>
+          </span>
+          
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
+    
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2019/06/26/rviz-sending-basic-shapes/" target="_self">工具使用-ROS在rviz中的应用实例 （python 版 basic shapes）</a>
+      </div>
+    
+    
+  </nav>
+
+  
+    <a href="#comment" class="comment-anchor"></a>
+<div class="comment-title"><i class="iconfont icon-footprint"></i> 留下足迹 <i class="iconfont icon-footprint"></i></div>
+<div id="vcomments"></div>
+
+<script defer>
+  if( true ) {
+    let path = getRealPath()
+    new Valine({
+      el: "#vcomments",
+      appId: "oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz",
+      appKey: "fWABYGLTAoV1LT4LYzh1PNmQ",
+      notify: false,
+      verify: false,
+      avatar: "robohash",
+      placeholder: "正确填写邮箱, 才能及时收到回复哦♪(^∇^*)",
+      path
+    });
+  }
+</script>
+   
+
+  
+    <script defer>
+const valineAPI = (() => {
+  try {
+    AV.init("oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz", "fWABYGLTAoV1LT4LYzh1PNmQ");
+  } catch(error) {}
+  const isExist = (identity) => {
+    identity = identity || getRealPath();
+    let query = new AV.Query('Timer');
+    return new Promise((resolve, reject) => {
+      query.equalTo("identity", identity);
+      query.find().then(results => {
+        resolve(results.length > 0);
+      }, error => reject(error));
+    })
+  }
+
+  const _get = (identity) => {
+    let query = null;
+    if(identity && identity instanceof Array){
+      let querys = [];
+      for(let i = 0; i < identity.length; ++i) {
+        querys[i] = new AV.Query('Timer');
+        querys[i].equalTo('identity', identity[i]);
+      }
+      query = AV.Query.or.apply(null ,querys);
+    } else {
+      identity = identity || getRealPath();
+      query = new AV.Query("Timer");
+      query.equalTo("identity", identity);
+    }
+
+    return new Promise((resolve, reject) => {
+      query.find()
+      .then(results => resolve(results))
+      .catch(error => reject(error))
+    })
+  }
+
+  const create = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let Todo = AV.Object.extend('Timer');
+      let todo = new Todo();
+      todo.set("times", 1);
+      todo.set("identity", identity);
+      todo.save().then(res => resolve(true), error => reject(error));
+    })
+  }
+
+  const update = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let query = new AV.Query('Timer');
+      query.equalTo("identity", identity);
+      query.find().then(todos => {
+        todos.forEach(todo => {
+          todo.set("times", todo.attributes.times + 1);
+        });
+        return AV.Object.saveAll(todos);
+      }).then(todos => resolve(true), error => reject(error));
+    })
+  }
+
+  return {
+    isExist,
+    _get,
+    update,
+    create
+  }
+})()
+
+const calcAndWriteTimes = () => {
+  let isPost = true;
+
+  let timerAllDOM = document.querySelectorAll(".article-timer");
+
+  if(isPost) {
+    let identity = timerAllDOM[0].getAttribute("data-identity");
+    valineAPI.isExist(identity)
+    .then(exist => {
+      if(exist) {
+        return valineAPI.update(identity);
+      }
+      return new Promise(resolve => resolve(true));
+    })
+    .then( succuess => valineAPI._get(identity))
+    .then( result => timerAllDOM[0].innerText = result[0].attributes.times)
+    .catch(error => console.log(error.message))
+    return ;
+  }
+
+  let timerDOMCache = {};
+
+  for(let timerDOM of timerAllDOM) {
+    let identity = timerDOM.getAttribute("data-identity");
+    if(timerDOMCache.hasOwnProperty(identity)){
+      timerDOMCache[identity].dom.push(timerDOM);
+    }else{
+      timerDOMCache[identity] = {
+        dom: [timerDOM],
+        times: undefined
+      };
+    }
+  }
+
+  let identities = Object.keys(timerDOMCache);
+  valineAPI._get(identities).then(results => {
+    for(let result of results) {
+      let {identity, times} = result.attributes;
+      timerDOMCache[identity].times = times;
+      timerDOMCache[identity].dom.map(item => item.innerText = times);
+    }
+    for(let identity of identities) {
+      if(timerDOMCache[identity].times){
+        continue;
+      }
+      timerDOMCache[identity].dom.map(item => item.innerText = 1);
+      valineAPI.create(identity);
+    }
+  }).catch(error => console.log(error.message))
+}
+
+if(true){
+  calcAndWriteTimes();
+}
+</script>
+   
+
+</div>
+
+
+      <footer>
+  <p class="site-info">
+    博客已萌萌哒运行<span id="time-to-now"></span><span class="my-face">(●'◡'●)ﾉ♥</span>
+    <br>
+    Theme - <a href="https://github.com/dongyuanxin/theme-bmw">BMW</a> | Made With 💗 | Powered by <a href="https://godbmw.com/">GodBMW</a>
+    <br>
+    
+  </p>
+</footer>
+
+
+
+<script>
+const timeToNowDOM = document.querySelector("#time-to-now");
+const startTimestamp = new Date(2018, 1, 10).getTime();
+
+const updateTimeStr = () => {
+  let offset = parseInt(
+      (new Date().getTime() - startTimestamp) / 1000,
+      10
+    ),
+    day = Math.floor(offset / 86400),
+    hour = Math.floor((offset % 86400) / 3600),
+    minute = Math.floor(((offset % 86400) % 3600) / 60),
+    second = Math.floor(((offset % 86400) % 3600) % 60);
+  timeToNowDOM.innerHTML =
+    day + "天" + hour + "小时" + minute + "分钟" + second + "秒";
+  setTimeout(updateTimeStr, 500);
+}
+
+setTimeout(updateTimeStr, 500);
+</script>
+
+
+      <div class="back-to-top hidden">
+  <span>
+    <i class="iconfont icon-60"></i><span></span>%
+  </span>
+</div>
+
+<script>
+const updateIconToTop = percent => {
+  let dom = document.querySelector(".back-to-top span span");
+  dom.innerText = percent;
+  if(percent < 1) {
+    document.querySelector(".back-to-top").className = "back-to-top hidden";
+  } else {
+    document.querySelector(".back-to-top").className = "back-to-top";
+  }
+}
+
+const handleScoll = () => {
+  let isRunning = false;
+  return () => {
+    if (isRunning) return;
+    isRunning = true;
+    window.requestAnimationFrame(timestamp => {
+      let scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop,
+        scrollHeight =
+          document.documentElement.scrollHeight ||
+          document.body.scrollHeight,
+        clientHeight =
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+      isRunning = false;
+      if (scrollTop <= 1) {
+        updateIconToTop(0);
+        return;
+      }
+      if (scrollTop + clientHeight >= scrollHeight) {
+        updateIconToTop(100);
+      } else {
+        updateIconToTop(parseInt(
+          100 * scrollTop / (scrollHeight - clientHeight),
+          10
+        ));
+      }
+    });
+  };
+}
+
+const backToTop = () => {
+  let scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop,
+    delay = 10,
+    time = 200;
+  if (scrollTop <= 20) {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    return;
+  }
+  let step = Math.ceil(scrollTop * delay / time);
+  let timer = setInterval(() => {
+    scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollTop - step <= 0) {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      clearInterval(timer);
+    } else {
+      document.documentElement.scrollTop = scrollTop - step;
+      document.body.scrollTop = scrollTop - step;
+    }
+  }, delay);
+}
+
+document.addEventListener("scroll", handleScoll(), false);
+
+document.querySelector(".back-to-top").addEventListener("click", backToTop, false);
+
+</script>
+
+    </div>
+
+    
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+<script>
+  (() => {
+    const mathjaxConfig = {
+      showProcessingMessages: false, //关闭js加载过程信息
+      messageStyle: "none", //不显示信息
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]], //行内公式选择符
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]], //段内公式选择符
+        skipTags: ["script", "noscript", "style", "textarea", "pre", "code", "a"] //避开某些标签
+      },
+      "HTML-CSS": {
+        availableFonts: ["STIX", "TeX"], //可选字体
+        showMathMenu: false //关闭右击菜单显示
+      }
+    }
+
+    let mathjaxInterval = setInterval(() => {
+      if(!window.MathJax){
+        return;
+      }
+      window.MathJax.Hub.Config(mathjaxConfig)
+      window.MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById('app')])
+
+      clearInterval(mathjaxInterval)
+    }, 10)    
+  })()
+</script>
+    
+
+    <script src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script>
+<script async>
+  let fancyTimer = setInterval(function(){
+    if(!window.$){
+      return;
+    }
+    $(document).ready(function() {
+      $(".post img").each(function () {
+        if($(this).parent().get(0).tagName.toLowerCase() === "a") {
+          return;
+        }
+        // $(this).attr("data-fancybox", "gallery"); // if you add 'data-fancybox', img will display after showed
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "gallery");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      });
+      
+      clearInterval(fancyTimer);
+    });
+  }, 10);
+</script>
+
+    
+  </body>
+
+</html>

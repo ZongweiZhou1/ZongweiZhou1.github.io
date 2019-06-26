@@ -181,6 +181,282 @@
   
   <div class="post">
     <h1 class="article-title">
+      <a href="/2019/05/21/MOT-overview-3rd/">
+        <span>多目标跟踪总结(下)-资源汇总</span>
+      </a>
+    </h1>
+    <!-- PC端文章信息 -->
+    <div class="article-top-meta pc-view">
+      <span>
+        发布时间 : 2019-05-21
+      </span>
+    </div>
+    <!-- 移动端文章信息 -->
+    <div class="article-top-meta mobile-view">
+      <span>
+        发布 : 2019-05-21
+      </span>
+      
+      
+        <span>
+          浏览 : <span class="article-timer" data-identity="MOT-overview-3rd"></span>
+        </span>
+      
+    </div>
+    
+    <!-- 文章简介 -->
+    <div class="article-content">
+      <div class="markdown-body article-content--inner" v-html="mdToHtml(psg.summary)">
+        <p>本文主要收集MOT领域的一些资源， 包括数据集，相关论文以及部分开源代码等。</p>
+      </div>
+    </div>
+    <div class="article-footer">
+      <div class="article-meta pull-left">
+        <!-- 分类pc端可见 -->
+        <span class="pc-view">
+          
+        <span>
+          
+            <i class="iconfont icon-06tags"></i>标签:
+            
+              <span class="span--tag">
+                <a href="/tags/MOT/">
+                  #MOT
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/overview/">
+                  #overview
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/code-and-paper/">
+                  #code and paper
+                </a>
+              </span>
+            
+                    
+        </span>
+      </span></div>
+      
+        <div class="article-meta pull-right">
+          <span class="pc-view">
+            <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="MOT-overview-3rd"></span>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+  
+  <div class="post">
+    <h1 class="article-title">
+      <a href="/2019/05/20/MOT-overview-2nd/">
+        <span>多目标跟踪总结(中)-深度方法</span>
+      </a>
+    </h1>
+    <!-- PC端文章信息 -->
+    <div class="article-top-meta pc-view">
+      <span>
+        发布时间 : 2019-05-20
+      </span>
+    </div>
+    <!-- 移动端文章信息 -->
+    <div class="article-top-meta mobile-view">
+      <span>
+        发布 : 2019-05-20
+      </span>
+      
+      
+        <span>
+          浏览 : <span class="article-timer" data-identity="MOT-overview-2nd"></span>
+        </span>
+      
+    </div>
+    
+    <!-- 文章简介 -->
+    <div class="article-content">
+      <div class="markdown-body article-content--inner" v-html="mdToHtml(psg.summary)">
+        <p>随着深度学习的推进，基于深度学习的检测器性能提升明显。因此目前的多目标跟踪算法大都基于tracking-by-detection框架。于是MOT任务可以转化为detection+ReID问题。</p>
+<p>但相对于与传统的ReID问题，MOT问题会更加复杂。首先，MOT任务中目标轨迹变化频繁， 图像样本库的数量和种类都不固定； 其次，检测结果可能出现新的目标，也可能出现漏检；另外，检测图像并不像行人重识别中的查询图像都是比较准确地检测结果， MOT任务中行人检测往往混杂着误检或者不准确的检测，尤其是相互遮挡产生时。检测行人的不对齐，相互遮挡给目标匹配带来了极大的挑战性。</p>
+<p>本文将主要总结一些基于深度网络，希望更好解决MOT任务中ReID子任务的方法。</p>
+      </div>
+    </div>
+    <div class="article-footer">
+      <div class="article-meta pull-left">
+        <!-- 分类pc端可见 -->
+        <span class="pc-view">
+          
+        <span>
+          
+            <i class="iconfont icon-06tags"></i>标签:
+            
+              <span class="span--tag">
+                <a href="/tags/MOT/">
+                  #MOT
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/deep-learning/">
+                  #deep learning
+                </a>
+              </span>
+            
+                    
+        </span>
+      </span></div>
+      
+        <div class="article-meta pull-right">
+          <span class="pc-view">
+            <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="MOT-overview-2nd"></span>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+  
+  <div class="post">
+    <h1 class="article-title">
+      <a href="/2019/05/19/CLEAR/">
+        <span>阅读笔记-Evaluation Multiple Object Tracking Performance-The CLEAR MOT Metrics</span>
+      </a>
+    </h1>
+    <!-- PC端文章信息 -->
+    <div class="article-top-meta pc-view">
+      <span>
+        发布时间 : 2019-05-19
+      </span>
+    </div>
+    <!-- 移动端文章信息 -->
+    <div class="article-top-meta mobile-view">
+      <span>
+        发布 : 2019-05-19
+      </span>
+      
+      
+        <span>
+          浏览 : <span class="article-timer" data-identity="CLEAR"></span>
+        </span>
+      
+    </div>
+    
+    <!-- 文章简介 -->
+    <div class="article-content">
+      <div class="markdown-body article-content--inner" v-html="mdToHtml(psg.summary)">
+        <p>这篇笔记主要总结了MOT任务中常用的度量指标，其表示的意义和计算方式。</p>
+      </div>
+    </div>
+    <div class="article-footer">
+      <div class="article-meta pull-left">
+        <!-- 分类pc端可见 -->
+        <span class="pc-view">
+          
+        <span>
+          
+            <i class="iconfont icon-06tags"></i>标签:
+            
+              <span class="span--tag">
+                <a href="/tags/MOT/">
+                  #MOT
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/CLEAR/">
+                  #CLEAR
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/Metric/">
+                  #Metric
+                </a>
+              </span>
+            
+                    
+        </span>
+      </span></div>
+      
+        <div class="article-meta pull-right">
+          <span class="pc-view">
+            <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="CLEAR"></span>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+  
+  <div class="post">
+    <h1 class="article-title">
+      <a href="/2019/05/19/STRN/">
+        <span>阅读笔记-Spatial-Temporal Relation Networks for Multi-Object Tracking</span>
+      </a>
+    </h1>
+    <!-- PC端文章信息 -->
+    <div class="article-top-meta pc-view">
+      <span>
+        发布时间 : 2019-05-19
+      </span>
+    </div>
+    <!-- 移动端文章信息 -->
+    <div class="article-top-meta mobile-view">
+      <span>
+        发布 : 2019-05-19
+      </span>
+      
+      
+        <span>
+          浏览 : <span class="article-timer" data-identity="STRN"></span>
+        </span>
+      
+    </div>
+    
+    <!-- 文章简介 -->
+    <div class="article-content">
+      <div class="markdown-body article-content--inner" v-html="mdToHtml(psg.summary)">
+        <p><img src="/2019/05/19/STRN/strn_architecture.png" alt="strn_architecture"></p>
+<p>鲁棒的相似度度量是MOT取得较好性能的一个关键。而鲁棒的相似度度量应该能够变现表观、位置、时间和空间信息。由于这些线索差异性较大，不能直接组合在一起，一般的MOT方法会分别使用网络处理这些特征。</p>
+<p>本文提出了一种Spatial-Temporal Relation network能够同时encode多种线索，并从时空关系中推理轨迹和检测的匹配关系。该网络能够端到端的训练并在MOT15-17benchmark上都取得了SOTA的性能。</p>
+      </div>
+    </div>
+    <div class="article-footer">
+      <div class="article-meta pull-left">
+        <!-- 分类pc端可见 -->
+        <span class="pc-view">
+          
+        <span>
+          
+            <i class="iconfont icon-06tags"></i>标签:
+            
+              <span class="span--tag">
+                <a href="/tags/MOT/">
+                  #MOT
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/Spatial-Temporal-Relational-Network/">
+                  #Spatial-Temporal Relational Network
+                </a>
+              </span>
+            
+                    
+        </span>
+      </span></div>
+      
+        <div class="article-meta pull-right">
+          <span class="pc-view">
+            <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="STRN"></span>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+  
+  <div class="post">
+    <h1 class="article-title">
       <a href="/2019/05/18/High-speed-tracking-with-kernelized-correlation-filters/">
         <span>阅读笔记-High-speed tracking with kernelized correlation filters</span>
       </a>

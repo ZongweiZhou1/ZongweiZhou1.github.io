@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta name="author" content="董沅鑫, yuanxin.me@gmail.com">
+  
+  
+  
+  <title>工具使用-rviz 中可交互的markers（InteractiveMarker） | YixiaoZhou&#39;s blog</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="rviz,ros,InteractiveMarker,">
+  
+
+  <script>
+    console.log('\n%c Hexo-theme-bmw v4.0 ' + '%c 🎉 https://github.com/dongyuanxin/theme-bmw 🎉\n' + '\n%c View demo online ' + '%c 🔍 https://godbmw.com/ 🔍  \n' , 'color: #fadfa3; background: #030307; padding:3px 0;', '', 'color: #fadfa3; background: #030307; padding:3px 0;', '');
+  </script>
+
+  
+    <meta name="description" content="海阔全是浪，天高皆是霾。">
+  
+
+  
+
+  
+    <link rel="icon" href="/images/fvatar2.png">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/icon/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+  <script src="/js/util.js"></script>
+<script src="/js/valine.min.js"></script>
+
+  
+
+  
+    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
+  
+
+  
+    <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
+  
+  
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js" async></script>
+  
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.0/dist/av-min.js"></script>
+  
+
+</head>
+
+  <body>
+
+    
+
+    <div id="app">
+
+      <div class="header-wrap">
+  <header>
+    <div class="site-brand">
+      <div class="site-title">
+        <a href="/">YiXiaoZhou</a>
+      </div>
+    </div>
+    <nav class="site-navigation">
+      <ul class="nav-menu">
+      
+        <li class="nav-item" data-path="/">
+          
+            <a href="/" target="_self">
+              主页
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          
+            <a href="/archives/" target="_self">
+              归档
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          
+            <a href="/friends/" target="_self">
+              友链
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          
+            <a href="/about/" target="_self">
+              关于
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path>
+          
+            <a href="javascript:void(0);" v-else>抓到我</a>
+            <ul class="nav-menu--dropdown">
+              
+                <li>
+                  <a href="https://github.com/ZongweiZhou1" target="_blank">
+                    Github
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://www.facebook.com/duncon.chou" target="_blank">
+                    Facebook
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://weibo.com/u/3231820650/home?wvr=5" target="_self">
+                    weibo
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+      </ul>
+    </nav>
+    <i class="iconfont icon-menu"></i>
+  </header>
+</div>
+
+<script>
+  let links = document.querySelectorAll('.nav-item');
+  for(let link of links){
+    let childrenLink = link.querySelector('ul');
+    link.addEventListener('mouseenter', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown active";
+      }
+    })
+    link.addEventListener('mouseleave', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown";
+      }
+    })
+  }
+  let rootRealPath = getRealPath(window.location.pathname, true);
+  for(let link of links) {
+    let linkPath = link.getAttribute("data-path");
+    if(linkPath && getRealPath(linkPath, true) === rootRealPath) {
+      link.className = "nav-item hover";
+    }
+  }
+
+  let iconMenu = document.querySelector("i.iconfont.icon-menu"),
+    iconMenuClicked = false;
+  let navDOM = document.querySelector("nav.site-navigation");
+  iconMenu.addEventListener("click", () => {
+    iconMenuClicked 
+      ? navDOM.className = "site-navigation active"
+      : navDOM.className = "site-navigation";
+    iconMenuClicked = !iconMenuClicked;
+  })
+</script>
+
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
+  
+
+<div class="post">
+  <h1 class="article-title">
+    <span>工具使用-rviz 中可交互的markers（InteractiveMarker）</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2019-06-26
+    </span>
+    
+    
+      <span>
+        浏览 : <span class="article-timer" data-identity="rviz-interactive-markers"></span>
+      </span>
+    
+  </div>
+
+  
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <p></p>
+<p>我们将通过一个简单的例子来了解interactive marker如何使用在rviz中实现交互的。大多数教程都只是介绍了官方的例子，但并没有分析交互是怎么实现的，消息流是如何传递的。官方给的交互网络：</p>
+<p><img src="/2019/06/26/rviz-interactive-markers/interactive_framework.png" alt="interactive_framework"></p>
+<p>并给了一段介绍：</p>
+<blockquote>
+<p>If you want to create a node providing a set of interactive markers, you need to instantiate an <code>InteractiveMarkerServer</code> object. This will handle the connection to the client (usually RViz)<br>and make sure that all changes you make are being transmitted and that your application is being notified of all the actions the user performs on the interactive markers. </p>
+</blockquote>
+<p>听的云里雾里的，并没有牵涉到本质。所以我们这里来分析下教程中<code>simple_marker</code>这个例子。</p>
+<h4 id="interactive-marker-server-py"><a href="#interactive-marker-server-py" class="headerlink" title="interactive_marker_server.py"></a>interactive_marker_server.py</h4><p>要理解消息流是怎么流动的，我们首先要看看InteractiveMarkerServer内部定义。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> rospy</span><br><span class="line"><span class="keyword">from</span> std_msgs.msg <span class="keyword">import</span> Header</span><br><span class="line"><span class="keyword">from</span> visualization_msgs.msg <span class="keyword">import</span> InteractiveMarker</span><br><span class="line"><span class="keyword">from</span> visualization_msgs.msg <span class="keyword">import</span> InteractiveMarkerFeedback</span><br><span class="line"><span class="keyword">from</span> visualization_msgs.msg <span class="keyword">import</span> InteractiveMarkerInit</span><br><span class="line"><span class="keyword">from</span> visualization_msgs.msg <span class="keyword">import</span> InteractiveMarkerPose</span><br><span class="line"><span class="keyword">from</span> visualization_msgs.msg <span class="keyword">import</span> InteractiveMarkerUpdate</span><br><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Lock</span><br><span class="line"><span class="comment"># 这几个marker msg的定义差别不大， </span></span><br><span class="line"><span class="comment"># InteractiveMarker是最基本的定义， 包含header， pose, MenuEntry[], Controls[]</span></span><br><span class="line"><span class="comment"># InteractiveMarkerInit 相对于InteractiveMarker更高一层， 它有一个InteractiveMarker List</span></span><br><span class="line"><span class="comment"># InteractiveMarkerPose 包含header, pose</span></span><br><span class="line"><span class="comment"># InteractiveMarkerUpdate 包含InteractiveMarker List和 pose List</span></span><br><span class="line"><span class="comment"># InteractiveMarkerFeedback 包含一些操作值，比如鼠标选择等还有一个pose</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Represents a single marker</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MarkerContext</span>:</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">		self.last_feedback = rospy.Time.now()</span><br><span class="line">		self.last_client_id = <span class="string">""</span></span><br><span class="line">		self.default_feedback_cb = <span class="literal">None</span></span><br><span class="line">		self.feedback_cbs = dict()</span><br><span class="line">		self.int_marker = InteractiveMarker()</span><br><span class="line"></span><br><span class="line"><span class="comment"># Represents an update to a single marker</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UpdateContext</span>:</span></span><br><span class="line">	FULL_UPDATE = <span class="number">0</span></span><br><span class="line">	POSE_UPDATE = <span class="number">1</span></span><br><span class="line">	ERASE = <span class="number">2</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">		self.update_type = self.FULL_UPDATE</span><br><span class="line">		self.int_marker = InteractiveMarker()</span><br><span class="line">		self.default_feedback_cb = <span class="literal">None</span></span><br><span class="line">		self.feedback_cbs = dict()</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Note: Keep in mind that changes made by calling insert(), erase(), setCallback() etc.</span></span><br><span class="line"><span class="comment">#       are not applied until calling applyChanges().</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InteractiveMarkerServer</span>:</span></span><br><span class="line">     DEFAULT_FEEDBACK_CB = <span class="number">255</span></span><br><span class="line">	 <span class="comment">## @brief Create an InteractiveMarkerServer and associated ROS connections</span></span><br><span class="line">	 <span class="comment">## @param topic_ns      The interface will use the topics topic_ns/update and</span></span><br><span class="line">     <span class="comment">##                      topic_ns/feedback for communication.</span></span><br><span class="line">     <span class="comment">## @param server_id     If you run multiple servers on the same topic from</span></span><br><span class="line">     <span class="comment">##                      within the same node, you will need to assign different names to them.</span></span><br><span class="line">     <span class="comment">##                      Otherwise, leave this empty.</span></span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, topic_ns, server_id=<span class="string">""</span>, q_size=<span class="number">100</span>)</span>:</span></span><br><span class="line">          self.topic_ns = topic_ns</span><br><span class="line">          self.seq_num = <span class="number">0</span></span><br><span class="line">          self.mutex = Lock()</span><br><span class="line">          self.server_id = rospy.get_name() + server_id</span><br><span class="line">          <span class="comment"># 当前markers的当前状态</span></span><br><span class="line">          self.marker_contexts = dict()</span><br><span class="line">		  <span class="comment"># 下一次publish需要发布的Markers，也是发生update的markers</span></span><br><span class="line">          self.pending_updates = dict()</span><br><span class="line">          self.init_pub = rospy.Publisher(topic_ns+<span class="string">"/update_full"</span>, InteractiveMarkerInit, latch=<span class="literal">True</span>, queue_size=<span class="number">100</span>)  <span class="comment"># 初始的发布器，发布所有的InteractiveMarker</span></span><br><span class="line">          self.update_pub = rospy.Publisher(topic_ns+<span class="string">"/update"</span>, InteractiveMarkerUpdate, queue_size=<span class="number">100</span>)  <span class="comment"># 只发布发生改变的InteractiveMarker， 注意与init_pub发布消息类型不一样</span></span><br><span class="line">          rospy.Subscriber(topic_ns+<span class="string">"/feedback"</span>, InteractiveMarkerFeedback, self.processFeedback, queue_size=q_size) <span class="comment"># 订阅器，订阅哪些marker发生了变化 </span></span><br><span class="line">          rospy.Timer(rospy.Duration(<span class="number">0.5</span>), self.keepAlive)  <span class="comment"># 保持node发布订阅从而一直alive</span></span><br><span class="line">          self.publishInit()  <span class="comment"># 当前其实没有任何markers要发布，只是发布了个msg头</span></span><br><span class="line">      <span class="comment">## @brief 析构函数接口 will lead to all managed markers being cleared.</span></span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">__del__</span><span class="params">(self)</span>:</span></span><br><span class="line">          self.clear()</span><br><span class="line">          self.applyChanges()</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># send an empty update to keep the client GUIs happy</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">keepAlive</span><span class="params">(self, msg)</span>:</span></span><br><span class="line">    empty_msg = InteractiveMarkerUpdate()</span><br><span class="line">    empty_msg.type = empty_msg.KEEP_ALIVE</span><br><span class="line">    self.publish(empty_msg)  <span class="comment"># 这个就是发布一个空的UpdateMarker， 没有任何改变，只是保持连接</span></span><br><span class="line">  </span><br><span class="line"><span class="comment"># increase sequence number &amp; publish an update</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">publish</span><span class="params">(self, update)</span>:</span></span><br><span class="line">    update.server_id = self.server_id</span><br><span class="line">    update.seq_num = self.seq_num</span><br><span class="line">    self.update_pub.publish(update)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># update pose, schedule update without locking</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">publishInit</span><span class="params">(self)</span>:</span></span><br><span class="line">     <span class="keyword">with</span> self.mutex:</span><br><span class="line">         init = InteractiveMarkerInit()</span><br><span class="line">         init.server_id = self.server_id</span><br><span class="line">         init.seq_num = self.seq_num</span><br><span class="line">  </span><br><span class="line">         <span class="keyword">for</span> name, marker_context <span class="keyword">in</span> self.marker_contexts.items():</span><br><span class="line">             rospy.logdebug(<span class="string">"Publishing "</span> + name)</span><br><span class="line">             init.markers.append(marker_context.int_marker)</span><br><span class="line">  </span><br><span class="line">         self.init_pub.publish(init)  <span class="comment"># 发布初始的markers</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## @brief Add or replace a marker.</span></span><br><span class="line">   <span class="comment">## Note: Changes to the marker will not take effect until you call applyChanges().</span></span><br><span class="line">   <span class="comment">## The callback changes immediately.</span></span><br><span class="line">   <span class="comment">## @param marker The marker to be added or replaced</span></span><br><span class="line">   <span class="comment">## @param feedback_cb Function to call on the arrival of a feedback message.</span></span><br><span class="line">   <span class="comment">## @param feedback_type Type of feedback for which to call the feedback.</span></span><br><span class="line">   <span class="function"><span class="keyword">def</span> <span class="title">insert</span><span class="params">(self, marker, feedback_cb=<span class="number">-1</span>, feedback_type=DEFAULT_FEEDBACK_CB)</span>:</span></span><br><span class="line">       <span class="comment">#插入marker，其实也是一种update</span></span><br><span class="line">        <span class="keyword">with</span> self.mutex:</span><br><span class="line">            <span class="keyword">try</span>: <span class="comment"># 首先看看要insert的marker是不是在等待update的dict中</span></span><br><span class="line">                update = self.pending_updates[marker.name]</span><br><span class="line">            <span class="keyword">except</span>:<span class="comment"># 不在的话，就新建一个UpdateContext类型，内容是marker</span></span><br><span class="line">                update = UpdateContext()</span><br><span class="line">                self.pending_updates[marker.name] = update</span><br><span class="line">            update.update_type = UpdateContext.FULL_UPDATE  <span class="comment"># 更新的类型，包含pose和颜色等</span></span><br><span class="line">            update.int_marker = marker</span><br><span class="line">        <span class="keyword">if</span> feedback_cb != <span class="number">-1</span>:  <span class="comment"># 是否给该marker添加反馈回调函数，添加的话，当订阅器收到对应marker的feedback之后就会调用回调函数处理。</span></span><br><span class="line">            self.setCallback(marker.name, feedback_cb, feedback_type)</span><br><span class="line">              </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">setCallback</span><span class="params">(self, name, feedback_cb, feedback_type=DEFAULT_FEEDBACK_CB)</span>:</span></span><br><span class="line">       <span class="comment"># 判断marker。name的对应marker，然后修改其回调函数 </span></span><br><span class="line">        <span class="keyword">with</span> self.mutex:</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                marker_context = self.marker_contexts[name]</span><br><span class="line">            <span class="keyword">except</span>:</span><br><span class="line">                marker_context = <span class="literal">None</span></span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                update = self.pending_updates[name]</span><br><span class="line">            <span class="keyword">except</span>:</span><br><span class="line">                update = <span class="literal">None</span></span><br><span class="line">            <span class="keyword">if</span> marker_context <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">and</span> update <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"></span><br><span class="line">            <span class="comment"># we need to overwrite both the callbacks for the actual marker</span></span><br><span class="line">            <span class="comment"># and the update, if there's any</span></span><br><span class="line">            <span class="keyword">if</span> marker_context:</span><br><span class="line">                <span class="comment"># the marker exists, so we can just overwrite the existing callbacks</span></span><br><span class="line">                <span class="keyword">if</span> feedback_type == self.DEFAULT_FEEDBACK_CB:</span><br><span class="line">                    marker_context.default_feedback_cb = feedback_cb</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    <span class="keyword">if</span> feedback_cb:  <span class="comment"># 可以定义多个回调函数</span></span><br><span class="line">                        marker_context.feedback_cbs[feedback_type] = feedback_cb</span><br><span class="line">                    <span class="keyword">else</span>:</span><br><span class="line">                        <span class="keyword">del</span> marker_context.feedback_cbs[feedback_type]</span><br><span class="line">            <span class="keyword">if</span> update:</span><br><span class="line">                <span class="keyword">if</span> feedback_type == self.DEFAULT_FEEDBACK_CB:</span><br><span class="line">                    update.default_feedback_cb = feedback_cb</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    <span class="keyword">if</span> feedback_cb:</span><br><span class="line">                        update.feedback_cbs[feedback_type] = feedback_cb</span><br><span class="line">                    <span class="keyword">else</span>:</span><br><span class="line">                        <span class="keyword">del</span> update.feedback_cbs[feedback_type]</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># update marker pose &amp; call user callback.  回调函数的处理过程</span></span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">processFeedback</span><span class="params">(self, feedback)</span>:</span></span><br><span class="line">          <span class="keyword">with</span> self.mutex:</span><br><span class="line">              <span class="comment"># ignore feedback for non-existing markers</span></span><br><span class="line">              <span class="keyword">try</span>: <span class="comment"># 如果该InteractiveMarkerFeedback指定的Marker不存在则返回，否则找到marker</span></span><br><span class="line">                  marker_context = self.marker_contexts[feedback.marker_name]</span><br><span class="line">              <span class="keyword">except</span>:</span><br><span class="line">                  <span class="keyword">return</span></span><br><span class="line">              <span class="comment"># 不能多个client同时请求处理同个marker，会发生冲突，相当于互斥锁</span></span><br><span class="line">              <span class="keyword">if</span> marker_context.last_client_id != feedback.client_id \</span><br><span class="line">                 <span class="keyword">and</span> (rospy.Time.now() - marker_context.last_feedback).to_sec() &lt; <span class="number">1.0</span>:</span><br><span class="line">                  rospy.logdebug(<span class="string">"Rejecting feedback for "</span> +</span><br><span class="line">                                  feedback.marker_name +</span><br><span class="line">                                 <span class="string">": conflicting feedback from separate clients."</span>)</span><br><span class="line">                  <span class="keyword">return</span></span><br><span class="line">  </span><br><span class="line">              marker_context.last_feedback = rospy.Time.now()</span><br><span class="line">              marker_context.last_client_id = feedback.client_id</span><br><span class="line">  </span><br><span class="line">              <span class="keyword">if</span> feedback.event_type == feedback.POSE_UPDATE:</span><br><span class="line">                  <span class="keyword">if</span> marker_context.int_marker.header.stamp == rospy.Time():</span><br><span class="line">                      <span class="comment"># keep the old header</span></span><br><span class="line">                      <span class="keyword">try</span>:</span><br><span class="line">                          self.doSetPose(self.pending_updates[feedback.marker_name],</span><br><span class="line">                                         feedback.marker_name,</span><br><span class="line">                                         feedback.pose,</span><br><span class="line">                                         marker_context.int_marker.header)</span><br><span class="line">                      <span class="keyword">except</span>:</span><br><span class="line">                          self.doSetPose(<span class="literal">None</span>,</span><br><span class="line">                                         feedback.marker_name,</span><br><span class="line">                                         feedback.pose,</span><br><span class="line">                                         marker_context.int_marker.header)</span><br><span class="line">                  <span class="keyword">else</span>:</span><br><span class="line">                      <span class="keyword">try</span>:</span><br><span class="line">                          self.doSetPose(self.pending_updates[feedback.marker_name],</span><br><span class="line">                                         feedback.marker_name,</span><br><span class="line">                                         feedback.pose,</span><br><span class="line">                                         feedback.header)</span><br><span class="line">                      <span class="keyword">except</span>:</span><br><span class="line">                          self.doSetPose(<span class="literal">None</span>, feedback.marker_name, feedback.pose, feedback.header)</span><br><span class="line">  </span><br><span class="line">          <span class="comment"># call feedback handler</span></span><br><span class="line">          <span class="keyword">try</span>:</span><br><span class="line">              feedback_cb = marker_context.feedback_cbs[feedback.event_type]</span><br><span class="line">              feedback_cb(feedback)</span><br><span class="line">          <span class="keyword">except</span> KeyError:</span><br><span class="line">              <span class="comment">#try:</span></span><br><span class="line">              marker_context.default_feedback_cb(feedback)</span><br><span class="line">              <span class="comment">#except:</span></span><br><span class="line">                  <span class="comment">#pass</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">setPose</span><span class="params">(self, name, pose, header=Header<span class="params">()</span>)</span>:</span></span><br><span class="line">         <span class="keyword">with</span> self.mutex:</span><br><span class="line">             <span class="keyword">try</span>:</span><br><span class="line">                 marker_context = self.marker_contexts[name]</span><br><span class="line">             <span class="keyword">except</span>:</span><br><span class="line">                 marker_context = <span class="literal">None</span></span><br><span class="line">             <span class="keyword">try</span>:</span><br><span class="line">                 update = self.pending_updates[name]</span><br><span class="line">             <span class="keyword">except</span>:</span><br><span class="line">                 update = <span class="literal">None</span></span><br><span class="line">             <span class="comment"># if there's no marker and no pending  for it, we can't update the pose</span></span><br><span class="line">             <span class="keyword">if</span> marker_context <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">and</span> update <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">                 <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">             <span class="keyword">if</span> update <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">and</span> update.update_type == UpdateContext.FULL_UPDATE:</span><br><span class="line">                 <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"> </span><br><span class="line">             <span class="keyword">if</span> header.frame_id <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">or</span> header.frame_id == <span class="string">""</span>:</span><br><span class="line">                 <span class="comment"># keep the old header</span></span><br><span class="line">                 self.doSetPose(update, name, pose, marker_context.int_marker.header)</span><br><span class="line">             <span class="keyword">else</span>:</span><br><span class="line">                 self.doSetPose(update, name, pose, header)</span><br><span class="line">             <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">doSetPose</span><span class="params">(self, update, name, pose, header)</span>:</span></span><br><span class="line">         <span class="keyword">if</span> update <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">             update = UpdateContext()</span><br><span class="line">             update.update_type = UpdateContext.POSE_UPDATE</span><br><span class="line">             self.pending_updates[name] = update</span><br><span class="line">         <span class="keyword">elif</span> update.update_type != UpdateContext.FULL_UPDATE:</span><br><span class="line">             update.update_type = UpdateContext.POSE_UPDATE</span><br><span class="line"> </span><br><span class="line">         update.int_marker.pose = pose</span><br><span class="line">         update.int_marker.header = header</span><br><span class="line">         rospy.logdebug(<span class="string">"Marker '"</span> + name + <span class="string">"' is now at "</span> +</span><br><span class="line">                        str(pose.position.x) + <span class="string">", "</span> + str(pose.position.y) +</span><br><span class="line">                        <span class="string">", "</span> + str(pose.position.z))</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 最重要的函数，只有该函数调用了，所有操作才会生效</span></span><br><span class="line"> 	<span class="function"><span class="keyword">def</span> <span class="title">applyChanges</span><span class="params">(self)</span>:</span></span><br><span class="line">          <span class="keyword">with</span> self.mutex:</span><br><span class="line">              <span class="keyword">if</span> len(self.pending_updates.keys()) == <span class="number">0</span>: <span class="comment"># 没有需要更新的</span></span><br><span class="line">                  <span class="keyword">return</span></span><br><span class="line">              update_msg = InteractiveMarkerUpdate()</span><br><span class="line">              update_msg.type = InteractiveMarkerUpdate.UPDATE</span><br><span class="line">              <span class="keyword">for</span> name, update <span class="keyword">in</span> self.pending_updates.items():</span><br><span class="line">                  <span class="keyword">if</span> update.update_type == UpdateContext.FULL_UPDATE:</span><br><span class="line">                      <span class="keyword">try</span>:</span><br><span class="line">                          marker_context = self.marker_contexts[name]</span><br><span class="line">                      <span class="keyword">except</span>:</span><br><span class="line">                          rospy.logdebug(<span class="string">"Creating new context for "</span> + name)</span><br><span class="line">                          <span class="comment"># create a new int_marker context</span></span><br><span class="line">                          marker_context = MarkerContext()</span><br><span class="line">                          marker_context.default_feedback_cb = update.default_feedback_cb</span><br><span class="line">                          marker_context.feedback_cbs = update.feedback_cbs</span><br><span class="line">                          self.marker_contexts[name] = marker_context</span><br><span class="line">                      marker_context.int_marker = update.int_marker</span><br><span class="line">                      update_msg.markers.append(marker_context.int_marker)</span><br><span class="line">                  <span class="keyword">elif</span> update.update_type == UpdateContext.POSE_UPDATE: <span class="comment"># 只更新pose</span></span><br><span class="line">                      <span class="keyword">try</span>:</span><br><span class="line">                          marker_context = self.marker_contexts[name]</span><br><span class="line">                          marker_context.int_marker.pose = update.int_marker.pose</span><br><span class="line">                          marker_context.int_marker.header = update.int_marker.header</span><br><span class="line">                          pose_update = InteractiveMarkerPose()</span><br><span class="line">                          pose_update.header = marker_context.int_marker.header</span><br><span class="line">                          pose_update.pose = marker_context.int_marker.pose</span><br><span class="line">                          pose_update.name = marker_context.int_marker.name</span><br><span class="line">                          update_msg.poses.append(pose_update)</span><br><span class="line">                      <span class="keyword">except</span>:</span><br><span class="line">                          rospy.logerr(<span class="string">"""\</span></span><br><span class="line"><span class="string">00265 Pending pose update for non-existing marker found. This is a bug in InteractiveMarkerInterface."""</span>)</span><br><span class="line">  </span><br><span class="line">                  <span class="keyword">elif</span> update.update_type == UpdateContext.ERASE: <span class="comment"># erase</span></span><br><span class="line">                      <span class="keyword">try</span>:</span><br><span class="line">                          marker_context = self.marker_contexts[name]</span><br><span class="line">                          <span class="keyword">del</span> self.marker_contexts[name]</span><br><span class="line">                          update_msg.erases.append(name)</span><br><span class="line">                      <span class="keyword">except</span>:</span><br><span class="line">                          <span class="keyword">pass</span></span><br><span class="line">                  self.pending_updates = dict()</span><br><span class="line">  </span><br><span class="line">          self.seq_num += <span class="number">1</span></span><br><span class="line">          self.publish(update_msg)</span><br><span class="line">          self.publishInit()</span><br></pre></td></tr></table></figure>
+<h4 id="Simple-marker-Example"><a href="#Simple-marker-Example" class="headerlink" title="Simple_marker Example"></a>Simple_marker Example</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">import</span> rospy</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> interactive_markers.interactive_marker_server <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> visualization_msgs.msg <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">processFeedback</span><span class="params">(feedback)</span>:</span></span><br><span class="line">    p = feedback.pose.position</span><br><span class="line">    <span class="keyword">print</span> feedback.marker_name + <span class="string">" is now at "</span> + str(p.x) + <span class="string">", "</span> + str(p.y) + <span class="string">", "</span> + str(p.z)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__==<span class="string">"__main__"</span>:</span><br><span class="line">    rospy.init_node(<span class="string">"simple_marker"</span>)  <span class="comment">#初始化进程 </span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># create an interactive marker server on the topic namespace simple_marker</span></span><br><span class="line">    server = InteractiveMarkerServer(<span class="string">"simple_marker"</span>)  <span class="comment"># 创建interactive marker server类的对象， 命名空间是simple_marker</span></span><br><span class="line">    <span class="comment"># 以下部分都是创建interactive marker消息的部分</span></span><br><span class="line">    <span class="comment"># create an interactive marker for our server</span></span><br><span class="line">    int_marker = InteractiveMarker() </span><br><span class="line">    int_marker.header.frame_id = <span class="string">"base_link"</span></span><br><span class="line">    int_marker.name = <span class="string">"my_marker"</span></span><br><span class="line">    int_marker.description = <span class="string">"Simple 1-DOF Control"</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># create a grey box marker</span></span><br><span class="line">    box_marker = Marker()</span><br><span class="line">    box_marker.type = Marker.CUBE</span><br><span class="line">    box_marker.scale.x = <span class="number">0.45</span></span><br><span class="line">    box_marker.scale.y = <span class="number">0.45</span></span><br><span class="line">    box_marker.scale.z = <span class="number">0.45</span></span><br><span class="line">    box_marker.color.r = <span class="number">0.0</span></span><br><span class="line">    box_marker.color.g = <span class="number">0.5</span></span><br><span class="line">    box_marker.color.b = <span class="number">0.5</span></span><br><span class="line">    box_marker.color.a = <span class="number">1.0</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># create a non-interactive control which contains the box</span></span><br><span class="line">    box_control = InteractiveMarkerControl()</span><br><span class="line">    box_control.always_visible = <span class="literal">True</span></span><br><span class="line">    box_control.markers.append( box_marker )</span><br><span class="line"></span><br><span class="line">    <span class="comment"># add the control to the interactive marker</span></span><br><span class="line">    int_marker.controls.append( box_control )</span><br><span class="line"></span><br><span class="line">    <span class="comment"># create a control which will move the box</span></span><br><span class="line">    <span class="comment"># this control does not contain any markers,</span></span><br><span class="line">    <span class="comment"># which will cause RViz to insert two arrows</span></span><br><span class="line">    rotate_control = InteractiveMarkerControl()</span><br><span class="line">    rotate_control.name = <span class="string">"move_x"</span></span><br><span class="line">    rotate_control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS</span><br><span class="line"></span><br><span class="line">    <span class="comment"># add the control to the interactive marker</span></span><br><span class="line">    int_marker.controls.append(rotate_control);</span><br><span class="line"></span><br><span class="line">    <span class="comment"># add the interactive marker to our collection &amp;</span></span><br><span class="line">    <span class="comment"># tell the server to call processFeedback() when feedback arrives for it</span></span><br><span class="line">    server.insert(int_marker, processFeedback) <span class="comment"># 将创建的消息和回调函数注册到interactive marker server中</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 'commit' changes and send to all clients</span></span><br><span class="line">    server.applyChanges() <span class="comment"># 调用server中的函数</span></span><br><span class="line">	rospy.spin()</span><br></pre></td></tr></table></figure>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>所以我们定义了一个interactiveMarker的node，其本质上是构造了InteractiveMarkerServer类，并初始化了InteractiveMarker和对应的回调函数。</p>
+<p>然后InteractiveMarkerServer发布了Markers， 客户端的Rviz则订阅到对应的消息， 同时客户端RViz本省也在接收鼠标，键盘等事件消息，一旦接收到这些msg之后就封装成InteractiveMarkerFeedback的消息发布出去。</p>
+<p>而这些消息则进一步被Server的订阅器接收到，从而将这些消息调用回调函数进行处理，修改Markers的状态，然后再将Update之后的状态发布出去。</p>
+<p>Server的消息再次被RViz订阅到，于是对应调整Markers的显示状态。</p>
+<p>如此往复，完成交互。</p>
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : zhouzongwei <br>
+        
+        原文链接 : <a href>http://yoursite.com/2019/06/26/rviz-interactive-markers/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
+    </div>
+  
+  
+  
+    <div class="social-share" style="margin-top: -2rem" data-wechat-qrcode-title="<p>微信扫一扫</p>" data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>" data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter">
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
+</div>
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async></script>
+  
+
+  
+    <div id="reward">
+  
+    <p id="reward-meta">知识 & 情怀 | 赏或者不赏，我都在这，不声不响</p>
+  
+  <button id="reward-btn">
+    
+    <span>打赏</span>
+  </button>
+  <div id="reward-qrcode">
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/wechatimg.jpg" alt="微信扫一扫, 以资鼓励">
+        <p class="qrcode-meta">微信扫一扫, 以资鼓励</p>
+      </div>
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/alipayimg.jpg" alt="支付宝扫一扫, 再接再厉">
+        <p class="qrcode-meta">支付宝扫一扫, 再接再厉</p>
+      </div>
+    
+  </div>
+
+</div>
+
+<script>
+  (() => {
+    let button = document.querySelector('#reward-btn'),
+      qrcode = document.querySelector('#reward-qrcode'),
+      display = false;
+    
+    button.addEventListener('click', () => {
+      qrcode.style.display = display ? 'none' : 'block'
+      display = !display
+    }, false)
+  })()
+</script>
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+          <i class="iconfont icon-06tags"></i>标签: 
+          
+          <span class="span--tag">
+            <a href="/tags/rviz/">
+              #rviz
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/ros/">
+              #ros
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/InteractiveMarker/">
+              #InteractiveMarker
+            </a>
+          </span>
+          
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
+    
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2019/06/24/ros-server-client/" target="_self">工具使用-ROS中server、client消息传递</a>
+      </div>
+    
+    
+      <div class="nav-next">
+        下一篇:
+        <a href="/2019/06/26/rviz-points-and-lines/" target="_self">工具使用-如何使用ROS在RViz中显示Markers（python版 points and lines 示例）</a>
+        <i class="iconfont icon-next"></i>
+      </div>
+    
+  </nav>
+
+  
+    <a href="#comment" class="comment-anchor"></a>
+<div class="comment-title"><i class="iconfont icon-footprint"></i> 留下足迹 <i class="iconfont icon-footprint"></i></div>
+<div id="vcomments"></div>
+
+<script defer>
+  if( true ) {
+    let path = getRealPath()
+    new Valine({
+      el: "#vcomments",
+      appId: "oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz",
+      appKey: "fWABYGLTAoV1LT4LYzh1PNmQ",
+      notify: false,
+      verify: false,
+      avatar: "robohash",
+      placeholder: "正确填写邮箱, 才能及时收到回复哦♪(^∇^*)",
+      path
+    });
+  }
+</script>
+   
+
+  
+    <script defer>
+const valineAPI = (() => {
+  try {
+    AV.init("oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz", "fWABYGLTAoV1LT4LYzh1PNmQ");
+  } catch(error) {}
+  const isExist = (identity) => {
+    identity = identity || getRealPath();
+    let query = new AV.Query('Timer');
+    return new Promise((resolve, reject) => {
+      query.equalTo("identity", identity);
+      query.find().then(results => {
+        resolve(results.length > 0);
+      }, error => reject(error));
+    })
+  }
+
+  const _get = (identity) => {
+    let query = null;
+    if(identity && identity instanceof Array){
+      let querys = [];
+      for(let i = 0; i < identity.length; ++i) {
+        querys[i] = new AV.Query('Timer');
+        querys[i].equalTo('identity', identity[i]);
+      }
+      query = AV.Query.or.apply(null ,querys);
+    } else {
+      identity = identity || getRealPath();
+      query = new AV.Query("Timer");
+      query.equalTo("identity", identity);
+    }
+
+    return new Promise((resolve, reject) => {
+      query.find()
+      .then(results => resolve(results))
+      .catch(error => reject(error))
+    })
+  }
+
+  const create = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let Todo = AV.Object.extend('Timer');
+      let todo = new Todo();
+      todo.set("times", 1);
+      todo.set("identity", identity);
+      todo.save().then(res => resolve(true), error => reject(error));
+    })
+  }
+
+  const update = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let query = new AV.Query('Timer');
+      query.equalTo("identity", identity);
+      query.find().then(todos => {
+        todos.forEach(todo => {
+          todo.set("times", todo.attributes.times + 1);
+        });
+        return AV.Object.saveAll(todos);
+      }).then(todos => resolve(true), error => reject(error));
+    })
+  }
+
+  return {
+    isExist,
+    _get,
+    update,
+    create
+  }
+})()
+
+const calcAndWriteTimes = () => {
+  let isPost = true;
+
+  let timerAllDOM = document.querySelectorAll(".article-timer");
+
+  if(isPost) {
+    let identity = timerAllDOM[0].getAttribute("data-identity");
+    valineAPI.isExist(identity)
+    .then(exist => {
+      if(exist) {
+        return valineAPI.update(identity);
+      }
+      return new Promise(resolve => resolve(true));
+    })
+    .then( succuess => valineAPI._get(identity))
+    .then( result => timerAllDOM[0].innerText = result[0].attributes.times)
+    .catch(error => console.log(error.message))
+    return ;
+  }
+
+  let timerDOMCache = {};
+
+  for(let timerDOM of timerAllDOM) {
+    let identity = timerDOM.getAttribute("data-identity");
+    if(timerDOMCache.hasOwnProperty(identity)){
+      timerDOMCache[identity].dom.push(timerDOM);
+    }else{
+      timerDOMCache[identity] = {
+        dom: [timerDOM],
+        times: undefined
+      };
+    }
+  }
+
+  let identities = Object.keys(timerDOMCache);
+  valineAPI._get(identities).then(results => {
+    for(let result of results) {
+      let {identity, times} = result.attributes;
+      timerDOMCache[identity].times = times;
+      timerDOMCache[identity].dom.map(item => item.innerText = times);
+    }
+    for(let identity of identities) {
+      if(timerDOMCache[identity].times){
+        continue;
+      }
+      timerDOMCache[identity].dom.map(item => item.innerText = 1);
+      valineAPI.create(identity);
+    }
+  }).catch(error => console.log(error.message))
+}
+
+if(true){
+  calcAndWriteTimes();
+}
+</script>
+   
+
+</div>
+
+
+      <footer>
+  <p class="site-info">
+    博客已萌萌哒运行<span id="time-to-now"></span><span class="my-face">(●'◡'●)ﾉ♥</span>
+    <br>
+    Theme - <a href="https://github.com/dongyuanxin/theme-bmw">BMW</a> | Made With 💗 | Powered by <a href="https://godbmw.com/">GodBMW</a>
+    <br>
+    
+  </p>
+</footer>
+
+
+
+<script>
+const timeToNowDOM = document.querySelector("#time-to-now");
+const startTimestamp = new Date(2018, 1, 10).getTime();
+
+const updateTimeStr = () => {
+  let offset = parseInt(
+      (new Date().getTime() - startTimestamp) / 1000,
+      10
+    ),
+    day = Math.floor(offset / 86400),
+    hour = Math.floor((offset % 86400) / 3600),
+    minute = Math.floor(((offset % 86400) % 3600) / 60),
+    second = Math.floor(((offset % 86400) % 3600) % 60);
+  timeToNowDOM.innerHTML =
+    day + "天" + hour + "小时" + minute + "分钟" + second + "秒";
+  setTimeout(updateTimeStr, 500);
+}
+
+setTimeout(updateTimeStr, 500);
+</script>
+
+
+      <div class="back-to-top hidden">
+  <span>
+    <i class="iconfont icon-60"></i><span></span>%
+  </span>
+</div>
+
+<script>
+const updateIconToTop = percent => {
+  let dom = document.querySelector(".back-to-top span span");
+  dom.innerText = percent;
+  if(percent < 1) {
+    document.querySelector(".back-to-top").className = "back-to-top hidden";
+  } else {
+    document.querySelector(".back-to-top").className = "back-to-top";
+  }
+}
+
+const handleScoll = () => {
+  let isRunning = false;
+  return () => {
+    if (isRunning) return;
+    isRunning = true;
+    window.requestAnimationFrame(timestamp => {
+      let scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop,
+        scrollHeight =
+          document.documentElement.scrollHeight ||
+          document.body.scrollHeight,
+        clientHeight =
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+      isRunning = false;
+      if (scrollTop <= 1) {
+        updateIconToTop(0);
+        return;
+      }
+      if (scrollTop + clientHeight >= scrollHeight) {
+        updateIconToTop(100);
+      } else {
+        updateIconToTop(parseInt(
+          100 * scrollTop / (scrollHeight - clientHeight),
+          10
+        ));
+      }
+    });
+  };
+}
+
+const backToTop = () => {
+  let scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop,
+    delay = 10,
+    time = 200;
+  if (scrollTop <= 20) {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    return;
+  }
+  let step = Math.ceil(scrollTop * delay / time);
+  let timer = setInterval(() => {
+    scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollTop - step <= 0) {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      clearInterval(timer);
+    } else {
+      document.documentElement.scrollTop = scrollTop - step;
+      document.body.scrollTop = scrollTop - step;
+    }
+  }, delay);
+}
+
+document.addEventListener("scroll", handleScoll(), false);
+
+document.querySelector(".back-to-top").addEventListener("click", backToTop, false);
+
+</script>
+
+    </div>
+
+    
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+<script>
+  (() => {
+    const mathjaxConfig = {
+      showProcessingMessages: false, //关闭js加载过程信息
+      messageStyle: "none", //不显示信息
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]], //行内公式选择符
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]], //段内公式选择符
+        skipTags: ["script", "noscript", "style", "textarea", "pre", "code", "a"] //避开某些标签
+      },
+      "HTML-CSS": {
+        availableFonts: ["STIX", "TeX"], //可选字体
+        showMathMenu: false //关闭右击菜单显示
+      }
+    }
+
+    let mathjaxInterval = setInterval(() => {
+      if(!window.MathJax){
+        return;
+      }
+      window.MathJax.Hub.Config(mathjaxConfig)
+      window.MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById('app')])
+
+      clearInterval(mathjaxInterval)
+    }, 10)    
+  })()
+</script>
+    
+
+    <script src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script>
+<script async>
+  let fancyTimer = setInterval(function(){
+    if(!window.$){
+      return;
+    }
+    $(document).ready(function() {
+      $(".post img").each(function () {
+        if($(this).parent().get(0).tagName.toLowerCase() === "a") {
+          return;
+        }
+        // $(this).attr("data-fancybox", "gallery"); // if you add 'data-fancybox', img will display after showed
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "gallery");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      });
+      
+      clearInterval(fancyTimer);
+    });
+  }, 10);
+</script>
+
+    
+  </body>
+
+</html>
