@@ -181,6 +181,145 @@
   
   <div class="post">
     <h1 class="article-title">
+      <a href="/2019/05/22/relationNetwork/">
+        <span>阅读笔记-Relation Network for Object Detection</span>
+      </a>
+    </h1>
+    <!-- PC端文章信息 -->
+    <div class="article-top-meta pc-view">
+      <span>
+        发布时间 : 2019-05-22
+      </span>
+    </div>
+    <!-- 移动端文章信息 -->
+    <div class="article-top-meta mobile-view">
+      <span>
+        发布 : 2019-05-22
+      </span>
+      
+      
+        <span>
+          浏览 : <span class="article-timer" data-identity="relationNetwork"></span>
+        </span>
+      
+    </div>
+    
+    <!-- 文章简介 -->
+    <div class="article-content">
+      <div class="markdown-body article-content--inner" v-html="mdToHtml(psg.summary)">
+        <p><img src="/2019/05/22/relationNetwork/title.png" alt="title"></p>
+<p>在目标检测领域，深度学习(RCNN系列，YOLO系列，SSD系列)方法取得了很大的成功，但是这些检测方法考虑的仅仅是目标的个体，而没有考虑一帧图像中目标之间的相互影响，所以本文提出一种<strong>object relation module</strong> ,通过考虑目标集合中个体的交互关系来辅助目标的检测。该模块参数很少能够很方便的嵌入到已有的网络中，提高目标检测性能，另外本文使用该模块实现duplicate removal（NMS实现的功能），从而能够实现网络的end-to-end学习。</p>
+      </div>
+    </div>
+    <div class="article-footer">
+      <div class="article-meta pull-left">
+        <!-- 分类pc端可见 -->
+        <span class="pc-view">
+          
+        <span>
+          
+            <i class="iconfont icon-06tags"></i>标签:
+            
+              <span class="span--tag">
+                <a href="/tags/Relation-Network/">
+                  #Relation Network
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/Object-Detection/">
+                  #Object Detection
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/GCN/">
+                  #GCN
+                </a>
+              </span>
+            
+                    
+        </span>
+      </span></div>
+      
+        <div class="article-meta pull-right">
+          <span class="pc-view">
+            <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="relationNetwork"></span>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+  
+  <div class="post">
+    <h1 class="article-title">
+      <a href="/2019/05/21/repulsion-loss/">
+        <span>阅读笔记-Repulsion loss:Detecting Pedestrians in a Crowd</span>
+      </a>
+    </h1>
+    <!-- PC端文章信息 -->
+    <div class="article-top-meta pc-view">
+      <span>
+        发布时间 : 2019-05-21
+      </span>
+    </div>
+    <!-- 移动端文章信息 -->
+    <div class="article-top-meta mobile-view">
+      <span>
+        发布 : 2019-05-21
+      </span>
+      
+      
+        <span>
+          浏览 : <span class="article-timer" data-identity="repulsion-loss"></span>
+        </span>
+      
+    </div>
+    
+    <!-- 文章简介 -->
+    <div class="article-content">
+      <div class="markdown-body article-content--inner" v-html="mdToHtml(psg.summary)">
+        <p>尽管目标检测目前已经取得了非常好的性能，但是针对于特定领域内的跟踪方法还可以进一步探讨。本篇文章的研究重点在于更好的检测拥挤场景下的行人。</p>
+<p>文章首先分析了拥挤场景下SOTA检测方法存在的问题，然后提出了一种针对于拥挤场景专门设计的回归损失。该损失函数的启发源主要有两点：预测框应该尽可能和目标接近；同时预测框应尽可能地与surrounding目标区分。</p>
+<p>实验证明本文提出的损失函数能够在拥挤场景中很大提升SOTA方法的性能。</p>
+      </div>
+    </div>
+    <div class="article-footer">
+      <div class="article-meta pull-left">
+        <!-- 分类pc端可见 -->
+        <span class="pc-view">
+          
+        <span>
+          
+            <i class="iconfont icon-06tags"></i>标签:
+            
+              <span class="span--tag">
+                <a href="/tags/Pedestrian-Detection/">
+                  #Pedestrian Detection
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/Repulsion-Loss/">
+                  #Repulsion Loss
+                </a>
+              </span>
+            
+                    
+        </span>
+      </span></div>
+      
+        <div class="article-meta pull-right">
+          <span class="pc-view">
+            <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="repulsion-loss"></span>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+  
+  <div class="post">
+    <h1 class="article-title">
       <a href="/2019/05/21/MOT-overview-3rd/">
         <span>多目标跟踪总结(下)-资源汇总</span>
       </a>
@@ -730,70 +869,13 @@
     </div>
   </div>
   
-  <div class="post">
-    <h1 class="article-title">
-      <a href="/2019/05/17/hello-world/">
-        <span>hello world</span>
-      </a>
-    </h1>
-    <!-- PC端文章信息 -->
-    <div class="article-top-meta pc-view">
-      <span>
-        发布时间 : 2019-05-17
-      </span>
-    </div>
-    <!-- 移动端文章信息 -->
-    <div class="article-top-meta mobile-view">
-      <span>
-        发布 : 2019-05-17
-      </span>
-      
-      
-        <span>
-          浏览 : <span class="article-timer" data-identity="hello-world"></span>
-        </span>
-      
-    </div>
-    
-    <!-- 文章简介 -->
-    <div class="article-content">
-      <div class="markdown-body article-content--inner" v-html="mdToHtml(psg.summary)">
-        <h3 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World"></a>Hello World</h3><p>使用Hexo + GithubPage创建个人网站总结与验证。</p>
-      </div>
-    </div>
-    <div class="article-footer">
-      <div class="article-meta pull-left">
-        <!-- 分类pc端可见 -->
-        <span class="pc-view">
-          
-        <span>
-          
-            <i class="iconfont icon-06tags"></i>标签:
-            
-              <span class="span--tag">
-                <a href="/tags/test/">
-                  #test
-                </a>
-              </span>
-            
-                    
-        </span>
-      </span></div>
-      
-        <div class="article-meta pull-right">
-          <span class="pc-view">
-            <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="hello-world"></span>
-          </span>
-        </div>
-      
-    </div>
-  </div>
-  
 
   <nav class="page-navigation">
     
       <a href="/page/3/">上一页</a>
     
+    
+      <a href="/page/5/">下一页</a>
     
   </nav>
 

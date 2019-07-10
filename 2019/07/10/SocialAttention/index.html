@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta name="author" content="董沅鑫, yuanxin.me@gmail.com">
+  
+  
+  
+  <title>阅读笔记-Social Attention Modeling Attention in Human Crowds | YixiaoZhou&#39;s blog</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="ST-Graph,Attention,trajectory prediction,">
+  
+
+  <script>
+    console.log('\n%c Hexo-theme-bmw v4.0 ' + '%c 🎉 https://github.com/dongyuanxin/theme-bmw 🎉\n' + '\n%c View demo online ' + '%c 🔍 https://godbmw.com/ 🔍  \n' , 'color: #fadfa3; background: #030307; padding:3px 0;', '', 'color: #fadfa3; background: #030307; padding:3px 0;', '');
+  </script>
+
+  
+    <meta name="description" content="海阔全是浪，天高皆是霾。">
+  
+
+  
+
+  
+    <link rel="icon" href="/images/fvatar2.png">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/icon/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+  <script src="/js/util.js"></script>
+<script src="/js/valine.min.js"></script>
+
+  
+
+  
+    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
+  
+
+  
+    <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
+  
+  
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js" async></script>
+  
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.0/dist/av-min.js"></script>
+  
+
+</head>
+
+  <body>
+
+    
+
+    <div id="app">
+
+      <div class="header-wrap">
+  <header>
+    <div class="site-brand">
+      <div class="site-title">
+        <a href="/">YiXiaoZhou</a>
+      </div>
+    </div>
+    <nav class="site-navigation">
+      <ul class="nav-menu">
+      
+        <li class="nav-item" data-path="/">
+          
+            <a href="/" target="_self">
+              主页
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          
+            <a href="/archives/" target="_self">
+              归档
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          
+            <a href="/friends/" target="_self">
+              友链
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          
+            <a href="/about/" target="_self">
+              关于
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path>
+          
+            <a href="javascript:void(0);" v-else>抓到我</a>
+            <ul class="nav-menu--dropdown">
+              
+                <li>
+                  <a href="https://github.com/ZongweiZhou1" target="_blank">
+                    Github
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://www.facebook.com/duncon.chou" target="_blank">
+                    Facebook
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://weibo.com/u/3231820650/home?wvr=5" target="_self">
+                    weibo
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+      </ul>
+    </nav>
+    <i class="iconfont icon-menu"></i>
+  </header>
+</div>
+
+<script>
+  let links = document.querySelectorAll('.nav-item');
+  for(let link of links){
+    let childrenLink = link.querySelector('ul');
+    link.addEventListener('mouseenter', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown active";
+      }
+    })
+    link.addEventListener('mouseleave', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown";
+      }
+    })
+  }
+  let rootRealPath = getRealPath(window.location.pathname, true);
+  for(let link of links) {
+    let linkPath = link.getAttribute("data-path");
+    if(linkPath && getRealPath(linkPath, true) === rootRealPath) {
+      link.className = "nav-item hover";
+    }
+  }
+
+  let iconMenu = document.querySelector("i.iconfont.icon-menu"),
+    iconMenuClicked = false;
+  let navDOM = document.querySelector("nav.site-navigation");
+  iconMenu.addEventListener("click", () => {
+    iconMenuClicked 
+      ? navDOM.className = "site-navigation active"
+      : navDOM.className = "site-navigation";
+    iconMenuClicked = !iconMenuClicked;
+  })
+</script>
+
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
+  
+
+<div class="post">
+  <h1 class="article-title">
+    <span>阅读笔记-Social Attention Modeling Attention in Human Crowds</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2019-07-10
+    </span>
+    
+    
+      <span>
+        浏览 : <span class="article-timer" data-identity="SocialAttention"></span>
+      </span>
+    
+  </div>
+
+  
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <h4 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h4><p>机器人在拥挤场景下的导航需要能够预测准确，有效的行人轨迹。之前的方法在预测行人轨迹时将行人之间的交互建模为临近度函数。 但这种假设有时候并不成立，比如距离近的目标可能因为和机器人的速度方向一致从而相对于较远的速度不一致的目标对于冲突规避的影响反而小。所以这篇文章不是基于距离度量刻画目标之间的相互影响，而是通过一种Social Attention的机制去刻画行人之间的相互影响的权重。</p>
+<h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><ol>
+<li>早期的一部分工作是从crowds场景中建模独立个体的运动模式，从而预测每个目标的运动轨迹。但这种方法每个个体独立，并没有考虑行人之间可能存在的相互影响，进而导致robot的路径规划是次优的。</li>
+<li>另外一些方法通过空间局部交互模型建模交互目标的未来轨迹的联合分布实现轨迹预测。这种方法能够建模轨迹之间的相互影响，但是该类方法只考虑了局部邻域内的其他目标， 而在真实场景中往往并不是这样。比如走廊对面迎面走过去的两个人，即使相距很远，对对方速度也是有影响的；同样的如果两个人很近但是相反方向运动，那么并不会对对方产生影响。所以行人与行人之间的相互作用并不局限于相对距离，与速度，目的地等都有关系。</li>
+<li>这篇文章提出利用RNN建模crowd场景中多人的轨迹状态，同时考虑时空线索。 human-human之间交互通过soft attention方式建模，而不仅仅考虑局部邻域目标。</li>
+</ol>
+<h4 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h4><p>假设每一帧图像上目标都可以检测和跟踪。当然允许目标在任意时刻进入、离开视野。时刻$t$ 的agent $i$的坐标位置表示为$(x_i^t, y_i^t)$, 于是问题可以定义为：</p>
+<p>给定时刻$t=1, \cdots, T_{obs}$中agents的位置坐标$\{(x_i^t, y_i^t)|i=1, 2, \cdots, N\}$, 希望预测每条轨迹的未来的位置$\{(\hat{x}_i^t, \hat{y}_i^t)| t=T_{obs+1}, \cdots, T_{pred}\}​$</p>
+<h4 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h4><p>文章主要解决的问题，是针对于局部邻域内目标相互影响的一类方法，回答</p>
+<blockquote>
+<p>Which surrounding agents do humans attend to, while navigating a crowd?</p>
+</blockquote>
+<p>就是希望能够从数据中抽取特征并推理出目标之间相互影响的程度。</p>
+<h5 id="Spatio-Temporal-Graph-Representation"><a href="#Spatio-Temporal-Graph-Representation" class="headerlink" title="Spatio-Temporal Graph Representation"></a>Spatio-Temporal Graph Representation</h5><p>使用时空图刻画时许中agents之间的关系$\mathcal{G}=(\mathcal{V, \varepsilon_S, \varepsilon_T})$, 分别表示所有的agents和空域，时域的关联边集合， 如下图所示2帧之间的st-graph</p>
+<p><img src="/2019/07/10/SocialAttention/st_graph example.png" alt></p>
+<p>时刻$t$中顶点$v$关联的特征向量是$x_v^t=(x_v^t, y_v^t)$， 里面对应的是两个方向的坐标值，注意不要混淆。 空间边$(u, v)\in\varepsilon_s$关联的特征向量$x_{uv}^t = (x_{uv}^t, y_{uv}^t)$表示当前时刻从$u$到$v$的矢量。类似的，时间边$(u, u)\in \varepsilon_T$关联的特征向量$x_{uu}^t=(x_{uu}^t, y_{uu}^t)$表示从$t-1$到$t$时刻的向量，于是得到下图：</p>
+<p><img src="/2019/07/10/SocialAttention/st.png" alt></p>
+<p>最左边的是rolled st图， 中间是将左图按照时间展开的图，每条边和顶点都对应其关联的特征向量。右图是接下来要将的网络待学习的权重参数。</p>
+<h5 id="Model-Attention"><a href="#Model-Attention" class="headerlink" title="Model Attention"></a>Model Attention</h5><p>整个模型共包含3个部分：nodeRNN， EdgeRNN和Attention Module。其中Attention Module刻画了每个节点关联到的时空边的关系，然后得到一个综合的时空边特征，该特征与节点的特征融合送入NodeRNN中估计node的状态。</p>
+<p><img src="/2019/07/10/SocialAttention/rnn.png" alt="rnn"></p>
+<ul>
+<li><p>EdgeRNN</p>
+<p>Fig3的左图所示，标准的RNN模型，输入特征经过一定的embeding，送入RNN模块中刻画当前时刻的特征。</p>
+<script type="math/tex; mode=display">
+e_{uv}^t = \phi(x_{uv}^t; W_{spatial}^e)\\
+h_{uv}^t = RNN(h_{uv}^{t-1}, e_{uv}^T; W_{spatial}^r)</script></li>
+</ul>
+<ul>
+<li><p>Attention Module</p>
+<p>Fig3的中间图所示，其目的是想获得与该顶点相关联的边对于当前顶点变化的影响。$h_{vv}$ 表示该顶点的自相关向量， $h_{v.}$表示该顶点射出去的边的特征， 经过标准的scaled dot product attention方法获得每个$h_{vv}, h_{vk}$的相似度</p>
+<script type="math/tex; mode=display">
+score(h_{vv}^t, h_{v.}^t) = \frac{m}{\sqrt{d_e}}<W_1h_{vv}^t, W_2h_{v.}^t></script><p>于是加权之后的时空边赋予顶点的特征为：</p>
+<script type="math/tex; mode=display">
+H_v^t = \sum_{i=1}^m\frac{\exp{score(h_{vv}^t, h_{v.}^t)}}{\sum\exp{score(h_{vv}^t, h_{v.}^t)}}\cdot h_{vi}^t</script></li>
+<li><p>Node RNN</p>
+<p>Fig3的右图显示的Node RNN的结构，其相对于标准的RNN只是将时空边提供node的特征向量与顶点本身的特征向量进行了embeding，然后送到RNN结构中。</p>
+<script type="math/tex; mode=display">
+e_v^t= \phi(x_v^t; W_{node}^e)\\
+a_v^t = \phi(concat(h_{vv}^t, H_v^t); W_{node}^h)\\
+h_v^t = RNN(h_v^{t-1}, concat(e_v^t, a_v^t); W_{node}^r)</script></li>
+<li><p>最终得到预估的2d高斯分布参数</p>
+<script type="math/tex; mode=display">
+(\mu_v^{t+1}, \sigma_v^{t+1}, \rho_v^{t+1}) = W_{node}^oh_v^t</script></li>
+</ul>
+<h5 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h5><p>训练的过程中希望最大后验概率， 于是损失函数采用交叉熵损失：</p>
+<script type="math/tex; mode=display">
+L_v = -\sum_{t=T_{obs+1}}^{T_{pred}}\log(P(x_v^t, y_v^t|\mu_v^{t}, \sigma_v^{t}, \rho_v^{t}))</script><h5 id="推理过程"><a href="#推理过程" class="headerlink" title="推理过程"></a>推理过程</h5><p>首先利用观测到的前$T_{obs}$帧结果放到网络中然后预测得到后续时刻的高斯分布参数， 再从这些高斯分布中采样得到每一时刻的预测位置。</p>
+<script type="math/tex; mode=display">
+(\hat{x}_v^t, \hat{y}_v^t)\sim \mathcal{N}(\mu_v^{t+1}, \sigma_v^{t+1}, \rho_v^{t+1})</script><p>这个采样过程是不确定的，只知道服从对应的高斯分布。在未知准确的位置时，比如$T_{obs}+1$时刻，使用预测的值代替真实的位置继续评估后续时刻的高斯参数。</p>
+<h4 id="评估"><a href="#评估" class="headerlink" title="评估"></a>评估</h4><ul>
+<li><p>所使用的数据集 ETH, UCY总共 5个结合， 1536个行人， 帧率25FPS， 每隔10帧标注一次。在使用的过程中通过插值的方式是的每一帧都有对应的gt。</p>
+</li>
+<li><p>评估指标。</p>
+<ul>
+<li>Average Displacement Error， 逐一统计每一时刻的预测值和真实值的偏差，然后计算均值。</li>
+<li>Final Displacement Error， 只计算$T_{pred}$之后的预测位置和真实位置的偏差均值。</li>
+</ul>
+</li>
+<li><p>操作细节</p>
+<p>nodeRNN的隐状态长度128， edgeRNN隐状态长度256， embedding层的长度64， 激活函数ReLU。 batchsize=8， lr=0.001， 训练了100个epoch。</p>
+<p>代码： github：<a href="https://github.com/BenJamesbabala/srnn-pytorch" target="_blank" rel="noopener">srnn-pytorch</a> </p>
+</li>
+<li><p>定量的实验结果</p>
+<p><img src="/2019/07/10/SocialAttention/tables.png" alt="tables"></p>
+</li>
+<li><p>定性分析</p>
+<p><img src="/2019/07/10/SocialAttention/attention.png" alt="attention"></p>
+<p>论文给出了一些attention的示例， 上图中圈的大小表示了相对attention权重的大小， 蓝色顶点表示当前时刻的每条轨迹的位置， 红色的轨迹是主体轨迹， abc图是成功的案例， def则存在着一些问题需要在未来工作中解决。d中深绿色的轨迹距离较远且速度方向不同但权重却挺大。同样的e中浅绿色的轨迹， f中更明显，几乎静止的运动反方向点却对轨迹预测影响很大，这些问题都需要进一步解决。</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><blockquote>
+<p>In this work, we have presented an attention-based trajectory prediction model, Social Attention, that learns the relative influence of each pedestrian in the crowd on the planing behavior of the other, and accurately predicts their future trajectories.  We use an RNN mixture to model both the temporal and spatial dynamics of trajectories in human crowds. The resulting model is feedforward, fully-differentiable, and is jointly trained to capture human-human interactions between pedestrians.</p>
+</blockquote>
+</li>
+</ul>
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : zhouzongwei <br>
+        
+        原文链接 : <a href>http://yoursite.com/2019/07/10/SocialAttention/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
+    </div>
+  
+  
+  
+    <div class="social-share" style="margin-top: -2rem" data-wechat-qrcode-title="<p>微信扫一扫</p>" data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>" data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter">
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
+</div>
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async></script>
+  
+
+  
+    <div id="reward">
+  
+    <p id="reward-meta">知识 & 情怀 | 赏或者不赏，我都在这，不声不响</p>
+  
+  <button id="reward-btn">
+    
+    <span>打赏</span>
+  </button>
+  <div id="reward-qrcode">
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/wechatimg.jpg" alt="微信扫一扫, 以资鼓励">
+        <p class="qrcode-meta">微信扫一扫, 以资鼓励</p>
+      </div>
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/alipayimg.jpg" alt="支付宝扫一扫, 再接再厉">
+        <p class="qrcode-meta">支付宝扫一扫, 再接再厉</p>
+      </div>
+    
+  </div>
+
+</div>
+
+<script>
+  (() => {
+    let button = document.querySelector('#reward-btn'),
+      qrcode = document.querySelector('#reward-qrcode'),
+      display = false;
+    
+    button.addEventListener('click', () => {
+      qrcode.style.display = display ? 'none' : 'block'
+      display = !display
+    }, false)
+  })()
+</script>
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+          <i class="iconfont icon-06tags"></i>标签: 
+          
+          <span class="span--tag">
+            <a href="/tags/ST-Graph/">
+              #ST-Graph
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/Attention/">
+              #Attention
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/trajectory-prediction/">
+              #trajectory prediction
+            </a>
+          </span>
+          
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
+    
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2019/06/27/pytorch-notes/" target="_self">pytorch_notes</a>
+      </div>
+    
+    
+  </nav>
+
+  
+    <a href="#comment" class="comment-anchor"></a>
+<div class="comment-title"><i class="iconfont icon-footprint"></i> 留下足迹 <i class="iconfont icon-footprint"></i></div>
+<div id="vcomments"></div>
+
+<script defer>
+  if( true ) {
+    let path = getRealPath()
+    new Valine({
+      el: "#vcomments",
+      appId: "oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz",
+      appKey: "fWABYGLTAoV1LT4LYzh1PNmQ",
+      notify: false,
+      verify: false,
+      avatar: "robohash",
+      placeholder: "正确填写邮箱, 才能及时收到回复哦♪(^∇^*)",
+      path
+    });
+  }
+</script>
+   
+
+  
+    <script defer>
+const valineAPI = (() => {
+  try {
+    AV.init("oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz", "fWABYGLTAoV1LT4LYzh1PNmQ");
+  } catch(error) {}
+  const isExist = (identity) => {
+    identity = identity || getRealPath();
+    let query = new AV.Query('Timer');
+    return new Promise((resolve, reject) => {
+      query.equalTo("identity", identity);
+      query.find().then(results => {
+        resolve(results.length > 0);
+      }, error => reject(error));
+    })
+  }
+
+  const _get = (identity) => {
+    let query = null;
+    if(identity && identity instanceof Array){
+      let querys = [];
+      for(let i = 0; i < identity.length; ++i) {
+        querys[i] = new AV.Query('Timer');
+        querys[i].equalTo('identity', identity[i]);
+      }
+      query = AV.Query.or.apply(null ,querys);
+    } else {
+      identity = identity || getRealPath();
+      query = new AV.Query("Timer");
+      query.equalTo("identity", identity);
+    }
+
+    return new Promise((resolve, reject) => {
+      query.find()
+      .then(results => resolve(results))
+      .catch(error => reject(error))
+    })
+  }
+
+  const create = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let Todo = AV.Object.extend('Timer');
+      let todo = new Todo();
+      todo.set("times", 1);
+      todo.set("identity", identity);
+      todo.save().then(res => resolve(true), error => reject(error));
+    })
+  }
+
+  const update = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let query = new AV.Query('Timer');
+      query.equalTo("identity", identity);
+      query.find().then(todos => {
+        todos.forEach(todo => {
+          todo.set("times", todo.attributes.times + 1);
+        });
+        return AV.Object.saveAll(todos);
+      }).then(todos => resolve(true), error => reject(error));
+    })
+  }
+
+  return {
+    isExist,
+    _get,
+    update,
+    create
+  }
+})()
+
+const calcAndWriteTimes = () => {
+  let isPost = true;
+
+  let timerAllDOM = document.querySelectorAll(".article-timer");
+
+  if(isPost) {
+    let identity = timerAllDOM[0].getAttribute("data-identity");
+    valineAPI.isExist(identity)
+    .then(exist => {
+      if(exist) {
+        return valineAPI.update(identity);
+      }
+      return new Promise(resolve => resolve(true));
+    })
+    .then( succuess => valineAPI._get(identity))
+    .then( result => timerAllDOM[0].innerText = result[0].attributes.times)
+    .catch(error => console.log(error.message))
+    return ;
+  }
+
+  let timerDOMCache = {};
+
+  for(let timerDOM of timerAllDOM) {
+    let identity = timerDOM.getAttribute("data-identity");
+    if(timerDOMCache.hasOwnProperty(identity)){
+      timerDOMCache[identity].dom.push(timerDOM);
+    }else{
+      timerDOMCache[identity] = {
+        dom: [timerDOM],
+        times: undefined
+      };
+    }
+  }
+
+  let identities = Object.keys(timerDOMCache);
+  valineAPI._get(identities).then(results => {
+    for(let result of results) {
+      let {identity, times} = result.attributes;
+      timerDOMCache[identity].times = times;
+      timerDOMCache[identity].dom.map(item => item.innerText = times);
+    }
+    for(let identity of identities) {
+      if(timerDOMCache[identity].times){
+        continue;
+      }
+      timerDOMCache[identity].dom.map(item => item.innerText = 1);
+      valineAPI.create(identity);
+    }
+  }).catch(error => console.log(error.message))
+}
+
+if(true){
+  calcAndWriteTimes();
+}
+</script>
+   
+
+</div>
+
+
+      <footer>
+  <p class="site-info">
+    博客已萌萌哒运行<span id="time-to-now"></span><span class="my-face">(●'◡'●)ﾉ♥</span>
+    <br>
+    Theme - <a href="https://github.com/dongyuanxin/theme-bmw">BMW</a> | Made With 💗 | Powered by <a href="https://godbmw.com/">GodBMW</a>
+    <br>
+    
+  </p>
+</footer>
+
+
+
+<script>
+const timeToNowDOM = document.querySelector("#time-to-now");
+const startTimestamp = new Date(2018, 1, 10).getTime();
+
+const updateTimeStr = () => {
+  let offset = parseInt(
+      (new Date().getTime() - startTimestamp) / 1000,
+      10
+    ),
+    day = Math.floor(offset / 86400),
+    hour = Math.floor((offset % 86400) / 3600),
+    minute = Math.floor(((offset % 86400) % 3600) / 60),
+    second = Math.floor(((offset % 86400) % 3600) % 60);
+  timeToNowDOM.innerHTML =
+    day + "天" + hour + "小时" + minute + "分钟" + second + "秒";
+  setTimeout(updateTimeStr, 500);
+}
+
+setTimeout(updateTimeStr, 500);
+</script>
+
+
+      <div class="back-to-top hidden">
+  <span>
+    <i class="iconfont icon-60"></i><span></span>%
+  </span>
+</div>
+
+<script>
+const updateIconToTop = percent => {
+  let dom = document.querySelector(".back-to-top span span");
+  dom.innerText = percent;
+  if(percent < 1) {
+    document.querySelector(".back-to-top").className = "back-to-top hidden";
+  } else {
+    document.querySelector(".back-to-top").className = "back-to-top";
+  }
+}
+
+const handleScoll = () => {
+  let isRunning = false;
+  return () => {
+    if (isRunning) return;
+    isRunning = true;
+    window.requestAnimationFrame(timestamp => {
+      let scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop,
+        scrollHeight =
+          document.documentElement.scrollHeight ||
+          document.body.scrollHeight,
+        clientHeight =
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+      isRunning = false;
+      if (scrollTop <= 1) {
+        updateIconToTop(0);
+        return;
+      }
+      if (scrollTop + clientHeight >= scrollHeight) {
+        updateIconToTop(100);
+      } else {
+        updateIconToTop(parseInt(
+          100 * scrollTop / (scrollHeight - clientHeight),
+          10
+        ));
+      }
+    });
+  };
+}
+
+const backToTop = () => {
+  let scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop,
+    delay = 10,
+    time = 200;
+  if (scrollTop <= 20) {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    return;
+  }
+  let step = Math.ceil(scrollTop * delay / time);
+  let timer = setInterval(() => {
+    scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollTop - step <= 0) {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      clearInterval(timer);
+    } else {
+      document.documentElement.scrollTop = scrollTop - step;
+      document.body.scrollTop = scrollTop - step;
+    }
+  }, delay);
+}
+
+document.addEventListener("scroll", handleScoll(), false);
+
+document.querySelector(".back-to-top").addEventListener("click", backToTop, false);
+
+</script>
+
+    </div>
+
+    
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+<script>
+  (() => {
+    const mathjaxConfig = {
+      showProcessingMessages: false, //关闭js加载过程信息
+      messageStyle: "none", //不显示信息
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]], //行内公式选择符
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]], //段内公式选择符
+        skipTags: ["script", "noscript", "style", "textarea", "pre", "code", "a"] //避开某些标签
+      },
+      "HTML-CSS": {
+        availableFonts: ["STIX", "TeX"], //可选字体
+        showMathMenu: false //关闭右击菜单显示
+      }
+    }
+
+    let mathjaxInterval = setInterval(() => {
+      if(!window.MathJax){
+        return;
+      }
+      window.MathJax.Hub.Config(mathjaxConfig)
+      window.MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById('app')])
+
+      clearInterval(mathjaxInterval)
+    }, 10)    
+  })()
+</script>
+    
+
+    <script src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script>
+<script async>
+  let fancyTimer = setInterval(function(){
+    if(!window.$){
+      return;
+    }
+    $(document).ready(function() {
+      $(".post img").each(function () {
+        if($(this).parent().get(0).tagName.toLowerCase() === "a") {
+          return;
+        }
+        // $(this).attr("data-fancybox", "gallery"); // if you add 'data-fancybox', img will display after showed
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "gallery");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      });
+      
+      clearInterval(fancyTimer);
+    });
+  }, 10);
+</script>
+
+    
+  </body>
+
+</html>
