@@ -8,12 +8,12 @@
   
   
   
-  <title>工具使用-如何使用ROS在RViz中显示Markers（python版 points and lines 示例） | YixiaoZhou&#39;s blog</title>
+  <title>工具使用-[linux] swig实现c++的python包装 | YixiaoZhou&#39;s blog</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   
-    <meta name="keywords" content="python,rviz,points and lines,">
+    <meta name="keywords" content="install,swig,cpp,python,">
   
 
   <script>
@@ -189,17 +189,17 @@
 
 <div class="post">
   <h1 class="article-title">
-    <span>工具使用-如何使用ROS在RViz中显示Markers（python版 points and lines 示例）</span>
+    <span>工具使用-[linux] swig实现c++的python包装</span>
   </h1>
   <div class="article-top-meta">
     <span>
       发布 : 
-      2019-06-26
+      2019-07-26
     </span>
     
     
       <span>
-        浏览 : <span class="article-timer" data-identity="rviz-points-and-lines"></span>
+        浏览 : <span class="article-timer" data-identity="swig-python"></span>
       </span>
     
   </div>
@@ -208,25 +208,45 @@
 
   <div class="article-content">
     <div class="markdown-body">
-      <h4 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h4><p>我们先来看看<code>Marker</code> 中定义了那些类型：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rosmsg show visualization_msgs/Marker</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>uint8 ARROW=0<br>uint8 CUBE=1<br>uint8 SPHERE=2<br>uint8 CYLINDER=3<br>uint8 LINE_STRIP=4<br>uint8 LINE_LIST=5<br>uint8 CUBE_LIST=6<br>uint8 SPHERE_LIST=7<br>uint8 POINTS=8</p>
-<p>% 上面声明了9种类型</p>
-<p>uint8 TEXT_VIEW_FACING=9<br>uint8 MESH_RESOURCE=10<br>uint8 TRIANGLE_LIST=11<br>uint8 ADD=0<br>uint8 MODIFY=0<br>uint8 DELETE=2<br>uint8 DELETEALL=3<br>std_msgs/Header header<br>uint32 seq<br>time stamp<br>string frame_id<br>string ns<br>int32 id<br>int32 type<br>int32 action<br>geometry_msgs/Pose pose  # pose包含的属性<br>geometry_msgs/Point position<br> float64 x<br> float64 y<br> float64 z<br>geometry_msgs/Quaternion orientation<br> float64 x<br> float64 y<br> float64 z<br> float64 w<br>geometry_msgs/Vector3 scale<br>float64 x<br>float64 y<br>float64 z<br>std_msgs/ColorRGBA color<br>float32 r<br>float32 g<br>float32 b<br>float32 a<br>duration lifetime<br>bool frame_locked<br>geometry_msgs/Point[] points  # 对应一个list<br>float64 x<br>float64 y<br>float64 z<br>std_msgs/ColorRGBA[] colors<br>float32 r<br>float32 g<br>float32 b<br>float32 a<br>string text<br>string mesh_resource<br>bool mesh_use_embedded_materials</p>
-</blockquote>
-<p>当type=POINTS时， points中的每一个点对应改为之上画一个点， type=LINE_STRIP时，表示poinits中任意两个相邻的点存在连线， type=LINE_LIST中的points内点不会将线连在一起，于是相邻点连线，但不存在共享定点的连线，比如第0个点和第1个点连线，第2个点和第3个点连线。</p>
-<h4 id="Publisher-Node"><a href="#Publisher-Node" class="headerlink" title="Publisher Node"></a>Publisher Node</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">roscd using_markers/scripts</span><br><span class="line">vim points_and_lines.py</span><br></pre></td></tr></table></figure>
-<p><code>points_and_lines.py</code>的内容：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">import</span> rospy</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> visualization_msgs.msg <span class="keyword">import</span> Marker</span><br><span class="line"><span class="keyword">from</span> geometry_msgs.msg <span class="keyword">import</span> Point</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    rospy.init_node(<span class="string">"points_and_lines"</span>, anonymous=<span class="literal">True</span>)</span><br><span class="line">    pub = rospy.Publisher(<span class="string">"visualization_marker"</span>, Marker, queue_size=<span class="number">10</span>)</span><br><span class="line">    rate = rospy.Rate(<span class="number">30</span>)</span><br><span class="line">    f = <span class="number">0.0</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">not</span> rospy.is_shutdown():</span><br><span class="line">        types = [Marker.POINTS, Marker.LINE_STRIP, Marker.LINE_LIST]</span><br><span class="line">        markers = [Marker() <span class="keyword">for</span> _ <span class="keyword">in</span> [<span class="string">'points'</span>, <span class="string">'line_strip'</span>, <span class="string">'line_list'</span>]]</span><br><span class="line">        <span class="keyword">for</span> i, m <span class="keyword">in</span> enumerate(markers):  <span class="comment"># 分别处理不同的marker </span></span><br><span class="line">            m.header.frame_id = <span class="string">'/my_frame'</span></span><br><span class="line">            m.header.stamp = rospy.Time.now()</span><br><span class="line">            m.ns = <span class="string">'points_and_lines'</span></span><br><span class="line">            m.pose.orientation.w = <span class="number">1.0</span></span><br><span class="line">            m.action = Marker.ADD</span><br><span class="line">            m.id = i</span><br><span class="line">            m.type = types[i]</span><br><span class="line">            m.color.a = <span class="number">1.0</span></span><br><span class="line">            <span class="keyword">if</span> i == <span class="number">0</span>: <span class="comment"># point</span></span><br><span class="line">                m.scale.x = <span class="number">0.2</span></span><br><span class="line">                m.scale.y = <span class="number">0.2</span></span><br><span class="line">                m.color.g = <span class="number">1.0</span></span><br><span class="line">            <span class="keyword">elif</span> i == <span class="number">1</span>:  <span class="comment"># line_strip</span></span><br><span class="line">                m.scale.x = <span class="number">0.1</span></span><br><span class="line">                m.color.b = <span class="number">1.0</span></span><br><span class="line">            <span class="keyword">elif</span> i == <span class="number">2</span>:</span><br><span class="line">                m.scale.x = <span class="number">0.1</span></span><br><span class="line">                m.color.r = <span class="number">1.0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">100</span>):  <span class="comment"># 给每一个marker添加points</span></span><br><span class="line">            y = <span class="number">5</span> * np.sin(f + i/<span class="number">100.0</span> * <span class="number">2</span> * np.pi)</span><br><span class="line">            z = <span class="number">5</span> * np.cos(f + i/<span class="number">100.0</span> * <span class="number">2</span> * np.pi)</span><br><span class="line">            p = Point(i<span class="number">-50</span>, y, z)</span><br><span class="line">            markers[<span class="number">0</span>].points.append(p)</span><br><span class="line">            markers[<span class="number">1</span>].points.append(p)</span><br><span class="line">            markers[<span class="number">2</span>].points.extend([p, Point(i<span class="number">-50</span>, y, z+<span class="number">1</span>)])</span><br><span class="line">        <span class="keyword">for</span> m <span class="keyword">in</span> markers:</span><br><span class="line">            pub.publish(m)</span><br><span class="line">        rate.sleep()</span><br><span class="line">        f += <span class="number">0.04</span></span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> __name__==<span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
-<p>好像相对于上篇文章内容并没有添加新的东西。主要就是不同类型中points列表的设置。</p>
-<h4 id="Building-and-Viewing"><a href="#Building-and-Viewing" class="headerlink" title="Building and Viewing"></a>Building and Viewing</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ～/catkin_ws</span></span><br><span class="line">catkin_make</span><br><span class="line">. devel/setup.bash</span><br></pre></td></tr></table></figure>
-<p>两个终端：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rosrun using_markers points_and_lines.py</span><br></pre></td></tr></table></figure>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rosrun rviz rviz</span><br></pre></td></tr></table></figure>
-<p>然后在rviz的左边栏将<code>Fixed Frame</code> 值改为 <code>/my_frame</code></p>
-<p>左下角添加<code>Add</code> msg的类型<code>Marker</code>， 然后就能看到结果了。</p>
-<p><img src="/2019/06/26/rviz-points-and-lines/rviz_points_and_lines_result.png" alt="points_and_lines_results"></p>
+      <h3 id="swig的安装"><a href="#swig的安装" class="headerlink" title="swig的安装"></a>swig的安装</h3><ol>
+<li><p>官网下载swig的安装包。</p>
+<p>目前下载的最新版本是4.0.0版本。</p>
+<p>下载地址<a href="http:www.swig.org/download.html" target="_blank" rel="noopener">http:www.swig.org/download.html</a></p>
+</li>
+<li><p>查看是否安装gcc/g++</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ --version</span><br></pre></td></tr></table></figure>
+<p>如何没安装过，就安装</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install g++</span><br></pre></td></tr></table></figure>
+<p>如果没有sudo权限的话，就把gcc/g++下载到自己目录下安装，再配置bashrc中的路径。</p>
+</li>
+<li><p>安装pcre</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install libpcre3 libpcre3-dev</span><br></pre></td></tr></table></figure>
+<p>安装成功后，看<code>/usr/lib/</code>是否存在<code>libpcre.so.1</code>文件，如果没有的话，后面swig安装会报错</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 错误信息：</span></span><br><span class="line">swig:error <span class="keyword">while</span> loading shared libraries: libpcre.so.1:cannot open shared object file: No such file or directory</span><br></pre></td></tr></table></figure>
+<p>这时候找一找 <code>libpcre.so.1</code> 被放到了哪里</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo find / -name libpcre.so.1</span><br></pre></td></tr></table></figure>
+<p>一般是因为anconda覆盖了，如果没有sudo权限，就在自己目录的anconda路径下查找。然后创建软连接到<code>/usr/lib</code>下</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ln -s /data/zwzhou/miniconda3/lib/libpcre.so.1 /usr/lib/libpcre.so.1</span><br></pre></td></tr></table></figure>
+<p>这个不知道没有权限能不能建立软连接。</p>
+<p>如果不行的话只能暂时将anaconda路径去掉，安装之后再加上。</p>
+</li>
+<li><p>安装swig</p>
+<p>进入文件下载目录： <code>~/software/</code> 即自己的安装包文件夹</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf swig-4.0.0.tar.gz</span><br><span class="line"><span class="built_in">cd</span> swig-4.0.0.tar.gz</span><br><span class="line">./configure</span><br><span class="line">./configure --prefix=/data/zwzhou/software/swig400_install <span class="comment"># 这时候指定自己的目录，避免后面install的时候需要sudo权限</span></span><br><span class="line">make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+<p>至此swig安装成功。</p>
+<p>还需要对swig的环境变量进行设置。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim ~/.bashrc  <span class="comment"># 打开配置文件</span></span><br></pre></td></tr></table></figure>
+<p>文件中插入</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SWIG_PATH=/data/zwzhou/software/swig400_install/share/swig/4.0.0</span><br><span class="line">PATH=<span class="variable">$PATH</span>:<span class="variable">$WEIG_PATH</span></span><br></pre></td></tr></table></figure>
+<p>激活环境变量</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>验证</p>
+<p>通过swig的版本来验证安装是否成功。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">swig -version</span><br></pre></td></tr></table></figure>
+<p>输出版本号则安装成功。</p>
+</li>
+</ol>
     </div>
   </div>
   
@@ -237,7 +257,7 @@
         
           本文作者 : zhouzongwei <br>
         
-        原文链接 : <a href>http://yoursite.com/2019/06/26/rviz-points-and-lines/</a><br>
+        原文链接 : <a href>http://yoursite.com/2019/07/26/swig-python/</a><br>
         版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
         </blockquote>
       </div>
@@ -297,20 +317,26 @@
           <i class="iconfont icon-06tags"></i>标签: 
           
           <span class="span--tag">
+            <a href="/tags/install/">
+              #install
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/swig/">
+              #swig
+            </a>
+          </span>
+          
+          <span class="span--tag">
+            <a href="/tags/cpp/">
+              #cpp
+            </a>
+          </span>
+          
+          <span class="span--tag">
             <a href="/tags/python/">
               #python
-            </a>
-          </span>
-          
-          <span class="span--tag">
-            <a href="/tags/rviz/">
-              #rviz
-            </a>
-          </span>
-          
-          <span class="span--tag">
-            <a href="/tags/points-and-lines/">
-              #points and lines
             </a>
           </span>
           
@@ -335,15 +361,9 @@
       <div class="nav-pre">
         <i class="iconfont icon-prev"></i>
         上一篇:
-        <a href="/2019/06/26/rviz-interactive-markers/" target="_self">工具使用-rviz 中可交互的markers（InteractiveMarker）</a>
+        <a href="/2019/07/10/SocialAttention/" target="_self">阅读笔记-Social Attention Modeling Attention in Human Crowds</a>
       </div>
     
-    
-      <div class="nav-next">
-        下一篇:
-        <a href="/2019/06/26/rviz-sending-basic-shapes/" target="_self">工具使用-ROS在rviz中的应用实例 （python 版 basic shapes）</a>
-        <i class="iconfont icon-next"></i>
-      </div>
     
   </nav>
 
