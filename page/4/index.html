@@ -181,6 +181,73 @@
   
   <div class="post">
     <h1 class="article-title">
+      <a href="/2019/05/22/SST-DAN/">
+        <span>阅读笔记-Deep Affinity Network for Multiple Object Tracking</span>
+      </a>
+    </h1>
+    <!-- PC端文章信息 -->
+    <div class="article-top-meta pc-view">
+      <span>
+        发布时间 : 2019-05-22
+      </span>
+    </div>
+    <!-- 移动端文章信息 -->
+    <div class="article-top-meta mobile-view">
+      <span>
+        发布 : 2019-05-22
+      </span>
+      
+      
+        <span>
+          浏览 : <span class="article-timer" data-identity="SST-DAN"></span>
+        </span>
+      
+    </div>
+    
+    <!-- 文章简介 -->
+    <div class="article-content">
+      <div class="markdown-body article-content--inner" v-html="mdToHtml(psg.summary)">
+        <p><img src="/2019/05/22/SST-DAN/DAN.png" alt="DAN"></p>
+<p>MOT方法一般包含两个步骤:目标检测和数据关联。 目标检测这两年随着深度学习的发展而迅速发展，但是数据关联绝大多数还是采用hand crafted的方式将表观特征，运动信息，空间关系，group关系等进行结合。 这篇文章则是利用深度网络实现端到端的表观特征抽取和数据关联。 Deep Affinity Network(DAN)还实现了轨迹的初始化和终止等操作。在MOT15和MOT17，以及UA-DETRAC数据集上验证了有效性。这篇文章和上篇笔记FANTrack的出发点类似。</p>
+<p>项目地址： <a href="https://github.com/shijieS/SST.git" target="_blank" rel="noopener">https://github.com/shijieS/SST.git</a></p>
+      </div>
+    </div>
+    <div class="article-footer">
+      <div class="article-meta pull-left">
+        <!-- 分类pc端可见 -->
+        <span class="pc-view">
+          
+        <span>
+          
+            <i class="iconfont icon-06tags"></i>标签:
+            
+              <span class="span--tag">
+                <a href="/tags/MOT/">
+                  #MOT
+                </a>
+              </span>
+            
+              <span class="span--tag">
+                <a href="/tags/Affinity-Network/">
+                  #Affinity Network
+                </a>
+              </span>
+            
+                    
+        </span>
+      </span></div>
+      
+        <div class="article-meta pull-right">
+          <span class="pc-view">
+            <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="SST-DAN"></span>
+          </span>
+        </div>
+      
+    </div>
+  </div>
+  
+  <div class="post">
+    <h1 class="article-title">
       <a href="/2019/05/22/FANTrack/">
         <span>阅读笔记-FANTrack：3DMulti-Object Tracking with Feature Association Network</span>
       </a>
@@ -810,72 +877,6 @@
         <div class="article-meta pull-right">
           <span class="pc-view">
             <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="MOT-overview-1st"></span>
-          </span>
-        </div>
-      
-    </div>
-  </div>
-  
-  <div class="post">
-    <h1 class="article-title">
-      <a href="/2019/05/17/Frame-wise-Motion-and-Appearance-for-Real-time-Multiple-Object-Tracking/">
-        <span>阅读笔记-Frame-wise Motion and Appearance for Real-time Multiple Object Tracking</span>
-      </a>
-    </h1>
-    <!-- PC端文章信息 -->
-    <div class="article-top-meta pc-view">
-      <span>
-        发布时间 : 2019-05-17
-      </span>
-    </div>
-    <!-- 移动端文章信息 -->
-    <div class="article-top-meta mobile-view">
-      <span>
-        发布 : 2019-05-17
-      </span>
-      
-      
-        <span>
-          浏览 : <span class="article-timer" data-identity="Frame-wise-Motion-and-Appearance-for-Real-time-Multiple-Object-Tracking"></span>
-        </span>
-      
-    </div>
-    
-    <!-- 文章简介 -->
-    <div class="article-content">
-      <div class="markdown-body article-content--inner" v-html="mdToHtml(psg.summary)">
-        <p><img src="/2019/05/17/Frame-wise-Motion-and-Appearance-for-Real-time-Multiple-Object-Tracking/architecture.png" alt="architecture"></p>
-<p>文章同时利用了光流信息和表观信息去解决多目标跟踪任务。对于简单的目标使用Frame-wise Motion Field(FMF)进行跟踪，而对于复杂的目标使用Frame-wise Appearance Features(FAF)进行reid的匹配。 两个模块集成在一起实现端到端的训练，同时也缩短了inference的时间。</p>
-      </div>
-    </div>
-    <div class="article-footer">
-      <div class="article-meta pull-left">
-        <!-- 分类pc端可见 -->
-        <span class="pc-view">
-          
-        <span>
-          
-            <i class="iconfont icon-06tags"></i>标签:
-            
-              <span class="span--tag">
-                <a href="/tags/MOT/">
-                  #MOT
-                </a>
-              </span>
-            
-              <span class="span--tag">
-                <a href="/tags/Motion-and-Appearance/">
-                  #Motion and Appearance
-                </a>
-              </span>
-            
-                    
-        </span>
-      </span></div>
-      
-        <div class="article-meta pull-right">
-          <span class="pc-view">
-            <i class="iconfont icon-view"></i>浏览: <span class="article-timer" data-identity="Frame-wise-Motion-and-Appearance-for-Real-time-Multiple-Object-Tracking"></span>
           </span>
         </div>
       

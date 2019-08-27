@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+  
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta name="author" content="董沅鑫, yuanxin.me@gmail.com">
+  
+  
+  
+  <title>笔试题总结 (1) | YixiaoZhou&#39;s blog</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="笔试, 算法,">
+  
+
+  <script>
+    console.log('\n%c Hexo-theme-bmw v4.0 ' + '%c 🎉 https://github.com/dongyuanxin/theme-bmw 🎉\n' + '\n%c View demo online ' + '%c 🔍 https://godbmw.com/ 🔍  \n' , 'color: #fadfa3; background: #030307; padding:3px 0;', '', 'color: #fadfa3; background: #030307; padding:3px 0;', '');
+  </script>
+
+  
+    <meta name="description" content="海阔全是浪，天高皆是霾。">
+  
+
+  
+
+  
+    <link rel="icon" href="/images/fvatar2.png">
+    <link rel="apple-touch-icon" href="/images/touch-icon.png">
+  
+
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/icon/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+  <script src="/js/util.js"></script>
+<script src="/js/valine.min.js"></script>
+
+  
+
+  
+    <link href="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/aplayer/1.10.1/APlayer.min.js" async></script>
+  
+
+  
+    <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
+  
+  
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js" async></script>
+  
+  
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.0/dist/av-min.js"></script>
+  
+
+</head>
+
+  <body>
+
+    
+
+    <div id="app">
+
+      <div class="header-wrap">
+  <header>
+    <div class="site-brand">
+      <div class="site-title">
+        <a href="/">YiXiaoZhou</a>
+      </div>
+    </div>
+    <nav class="site-navigation">
+      <ul class="nav-menu">
+      
+        <li class="nav-item" data-path="/">
+          
+            <a href="/" target="_self">
+              主页
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          
+            <a href="/archives/" target="_self">
+              归档
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          
+            <a href="/friends/" target="_self">
+              友链
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          
+            <a href="/about/" target="_self">
+              关于
+            </a>
+          
+        </li>
+      
+        <li class="nav-item" data-path>
+          
+            <a href="javascript:void(0);" v-else>抓到我</a>
+            <ul class="nav-menu--dropdown">
+              
+                <li>
+                  <a href="https://github.com/ZongweiZhou1" target="_blank">
+                    Github
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://www.facebook.com/duncon.chou" target="_blank">
+                    Facebook
+                  </a>
+                </li>
+              
+                <li>
+                  <a href="https://weibo.com/u/3231820650/home?wvr=5" target="_self">
+                    weibo
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+      </ul>
+    </nav>
+    <i class="iconfont icon-menu"></i>
+  </header>
+</div>
+
+<script>
+  let links = document.querySelectorAll('.nav-item');
+  for(let link of links){
+    let childrenLink = link.querySelector('ul');
+    link.addEventListener('mouseenter', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown active";
+      }
+    })
+    link.addEventListener('mouseleave', () => {
+      if(childrenLink) {
+        childrenLink.className = "nav-menu--dropdown";
+      }
+    })
+  }
+  let rootRealPath = getRealPath(window.location.pathname, true);
+  for(let link of links) {
+    let linkPath = link.getAttribute("data-path");
+    if(linkPath && getRealPath(linkPath, true) === rootRealPath) {
+      link.className = "nav-item hover";
+    }
+  }
+
+  let iconMenu = document.querySelector("i.iconfont.icon-menu"),
+    iconMenuClicked = false;
+  let navDOM = document.querySelector("nav.site-navigation");
+  iconMenu.addEventListener("click", () => {
+    iconMenuClicked 
+      ? navDOM.className = "site-navigation active"
+      : navDOM.className = "site-navigation";
+    iconMenuClicked = !iconMenuClicked;
+  })
+</script>
+
+      
+
+
+
+
+
+
+
+
+<div class="container post-index">
+
+  
+
+<div class="post">
+  <h1 class="article-title">
+    <span>笔试题总结 (1)</span>
+  </h1>
+  <div class="article-top-meta">
+    <span>
+      发布 : 
+      2019-08-26
+    </span>
+    
+    
+      <span>
+        浏览 : <span class="article-timer" data-identity="interview-questions-1"></span>
+      </span>
+    
+  </div>
+
+  
+
+  <div class="article-content">
+    <div class="markdown-body">
+      <p>阿里的部分笔试题总结。</p>
+<p>原文链接：<a href="https://blog.csdn.net/weixin_43730955/article/details/89163131" target="_blank" rel="noopener">https://blog.csdn.net/weixin_43730955/article/details/89163131</a></p>
+<ol>
+<li><p><strong>下面哪一个不是动态链接库的优点？</strong>（F）<br>A.共享<br>B.装载速度快<br>C.开发模式好<br>D.减少页面交换</p>
+<p>知识补充<br>1）动态链接库：<br>a.动态链接提供了一种方法，使进程可以调用不属于其可执行代码的函数。<br>b.使用动态链接库可以更为容易地将更新应用于各个模块，而不会影响该程序的其他部分。<br>c.动态链接库文件，是一种不可执行的二进制程序文件，它允许程序共享执行特殊任务所必需的代码和其他资源。<br><a href="https://baike.baidu.com/item/动态链接库/100352?fr=aladdin#4" target="_blank" rel="noopener">https://baike.baidu.com/item/动态链接库/100352?fr=aladdin#4</a></p>
+<p>2)动态链接库的优缺点<br>a. 更加节省内存并减少页面交换；<br>b. DLL文件与EXE文件独立，只要输出接口不变（即名称、参数、返回值类型和调用约定不变），更换DLL文件不会对EXE文件造成任何影响，因而极大地提高了可维护性和可扩展性；<br>c.不同编程语言编写的程序只要按照函数调用约定就可以调用同一个DLL函数；<br>d.适用于大规模的软件开发，使开发过程独立、耦合度小，便于不同开发者和开发组织之间进行开发和测试。<br>e. 使用动态链接库的应用程序不是自完备的，它依赖的DLL模块也要存在，如果使用载入时动态链接，程序启动时发现DLL不存在，系统将终止程序并给出错误信息。而使用运行时动态链接，系统不会终止，但由于DLL中的导出函数不可用，程序会加载失败；速度比静态链接慢。当某个模块更新后，如果新模块与旧的模块不兼容，那么那些需要该模块才能运行的软件，统统撕掉。这在早期Windows中很常见。</p>
+<p>3）静态链接库：<br>所谓静态链接库，说白了就是在你把写好的代码编译的时候，就把你引用的库一起给编进去了，从此后你编出来的执行程序跟外面都不再有任何关系，即使这个库更新了，你也搭不上边儿，其次，如果系统中许多类似的程序都需要用到这个库，那么各自在编译的时候都需要把这个库给编进去，浪费存储空间（加载到内存里应该也是浪费内存空间的）。linux系统中静态库的名字一般叫xxx.a, 所以如果你看到一个以 .a结束的文件那么它多半就是一个静态链接库文件。</p>
+<p>4)静态链接库的优缺点：<br>a.代码装载速度快，执行速度略比动态链接库快；<br>b.只需保证在开发者的计算机中有正确的.LIB文件，在以二进制形式发布程序时不需考虑在用户的计算机上.LIB文件是否存在及版本问题，可避免DLL地狱等问题。<br>c.使用静态链接生成的可执行文件体积较大，包含相同的公共代码，造成浪费；</p>
+</li>
+<li><p><strong>n个数值选出最大m个数（3&lt;m&lt;n）的最小算法复杂度是（A）</strong><br>A.O(n)<br>B.O(nlogn)<br>C.O(logn)<br>D.O(mlogn)<br>E.O(nlogm)<br>F.O(mn)</p>
+<p>知识补充:<br>1)最简单的方法：将n个数排序，排序后的前k个数就是最大的k个数，这种算法的复杂度是O（nlogn）。<br>2)O（n）的方法：利用快排的patition思想，基于数组的第k个数来调整，将比第k个数小的都位于数组的左边，比第k个数大的都调整到数组的右边。<br>3)O(nlogm）的方法：先创建一个大小为m的最小堆，接下来我们每次从输入的n个整数中读入一个数，如果这个数比最小堆的堆顶元素还要大，那么替换这个最小堆的堆顶并调整。<br>4）部分快排 时间复杂度 O(N) ，存储复杂度 O(N)；堆排序 时间复杂度 O(NlogM) 空间复杂度 O(M) 。如果数组能存下的话，O(N) 是最小时间复杂度。但是你可能面临从（文件）流中读取数据，O(N) 的空间复杂度超过内存限制的情况，这种情况下就该用优先队列了。</p>
+</li>
+<li><p><strong>由权值分别为1、12、13、4、8的叶子节点生成一颗哈夫曼树，它的带权路径长度为(F)</strong><br>A.12<br>B.68<br>C.43<br>D.6<br>E.25<br>F.81</p>
+<p>知识点：</p>
+<ul>
+<li>哈夫曼树的权重为每个叶子节点到根节点的距离与叶节点的加权和。</li>
+<li>哈夫曼树一定是满二叉树</li>
+<li>哈夫曼树中权重小的叶节点一定比权重大的节点距离更远</li>
+<li>存在这样一株哈夫曼树，使得权重最小的两个叶节点的父节点相同。</li>
+<li>哈夫曼的构建：从数据中选择最小的两个数作为叶节点，然后将子树放回去，继续找最小的点，直至所有点都加入树中。</li>
+</ul>
+</li>
+<li><p><strong>阿里巴巴国际站的股票代码是1688，这个数字具有这样的特性，首先是个首位为1的4位数，其次恰巧有且仅有1个数字出现了两次。类似的数字还有：1861,1668等。这样的数字一共有(F)个。</strong><br>A.144<br>B.180<br>C.216<br>D.270<br>E.288<br>F.432</p>
+<p>求解方法：首先第一个数字是固定为1的，要求数字中有且只有一个数字出现两次，分为两种情况，即还有一次1出现，和1不在出现。</p>
+<p>当1出现两次时，表示后面三位数有一个为1，其他两个不为1的数不同，那么先随机选一个数a，其有九种可能，再选一个数b，其有8种可能；于是后面三个数字 1,a,b, 可以随机排列 有C(3,2)中可能，总共为 9x8x3 = 216种。</p>
+<p>当1只出现在第一位时，先选择重复数字a，有9种可能，再选择不同数字b，有8种可能，(a,a,b)所有可能组合有3中，所以这种情况有 3x9x8=216种</p>
+<p>共有432种</p>
+</li>
+<li><p><strong>工程师M发明了一种游戏：M将一个小球随机放入完全相同的三个盒子中的某一个，玩家选中装有球的盒子即获胜；开始时M会让玩家选择一个盒子（选择任何一个获胜概率均为1/3）;玩家做出选择后，M会打开没有被选择的两个盒子中的一个空盒，此时M会询问玩家是否更改选择（可以坚持第一次选择，也可以选择另一个没有打开的盒子），下列叙述正确的有（E）。</strong><br>A.改选后，玩家获胜的概率还是1/3<br>B.若不改选，玩家的获胜概率是1/2<br>C.无论怎么选择，获胜的概率都是1/2<br>D.坚持原来的选择获胜概率更高<br>E.选择另一个没有被打开的盒子获胜概率更高<br>F.获胜概率取决于随机因素（如小球的实际位置）<br>解析： 首先玩家获胜概率是1/3， 去掉一个空盒时，玩家此时的获胜概率为1/2.  那么改选之后获胜的概率如何计算呢？</p>
+<p>假设第一次选择事件表示为A， 该选事件表示为B，那么A=1表示有球，于是</p>
+<p>P(B=1|A) = P(B=1|A=1)P(A=1) + P(B=1|A=0)P(A=0) = 2/3</p>
+<p>P(B=0|A) = P(B=0|A=1)P(A=1) + P(B=0|A=0)P(A=0) = 1/3</p>
+<p>所以改选之后获胜概率更大。</p>
+</li>
+<li><p><strong>以下哪种方式，在读取磁盘上多个顺序数据块时的效率最高？（C）</strong><br>A.中断控制方式<br>B.DMA方式<br>C.通道方式<br>D.程序直接访问方式<br>E.循环检查I/O方式<br>F.以上访问方式都一样<br>知识补充:主要原因在于通道方式可以并行处理。</p>
+<p>中断控制是指I/O完成任务后触发中断读取数据。</p>
+<p>DMA指直接存储器访问，这个比中断更有优势，因为开辟了一个空间用于缓存I/O的结果，一定程度I/O和程序并行。</p>
+<p>通道方式：比DMA先进的地方是，每次可以处理多个块，而不只是一个块。</p>
+<p>直接访问，即程序查询I/0的状态，可能中断</p>
+<p>循环检查则是不断循环的查询I/O是否准备好。</p>
+</li>
+</ol>
+<ol>
+<li><p><strong>下列不是进程间的通信方式的是（B）</strong><br>A.管道<br>B.回调<br>C.共享内存<br>D.消息队列<br>E.socket<br>F.信号量<br>知识补充:<br>1)管道( pipe )：管道是一种半双工的通信方式，数据只能单向流动，而且只能在具有亲缘关系的进程间使用。进程的亲缘关系通常是指父子进程关系。<br>2)信号量( semophore ) ： 信号量是一个计数器，可以用来控制多个进程对共享资源的访问。它常作为一种锁机制，防止某进程正在访问共享资源时，其他进程也访问该资源。因此，主要作为进程间以及同一进程内不同线程之间的同步手段。<br>3) 消息队列( message queue ) ： 消息队列是由消息的链表，存放在内核中并由消息队列标识符标识。消息队列克服了信号传递信息少、管道只能承载无格式字节流以及缓冲区大小受限等缺点。<br>4) 共享内存( shared memory ) ：共享内存就是映射一段能被其他进程所访问的内存，这段共享内存由一个进程创建，但多个进程都可以访问。共享内存是最快的 IPC 方式，它是针对其他进程间通信方式运行效率低而专门设计的。它往往与其他通信机制，如信号量，配合使用，来实现进程间的同步和通信。<br>5) 套接字( socket ) ： 套解口也是一种进程间通信机制，与其他通信机制不同的是，它可用于不同及其间的进程通信。</p>
+</li>
+<li><p>已知IBM的PowerPC是big-endian字节序列而Intel的X86是little-endian字节序，如果在地址啊存储的整形值时0x04030201，那么地址为a+3的字节内存储的值在PowerPC和Intel X86结构下的值分别是？（A）<br>A.1 4<br>B.1 3<br>C.4 1<br>D.3 1<br>E.4 4<br>F.1 1<br>知识补充:<br>大端从大地址开始存储，小端相反，两者都是从数据低位开始存起；<br>假设从上至下地址递增，则<br>PowerPC（大）： Intel X86（小）：<br>04 01 低<br>03 02 |<br>02 03 |<br>01 04 高<br>a+3指向最大的地址，所以分别为1 4</p>
+</li>
+<li><p><strong>在TCP/IP建立连接过程中，客户端或服务器的状态转移说法错误的是(D)？</strong><br>A. 经历SYN_RECV状态<br>B.经历SYN_SEND状态<br>C.经历ESTABLISHED状态<br>D.经历TIME_WAIT状态<br>E.服务器在收到syn包时将加入半连接队列<br>F.服务器收到客户端的ack包后将从半连接队列删除<br>知识补充:<br>1)Tcp/Ip有3次握手：第一次握手：客户端向服务器端发送SYN包（syn＝j），进入SYN_SEND状态，等待服务器确认。第二次握手：服务器收到SYN包，确认SYN，此时syn＝j+1，同时发送一个SYN包（syn＝k）即SYN＋ACK包，此时服务器进入SYN_RECV状态；第三次握手：客户端收到SYN＋ACK包，向服务器发送ACK确认包，此时客户端和服务器端均进入ESTABLISHED状态。<br>2)其中有一个半连接状态：服务器维护一个半连接队列，该队列卫每个客户端SYN包开设一个条目，标明服务器已经接到SYN包，并向客户端发出确认，这些条目表示的连接处于SYN_RECV状态，得到客户端的确认后进入ESTABLISHED状态。<br>3)TIME_WAIT是断开连接时的状态<br>4)TCP连接的建立与终止 :<a href="http://www.cnblogs.com/newwy/p/3234536.html" target="_blank" rel="noopener">http://www.cnblogs.com/newwy/p/3234536.html</a></p>
+</li>
+<li><p><strong>已知一棵二叉树的先序和中序遍历序列如下：先序：A、B、C、D、E、F、G、H、I，J中序：C、B、A、E、F、D、I、H、J、G其后序遍历序列为：(E)</strong><br>A.C、B、D、E、A、G、I、H、J、F<br>B.C、B、D、A、E、G、I、H、J、F<br>C.C、E、D、B、I、J、H、G、F、A<br>D.C、E、D、B、I、H、J、G、F、A<br>E.C、B、F、E、I、J、H、G、D、A<br>F.C、B、F、E、I、H、J、G、D、A<br>知识补充:  </p>
+<p>先序： 根-&gt;左-&gt;右</p>
+<p>中序： 左 -&gt; 根-&gt;右</p>
+<p>后序： 左-&gt; 右-&gt;根</p>
+<p>1)先序，中序，后序，已知中序和先序或者中序和后序两种遍历结果，就可以逆向推导出整颗树<br>a.由先序，知A是根<br>b.由中序，知B、C为A左子树，D、E、F、G、H、I、J为A右子树<br>c.由先序，知B为A左子树根<br>d.由中序，知C为B左子树<br>e.由先序，知D为A右子树根<br>f.由中序，知E、F为D左子树，G、H、I、J位D右子树<br>g.由先序，知E为D左子树根<br>h.由中序，知F为E左子树<br>i.由先序，知G为D右子树根<br>j.由中序，知H、I、J为G左子树<br>k.由先序，知H为G左子树根<br>l.由中序，知I为H左子树，J为H右子树<br>m.树推导构造完毕</p>
+</li>
+<li><p>同一个进程中的线程不共享的部分是(F)</p>
+<p>A.信号<br>B.堆<br>C.文件描述符<br>D.进程组id<br>E.代码段<br>F.栈空间</p>
+<p>知识补充:</p>
+<p>1)线程共享的环境包括：进程代码段、进程的公有数据(利用这些共享的数据，线程很容易的实现相互之间的通讯)、进程打开的文件描述符、信号的处理器、进程的当前目录和进程用户ID与进程组ID。<br>2)进程拥有这许多共性的同时，还拥有自己的个性。有了这些个性，线程才能实现并发性。这些个性包括：<br>a.线程ID: 每个线程都有自己的线程ID，这个ID在本进程中是唯一的。进程用此来标<br>识线程。<br>b.寄存器组的值: 由于线程间是并发运行的，每个线程有自己不同的运行线索，当从一个线<br>程切换到另一个线程上 时，必须将原有的线程的寄存器集合的状态保存，以便<br>将来该线程在被重新切换到时能得以恢复。<br>c.线程的堆栈: 堆栈是保证线程独立运行所必须的。线程函数可以调用函数，而被调用函数中 又是可以层层嵌套的，所以线程必须拥有自己的函数堆栈， 使得函数调用可以正常执行，不 受其他线程的影响。<br>d.错误返回码: 由于同一个进程中有很多个线程在同时运行，可能某个线程进行系统调用<br>后设置了errno值，而在该 线程还没有处理这个错误，另外一个线程就在此时<br>被调度器投入运行，这样错误值就有可能被修改。所以，不同的线程应该拥有自己的错误返 回码变量。<br>e.线程的信号屏蔽码:由于每个线程所感兴趣的信号不同，所以线程的信号屏蔽码应该由线程自己管理。但所有的线程都共享同样的信号处理器。<br>f.线程的优先级:由于线程需要像进程那样能够被调度，那么就必须要有可供调度使用的参数，这个参数就是线程的优先级。</p>
+</li>
+</ol>
+<ol>
+<li><p>下面关于系统调用的描述中,错误的是(B)</p>
+<p>A.系统调用把应用程序的请求传输给系统内核执行<br>B.系统调用中被调用的过程运行在”用户态”中<br>C.利用系统调用能够得到操作系统提供的多种服务<br>D.是操作系统提供给编程人员的接口<br>E.系统调用给用户屏蔽了设备访问的细节<br>F.系统调用保护了一些只能在内核模式执行的操作指令</p>
+<p>知识补充: 调用程序是运行在用户态，而被调用的程序是运行在系统态, 被调用的过程运行在内核。</p>
+</li>
+<li><p>在动态分区分配方案中,系统回收主存,合并空闲空间时需修改空闲区表,以下哪种情况空闲区会减1?（F）<br>A.只要回收主存,空闲区数就会减一<br>B.空闲区数和主存回收无关<br>C.无上邻空闲区,也无下邻空闲区<br>D.有上邻空闲区,但无下邻空闲区<br>E.有下邻空闲区,但无上邻空闲区<br>F.有上邻空闲区,也有下邻空闲区<br>知识补充: 1) 在分区分配方案中，回收一个分区时有几种不同的邻接情况，在各种情况下应如何处理？ 答：有四种：上邻，下邻，上下相邻，上下不相邻。<br>a.回收分区的上邻分区是空闲的，需要将两个相邻的空闲区合并成一个更大的空闲区，然后修改空闲区表。<br>b.回收分区的下邻分区是空闲的，需要将两个相邻的空闲区合并成一个更大的空闲区，然后修改空闲区表。<br>c.回收分区的上、下邻分区都是空闲的（空闲区个数为2），需要将三个空闲区合并成一个更大的空闲区（空闲区个数为1 ），然后修改空闲区表、<br>d.回收分区的上、下邻分区都不是空闲的，则直接将空闲区记录在空闲区表中。</p>
+</li>
+<li><p>下面关于虚拟局域网VLAN的叙述错误的是(D)<br>A.VLAN是由局域网网段构成的与物理位置无关的逻辑组<br>B.利用以太网交换机可以很方便地实现VLAN<br>C.每一个VLAN的工作站可处在不同的局域网中<br>D.不同VLAN内的用户可以相互之间直接通信<br>E.VLAN可以强化网络安全和网络管理<br>F.VLAN能灵活控制广播活动<br>VLAN（Virtual Local Area Network）的中文名为”虚拟局域网”。<br>知识补充:<br>1)虚拟局域网（VLAN）是一组逻辑上的设备和用户，这些设备和用户并不受物理位置的限制，可以根据功能、部门及应用等因素将它们组织起来，相互之间的通信就好像它们在同一个网段中一样，由此得名虚拟局域网。VLAN是一种比较新的技术，工作在OSI参考模型的第2层和第3层，一个VLAN就是一个广播域，VLAN之间的通信是通过第3层的路由器来完成的。与传统的局域网技术相比较，VLAN技术更加灵活，它具有以下优点： 网络设备的移动、添加和修改的管理开销减少；可以控制广播活动；可提高网络的安全性。<br>2)在计算机网络中，一个二层网络可以被划分为多个不同的广播域，一个广播域对应了一个特定的用户组，默认情况下这些不同的广播域是相互隔离的。不同的广播域之间想要通信，需要通过一个或多个路由器。这样的一个广播域就称为VLAN。</p>
+</li>
+<li><p>刚毕业的小王上班有两路公交车都可以从家到公司.如果只等A车,平均需要5分钟才等到;如果只等B车,平均需要7分钟才能等到.假定两辆车运行时间独立,那么小王平均需要等多长时间才能等到A车或B车?（C）<br>A.2分钟<br>B.2分35秒<br>C.2分55秒<br>D.3分钟<br>E.5分钟<br>F.6分钟</p>
+<p>知识补充:<br>35分钟内一共来了12辆车<br>平均每 35/12 min 来一辆<br>35/12min = 2min55s</p>
+</li>
+<li><p>一个黑色袋子中装有5个红球，5个蓝球，5个黄球，从中抽取三次，每次抽一个球，取完不放回，则每种颜色球各得一个的概率是（F）<br>A.1/5<br>B.1/4<br>C.1/3<br>D.12/91<br>E.20/91<br>F.25/91<br>知识补充:<br>1)最开始是0个球，第一次不管怎么选都会选一个和以前不同颜色的球，所以第一次选择颜色不同的球概率为1；<br>2)第一次选择之后，还剩14个球，其中 被第一次选走的那个颜色只有4个，剩下的两种颜色的球个数不变，都为5，然后选一个与第一次颜色不同的球的概率是：10/14， 这是第二次选择<br>3)第二次选择之后，还剩13个球，其中被第一次和第二次选中的球，各有4个，剩下的没选到颜色的球还是5个，这次选中还没选到的这个颜色的球的概率是：5/13<br>4)所以选择三个不同颜色总的概率为：1<em>（10/14）</em>（5/13） = 25/91.</p>
+</li>
+<li><p>下面哪种协议在数据链路层？（F）</p>
+<p>A.ARP<br>B.ICMP<br>C.FTP<br>D.UDP<br>E.HTTP<br>F.VPN<br>知识补充:<br>ICMP是网络层，UDP是传输层，FTP和HTTP是应用层 。目前VPN隧道协议主要有4种：点到点隧道协议PPTP、第二层隧道协议L2TP、网络层隧道协议IPSec以及SOCKS v5协议。其中，PPTP和L2TP工作在数据链路层，IPSec工作在网络层，SOCK v5工作在会话层。</p>
+</li>
+<li><p>一组记录排序码为(5 11 7 2 3 17),则利用堆排序方法建立的初始堆为（C）<br>A.(11 5 7 2 3 17)<br>B.(11 5 7 2 13 3)<br>C.(17 11 7 2 3 5)<br>D.(17 11 7 5 3 2)<br>E.(17 7 11 3 5 2)<br>F.(17 7 11 3 2 5)<br>知识补充:<br>如果堆的有序状态因为某个节点变得比它的父节点更大而打破，那么就需要通过交换它和它的父节点来修复堆。</p>
+</li>
+</ol>
+    </div>
+  </div>
+  
+    <div class="copy-right">
+      <div class="markdown-body">
+        <blockquote>
+        
+        
+          本文作者 : zhouzongwei <br>
+        
+        原文链接 : <a href>http://yoursite.com/2019/08/26/interview-questions-1/</a><br>
+        版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
+        </blockquote>
+      </div>
+    </div>
+  
+  
+  
+    <div class="social-share" style="margin-top: -2rem" data-wechat-qrcode-title="<p>微信扫一扫</p>" data-wechat-qrcode-helper="<p>微信右上角, 扫一扫分享</p>" data-sites="qzone, qq, weibo, wechat, douban, google, facebook, twitter">
+  <span style="color: #6b7487; font-size: 1.4rem;">分享到: </span>
+</div>
+<script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js" async></script>
+  
+
+  
+    <div id="reward">
+  
+    <p id="reward-meta">知识 & 情怀 | 赏或者不赏，我都在这，不声不响</p>
+  
+  <button id="reward-btn">
+    
+    <span>打赏</span>
+  </button>
+  <div id="reward-qrcode">
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/wechatimg.jpg" alt="微信扫一扫, 以资鼓励">
+        <p class="qrcode-meta">微信扫一扫, 以资鼓励</p>
+      </div>
+    
+      <div class="reward-qrcode--container">
+        <img class="qrcode-img" src="/images/alipayimg.jpg" alt="支付宝扫一扫, 再接再厉">
+        <p class="qrcode-meta">支付宝扫一扫, 再接再厉</p>
+      </div>
+    
+  </div>
+
+</div>
+
+<script>
+  (() => {
+    let button = document.querySelector('#reward-btn'),
+      qrcode = document.querySelector('#reward-qrcode'),
+      display = false;
+    
+    button.addEventListener('click', () => {
+      qrcode.style.display = display ? 'none' : 'block'
+      display = !display
+    }, false)
+  })()
+</script>
+  
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+      <span>
+        
+          <i class="iconfont icon-06tags"></i>标签: 
+          
+          <span class="span--tag">
+            <a href="/tags/笔试-算法/">
+              #笔试, 算法
+            </a>
+          </span>
+          
+        
+      </span>
+    </div>
+    <div class="article-meta pull-right">
+    </div>
+  </div>
+</div>
+
+
+  <aside id="sidebar">
+    <p id="sidebar-header"></p>
+    <ol id="sidebar-toc"></ol>
+  </aside>
+  <script async>setTimeout(generateToc, 10);</script>
+
+
+  <nav class="post-navigation">
+    
+      <div class="nav-pre">
+        <i class="iconfont icon-prev"></i>
+        上一篇:
+        <a href="/2019/07/26/swig-python/" target="_self">工具使用-[linux] swig实现c++的python包装</a>
+      </div>
+    
+    
+  </nav>
+
+  
+    <a href="#comment" class="comment-anchor"></a>
+<div class="comment-title"><i class="iconfont icon-footprint"></i> 留下足迹 <i class="iconfont icon-footprint"></i></div>
+<div id="vcomments"></div>
+
+<script defer>
+  if( true ) {
+    let path = getRealPath()
+    new Valine({
+      el: "#vcomments",
+      appId: "oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz",
+      appKey: "fWABYGLTAoV1LT4LYzh1PNmQ",
+      notify: false,
+      verify: false,
+      avatar: "robohash",
+      placeholder: "正确填写邮箱, 才能及时收到回复哦♪(^∇^*)",
+      path
+    });
+  }
+</script>
+   
+
+  
+    <script defer>
+const valineAPI = (() => {
+  try {
+    AV.init("oGELcUvlMiFClUUpxn7V3qUo-gzGzoHsz", "fWABYGLTAoV1LT4LYzh1PNmQ");
+  } catch(error) {}
+  const isExist = (identity) => {
+    identity = identity || getRealPath();
+    let query = new AV.Query('Timer');
+    return new Promise((resolve, reject) => {
+      query.equalTo("identity", identity);
+      query.find().then(results => {
+        resolve(results.length > 0);
+      }, error => reject(error));
+    })
+  }
+
+  const _get = (identity) => {
+    let query = null;
+    if(identity && identity instanceof Array){
+      let querys = [];
+      for(let i = 0; i < identity.length; ++i) {
+        querys[i] = new AV.Query('Timer');
+        querys[i].equalTo('identity', identity[i]);
+      }
+      query = AV.Query.or.apply(null ,querys);
+    } else {
+      identity = identity || getRealPath();
+      query = new AV.Query("Timer");
+      query.equalTo("identity", identity);
+    }
+
+    return new Promise((resolve, reject) => {
+      query.find()
+      .then(results => resolve(results))
+      .catch(error => reject(error))
+    })
+  }
+
+  const create = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let Todo = AV.Object.extend('Timer');
+      let todo = new Todo();
+      todo.set("times", 1);
+      todo.set("identity", identity);
+      todo.save().then(res => resolve(true), error => reject(error));
+    })
+  }
+
+  const update = (identity) => {
+    identity = identity || getRealPath();
+    return new Promise((resolve, reject) => {
+      let query = new AV.Query('Timer');
+      query.equalTo("identity", identity);
+      query.find().then(todos => {
+        todos.forEach(todo => {
+          todo.set("times", todo.attributes.times + 1);
+        });
+        return AV.Object.saveAll(todos);
+      }).then(todos => resolve(true), error => reject(error));
+    })
+  }
+
+  return {
+    isExist,
+    _get,
+    update,
+    create
+  }
+})()
+
+const calcAndWriteTimes = () => {
+  let isPost = true;
+
+  let timerAllDOM = document.querySelectorAll(".article-timer");
+
+  if(isPost) {
+    let identity = timerAllDOM[0].getAttribute("data-identity");
+    valineAPI.isExist(identity)
+    .then(exist => {
+      if(exist) {
+        return valineAPI.update(identity);
+      }
+      return new Promise(resolve => resolve(true));
+    })
+    .then( succuess => valineAPI._get(identity))
+    .then( result => timerAllDOM[0].innerText = result[0].attributes.times)
+    .catch(error => console.log(error.message))
+    return ;
+  }
+
+  let timerDOMCache = {};
+
+  for(let timerDOM of timerAllDOM) {
+    let identity = timerDOM.getAttribute("data-identity");
+    if(timerDOMCache.hasOwnProperty(identity)){
+      timerDOMCache[identity].dom.push(timerDOM);
+    }else{
+      timerDOMCache[identity] = {
+        dom: [timerDOM],
+        times: undefined
+      };
+    }
+  }
+
+  let identities = Object.keys(timerDOMCache);
+  valineAPI._get(identities).then(results => {
+    for(let result of results) {
+      let {identity, times} = result.attributes;
+      timerDOMCache[identity].times = times;
+      timerDOMCache[identity].dom.map(item => item.innerText = times);
+    }
+    for(let identity of identities) {
+      if(timerDOMCache[identity].times){
+        continue;
+      }
+      timerDOMCache[identity].dom.map(item => item.innerText = 1);
+      valineAPI.create(identity);
+    }
+  }).catch(error => console.log(error.message))
+}
+
+if(true){
+  calcAndWriteTimes();
+}
+</script>
+   
+
+</div>
+
+
+      <footer>
+  <p class="site-info">
+    博客已萌萌哒运行<span id="time-to-now"></span><span class="my-face">(●'◡'●)ﾉ♥</span>
+    <br>
+    Theme - <a href="https://github.com/dongyuanxin/theme-bmw">BMW</a> | Made With 💗 | Powered by <a href="https://godbmw.com/">GodBMW</a>
+    <br>
+    
+  </p>
+</footer>
+
+
+
+<script>
+const timeToNowDOM = document.querySelector("#time-to-now");
+const startTimestamp = new Date(2018, 1, 10).getTime();
+
+const updateTimeStr = () => {
+  let offset = parseInt(
+      (new Date().getTime() - startTimestamp) / 1000,
+      10
+    ),
+    day = Math.floor(offset / 86400),
+    hour = Math.floor((offset % 86400) / 3600),
+    minute = Math.floor(((offset % 86400) % 3600) / 60),
+    second = Math.floor(((offset % 86400) % 3600) % 60);
+  timeToNowDOM.innerHTML =
+    day + "天" + hour + "小时" + minute + "分钟" + second + "秒";
+  setTimeout(updateTimeStr, 500);
+}
+
+setTimeout(updateTimeStr, 500);
+</script>
+
+
+      <div class="back-to-top hidden">
+  <span>
+    <i class="iconfont icon-60"></i><span></span>%
+  </span>
+</div>
+
+<script>
+const updateIconToTop = percent => {
+  let dom = document.querySelector(".back-to-top span span");
+  dom.innerText = percent;
+  if(percent < 1) {
+    document.querySelector(".back-to-top").className = "back-to-top hidden";
+  } else {
+    document.querySelector(".back-to-top").className = "back-to-top";
+  }
+}
+
+const handleScoll = () => {
+  let isRunning = false;
+  return () => {
+    if (isRunning) return;
+    isRunning = true;
+    window.requestAnimationFrame(timestamp => {
+      let scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop,
+        scrollHeight =
+          document.documentElement.scrollHeight ||
+          document.body.scrollHeight,
+        clientHeight =
+          document.documentElement.clientHeight ||
+          document.body.clientHeight;
+      isRunning = false;
+      if (scrollTop <= 1) {
+        updateIconToTop(0);
+        return;
+      }
+      if (scrollTop + clientHeight >= scrollHeight) {
+        updateIconToTop(100);
+      } else {
+        updateIconToTop(parseInt(
+          100 * scrollTop / (scrollHeight - clientHeight),
+          10
+        ));
+      }
+    });
+  };
+}
+
+const backToTop = () => {
+  let scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop,
+    delay = 10,
+    time = 200;
+  if (scrollTop <= 20) {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    return;
+  }
+  let step = Math.ceil(scrollTop * delay / time);
+  let timer = setInterval(() => {
+    scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollTop - step <= 0) {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      clearInterval(timer);
+    } else {
+      document.documentElement.scrollTop = scrollTop - step;
+      document.body.scrollTop = scrollTop - step;
+    }
+  }, delay);
+}
+
+document.addEventListener("scroll", handleScoll(), false);
+
+document.querySelector(".back-to-top").addEventListener("click", backToTop, false);
+
+</script>
+
+    </div>
+
+    
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+<script>
+  (() => {
+    const mathjaxConfig = {
+      showProcessingMessages: false, //关闭js加载过程信息
+      messageStyle: "none", //不显示信息
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]], //行内公式选择符
+        displayMath: [["$$", "$$"], ["\\[", "\\]"]], //段内公式选择符
+        skipTags: ["script", "noscript", "style", "textarea", "pre", "code", "a"] //避开某些标签
+      },
+      "HTML-CSS": {
+        availableFonts: ["STIX", "TeX"], //可选字体
+        showMathMenu: false //关闭右击菜单显示
+      }
+    }
+
+    let mathjaxInterval = setInterval(() => {
+      if(!window.MathJax){
+        return;
+      }
+      window.MathJax.Hub.Config(mathjaxConfig)
+      window.MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById('app')])
+
+      clearInterval(mathjaxInterval)
+    }, 10)    
+  })()
+</script>
+    
+
+    <script src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script>
+<script async>
+  let fancyTimer = setInterval(function(){
+    if(!window.$){
+      return;
+    }
+    $(document).ready(function() {
+      $(".post img").each(function () {
+        if($(this).parent().get(0).tagName.toLowerCase() === "a") {
+          return;
+        }
+        // $(this).attr("data-fancybox", "gallery"); // if you add 'data-fancybox', img will display after showed
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "gallery");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      });
+      
+      clearInterval(fancyTimer);
+    });
+  }, 10);
+</script>
+
+    
+  </body>
+
+</html>
