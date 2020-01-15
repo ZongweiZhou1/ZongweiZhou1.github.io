@@ -253,7 +253,7 @@
 <ol>
 <li><p><strong>下列不是进程间的通信方式的是（B）</strong><br>A.管道<br>B.回调<br>C.共享内存<br>D.消息队列<br>E.socket<br>F.信号量<br>知识补充:<br>1)管道( pipe )：管道是一种半双工的通信方式，数据只能单向流动，而且只能在具有亲缘关系的进程间使用。进程的亲缘关系通常是指父子进程关系。<br>2)信号量( semophore ) ： 信号量是一个计数器，可以用来控制多个进程对共享资源的访问。它常作为一种锁机制，防止某进程正在访问共享资源时，其他进程也访问该资源。因此，主要作为进程间以及同一进程内不同线程之间的同步手段。<br>3) 消息队列( message queue ) ： 消息队列是由消息的链表，存放在内核中并由消息队列标识符标识。消息队列克服了信号传递信息少、管道只能承载无格式字节流以及缓冲区大小受限等缺点。<br>4) 共享内存( shared memory ) ：共享内存就是映射一段能被其他进程所访问的内存，这段共享内存由一个进程创建，但多个进程都可以访问。共享内存是最快的 IPC 方式，它是针对其他进程间通信方式运行效率低而专门设计的。它往往与其他通信机制，如信号量，配合使用，来实现进程间的同步和通信。<br>5) 套接字( socket ) ： 套解口也是一种进程间通信机制，与其他通信机制不同的是，它可用于不同及其间的进程通信。</p>
 </li>
-<li><p>已知IBM的PowerPC是big-endian字节序列而Intel的X86是little-endian字节序，如果在地址啊存储的整形值时0x04030201，那么地址为a+3的字节内存储的值在PowerPC和Intel X86结构下的值分别是？（A）<br>A.1 4<br>B.1 3<br>C.4 1<br>D.3 1<br>E.4 4<br>F.1 1<br>知识补充:<br>大端从大地址开始存储，小端相反，两者都是从数据低位开始存起；<br>假设从上至下地址递增，则<br>PowerPC（大）： Intel X86（小）：<br>04 01 低<br>03 02 |<br>02 03 |<br>01 04 高<br>a+3指向最大的地址，所以分别为1 4</p>
+<li><p>已知IBM的PowerPC是big-endian字节序列而Intel的X86是little-endian字节序，如果在地址啊存储的整形值时0x04030201，那么地址为a+3的字节内存储的值在PowerPC和Intel X86结构下的值分别是？（A）<br>A.1 4<br>B.1 3<br>C.4 1<br>D.3 1<br>E.4 4<br>F.1 1<br>知识补充:<br>大端从大地址结束，小端相反，两者都是从数据低位开始存起；<br>假设从上至下地址递增，则<br>PowerPC（大）： Intel X86（小）：<br>04 01 低<br>03 02 |<br>02 03 |<br>01 04 高<br>a+3指向最大的地址，所以分别为1 4</p>
 </li>
 <li><p><strong>在TCP/IP建立连接过程中，客户端或服务器的状态转移说法错误的是(D)？</strong><br>A. 经历SYN_RECV状态<br>B.经历SYN_SEND状态<br>C.经历ESTABLISHED状态<br>D.经历TIME_WAIT状态<br>E.服务器在收到syn包时将加入半连接队列<br>F.服务器收到客户端的ack包后将从半连接队列删除<br>知识补充:<br>1)Tcp/Ip有3次握手：第一次握手：客户端向服务器端发送SYN包（syn＝j），进入SYN_SEND状态，等待服务器确认。第二次握手：服务器收到SYN包，确认SYN，此时syn＝j+1，同时发送一个SYN包（syn＝k）即SYN＋ACK包，此时服务器进入SYN_RECV状态；第三次握手：客户端收到SYN＋ACK包，向服务器发送ACK确认包，此时客户端和服务器端均进入ESTABLISHED状态。<br>2)其中有一个半连接状态：服务器维护一个半连接队列，该队列卫每个客户端SYN包开设一个条目，标明服务器已经接到SYN包，并向客户端发出确认，这些条目表示的连接处于SYN_RECV状态，得到客户端的确认后进入ESTABLISHED状态。<br>3)TIME_WAIT是断开连接时的状态<br>4)TCP连接的建立与终止 :<a href="http://www.cnblogs.com/newwy/p/3234536.html" target="_blank" rel="noopener">http://www.cnblogs.com/newwy/p/3234536.html</a></p>
 </li>
@@ -388,6 +388,12 @@
         <a href="/2019/07/26/swig-python/" target="_self">工具使用-[linux] swig实现c++的python包装</a>
       </div>
     
+    
+      <div class="nav-next">
+        下一篇:
+        <a href="/2019/12/03/MultiTaskLearning/" target="_self">Multi-Task Learning Using Uncertainty to Weigh Losses for Scene Geometry and Semantics</a>
+        <i class="iconfont icon-next"></i>
+      </div>
     
   </nav>
 

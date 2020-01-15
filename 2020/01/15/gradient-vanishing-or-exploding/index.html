@@ -8,12 +8,12 @@
   
   
   
-  <title>工具使用-如何使用ROS在RViz中显示Markers（python版 points and lines 示例） | YixiaoZhou&#39;s blog</title>
+  <title>gradient vanishing or exploding | YixiaoZhou&#39;s blog</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   
-    <meta name="keywords" content="rviz,points and lines,python,">
+    <meta name="keywords" content="Hexo, theme-bmw">
   
 
   <script>
@@ -189,17 +189,17 @@
 
 <div class="post">
   <h1 class="article-title">
-    <span>工具使用-如何使用ROS在RViz中显示Markers（python版 points and lines 示例）</span>
+    <span>gradient vanishing or exploding</span>
   </h1>
   <div class="article-top-meta">
     <span>
       发布 : 
-      2019-06-26
+      2020-01-15
     </span>
     
     
       <span>
-        浏览 : <span class="article-timer" data-identity="rviz-points-and-lines"></span>
+        浏览 : <span class="article-timer" data-identity="gradient-vanishing-or-exploding"></span>
       </span>
     
   </div>
@@ -208,25 +208,54 @@
 
   <div class="article-content">
     <div class="markdown-body">
-      <h4 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h4><p>我们先来看看<code>Marker</code> 中定义了那些类型：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rosmsg show visualization_msgs/Marker</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>uint8 ARROW=0<br>uint8 CUBE=1<br>uint8 SPHERE=2<br>uint8 CYLINDER=3<br>uint8 LINE_STRIP=4<br>uint8 LINE_LIST=5<br>uint8 CUBE_LIST=6<br>uint8 SPHERE_LIST=7<br>uint8 POINTS=8</p>
-<p>% 上面声明了9种类型</p>
-<p>uint8 TEXT_VIEW_FACING=9<br>uint8 MESH_RESOURCE=10<br>uint8 TRIANGLE_LIST=11<br>uint8 ADD=0<br>uint8 MODIFY=0<br>uint8 DELETE=2<br>uint8 DELETEALL=3<br>std_msgs/Header header<br>uint32 seq<br>time stamp<br>string frame_id<br>string ns<br>int32 id<br>int32 type<br>int32 action<br>geometry_msgs/Pose pose  # pose包含的属性<br>geometry_msgs/Point position<br> float64 x<br> float64 y<br> float64 z<br>geometry_msgs/Quaternion orientation<br> float64 x<br> float64 y<br> float64 z<br> float64 w<br>geometry_msgs/Vector3 scale<br>float64 x<br>float64 y<br>float64 z<br>std_msgs/ColorRGBA color<br>float32 r<br>float32 g<br>float32 b<br>float32 a<br>duration lifetime<br>bool frame_locked<br>geometry_msgs/Point[] points  # 对应一个list<br>float64 x<br>float64 y<br>float64 z<br>std_msgs/ColorRGBA[] colors<br>float32 r<br>float32 g<br>float32 b<br>float32 a<br>string text<br>string mesh_resource<br>bool mesh_use_embedded_materials</p>
-</blockquote>
-<p>当type=POINTS时， points中的每一个点对应改为之上画一个点， type=LINE_STRIP时，表示poinits中任意两个相邻的点存在连线， type=LINE_LIST中的points内点不会将线连在一起，于是相邻点连线，但不存在共享定点的连线，比如第0个点和第1个点连线，第2个点和第3个点连线。</p>
-<h4 id="Publisher-Node"><a href="#Publisher-Node" class="headerlink" title="Publisher Node"></a>Publisher Node</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">roscd using_markers/scripts</span><br><span class="line">vim points_and_lines.py</span><br></pre></td></tr></table></figure>
-<p><code>points_and_lines.py</code>的内容：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">import</span> rospy</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> visualization_msgs.msg <span class="keyword">import</span> Marker</span><br><span class="line"><span class="keyword">from</span> geometry_msgs.msg <span class="keyword">import</span> Point</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    rospy.init_node(<span class="string">"points_and_lines"</span>, anonymous=<span class="literal">True</span>)</span><br><span class="line">    pub = rospy.Publisher(<span class="string">"visualization_marker"</span>, Marker, queue_size=<span class="number">10</span>)</span><br><span class="line">    rate = rospy.Rate(<span class="number">30</span>)</span><br><span class="line">    f = <span class="number">0.0</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">not</span> rospy.is_shutdown():</span><br><span class="line">        types = [Marker.POINTS, Marker.LINE_STRIP, Marker.LINE_LIST]</span><br><span class="line">        markers = [Marker() <span class="keyword">for</span> _ <span class="keyword">in</span> [<span class="string">'points'</span>, <span class="string">'line_strip'</span>, <span class="string">'line_list'</span>]]</span><br><span class="line">        <span class="keyword">for</span> i, m <span class="keyword">in</span> enumerate(markers):  <span class="comment"># 分别处理不同的marker </span></span><br><span class="line">            m.header.frame_id = <span class="string">'/my_frame'</span></span><br><span class="line">            m.header.stamp = rospy.Time.now()</span><br><span class="line">            m.ns = <span class="string">'points_and_lines'</span></span><br><span class="line">            m.pose.orientation.w = <span class="number">1.0</span></span><br><span class="line">            m.action = Marker.ADD</span><br><span class="line">            m.id = i</span><br><span class="line">            m.type = types[i]</span><br><span class="line">            m.color.a = <span class="number">1.0</span></span><br><span class="line">            <span class="keyword">if</span> i == <span class="number">0</span>: <span class="comment"># point</span></span><br><span class="line">                m.scale.x = <span class="number">0.2</span></span><br><span class="line">                m.scale.y = <span class="number">0.2</span></span><br><span class="line">                m.color.g = <span class="number">1.0</span></span><br><span class="line">            <span class="keyword">elif</span> i == <span class="number">1</span>:  <span class="comment"># line_strip</span></span><br><span class="line">                m.scale.x = <span class="number">0.1</span></span><br><span class="line">                m.color.b = <span class="number">1.0</span></span><br><span class="line">            <span class="keyword">elif</span> i == <span class="number">2</span>:</span><br><span class="line">                m.scale.x = <span class="number">0.1</span></span><br><span class="line">                m.color.r = <span class="number">1.0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">100</span>):  <span class="comment"># 给每一个marker添加points</span></span><br><span class="line">            y = <span class="number">5</span> * np.sin(f + i/<span class="number">100.0</span> * <span class="number">2</span> * np.pi)</span><br><span class="line">            z = <span class="number">5</span> * np.cos(f + i/<span class="number">100.0</span> * <span class="number">2</span> * np.pi)</span><br><span class="line">            p = Point(i<span class="number">-50</span>, y, z)</span><br><span class="line">            markers[<span class="number">0</span>].points.append(p)</span><br><span class="line">            markers[<span class="number">1</span>].points.append(p)</span><br><span class="line">            markers[<span class="number">2</span>].points.extend([p, Point(i<span class="number">-50</span>, y, z+<span class="number">1</span>)])</span><br><span class="line">        <span class="keyword">for</span> m <span class="keyword">in</span> markers:</span><br><span class="line">            pub.publish(m)</span><br><span class="line">        rate.sleep()</span><br><span class="line">        f += <span class="number">0.04</span></span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> __name__==<span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
-<p>好像相对于上篇文章内容并没有添加新的东西。主要就是不同类型中points列表的设置。</p>
-<h4 id="Building-and-Viewing"><a href="#Building-and-Viewing" class="headerlink" title="Building and Viewing"></a>Building and Viewing</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ～/catkin_ws</span></span><br><span class="line">catkin_make</span><br><span class="line">. devel/setup.bash</span><br></pre></td></tr></table></figure>
-<p>两个终端：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rosrun using_markers points_and_lines.py</span><br></pre></td></tr></table></figure>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rosrun rviz rviz</span><br></pre></td></tr></table></figure>
-<p>然后在rviz的左边栏将<code>Fixed Frame</code> 值改为 <code>/my_frame</code></p>
-<p>左下角添加<code>Add</code> msg的类型<code>Marker</code>， 然后就能看到结果了。</p>
-<p><img src="/2019/06/26/rviz-points-and-lines/rviz_points_and_lines_result.png" alt="points_and_lines_results"></p>
+      <h3 id="梯度消失和梯度爆炸产生的原因"><a href="#梯度消失和梯度爆炸产生的原因" class="headerlink" title="梯度消失和梯度爆炸产生的原因"></a>梯度消失和梯度爆炸产生的原因</h3><p><img src="/2020/01/15/gradient-vanishing-or-exploding/mlp.png" alt="mlp"></p>
+<p>我们以简单的多层感知机为例，已知该MLP的层数为k=4， $f_i = \sigma(w_if_{i-1}+b_i), i=1,2,\cdots,k$ 表示第i层的非线性变换，$\sigma$表示激活函数主要用来非线性变换，$w_i, b_i$分别表示第i层的待学习的权重和偏置, $f_0$表示网络的输入。 损失函数可以使用$L(f_k, y)$表示，其中$y$是ground truth。于是整个网络可以表示为如下的映射</p>
+<script type="math/tex; mode=display">
+f_k = \sigma(w_k f_{k-1} + b_k)</script><p>所谓的梯度反传就是计算损失函数在每一个需要利用梯度更新数值的变量上计算偏导。<br>对第$k$层的$w_k, b_k$计算偏导数可以得到：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    \frac{\partial L}{\partial w_k} &= \frac{\partial L}{\partial f_k}\frac{\partial f_k}{\partial w_k} \\
+                                    &= \frac{\partial L}{\partial f_k}\frac{\partial \sigma}{\partial(w_k f_{k-1}+b_k)}f_{k-1} \\
+    \frac{\partial L}{\partial b_k} &= \frac{\partial L}{\partial f_k}\frac{\partial \sigma}{\partial (w_k f_{k-1}+b_k)}
+\end{aligned}</script><p>对第$k-1$层的偏导数可以计算：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    \frac{\partial L}{\partial w_{k-1}} &= \frac{\partial L}{\partial f_{k-1}}\frac{\partial f_{k-1}}{\partial w_{k-1}} \\
+    & = \frac{\partial L}{\partial f_k} \frac{\partial f_k}{\partial f_{k-1}}\frac{\partial f_{k-1}}{\partial w_{k-1}} \\
+    & = \frac{\partial L}{\partial f_k}\frac{\partial \sigma}{\partial(w_k f_{k-1}+b_k)}w_k\frac{\partial f_{k-1}}{\partial w_{k-1}} \\
+    & = \frac{\partial L}{\partial f_k}\frac{\partial \sigma}{\partial(w_k f_{k-1}+b_k)}\frac{\partial \sigma}{\partial(w_{k-1} f_{k-2}+b_{k-1})}f_{k-2}w_k \\
+    \\ 
+    \frac{\partial L}{\partial w_p} &= \frac{\partial L}{\partial f_k} \frac{\partial \sigma}{\partial(w_k f_{k-1}+b_k)} f_{p-1} \prod_{i=p}^{k-1}\frac{\partial \sigma}{\partial(w_i f_{i-1} + b_i)}w_{i+1}
+\end{aligned}</script><p>于是我们发现第 $p, p&lt;k$层参数的梯度和 $\delta_i = \frac{\partial \sigma}{\partial(w_i f_{i-1} + b_i)}w_{i+1}, i=p, \cdots, k-1$有关，若每一个因子$\delta_i$都小于1，则乘积趋于0； 若每个因子都大于1，则乘积趋于无穷大. 那么什么情形对导致因子 $\delta_i$过小或者过大呢？$\delta_i$与激活函数的导数和后面层的权重参数有关。所以深层网络产生梯度消失和梯度爆炸有两个原因：激活函数不合适、权重参数出现问题。</p>
+<p>激活函数不合适：</p>
+<p>以sigmoid函数为例：</p>
+<script type="math/tex; mode=display">
+    \sigma(x) = \frac{1}{1+e^{-x}}</script><p>其导数为： </p>
+<script type="math/tex; mode=display">
+    \sigma'(x) = \frac{e^{-x}}{(1+e^{-x})^2}</script><p>其曲线图如下：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">s = <span class="keyword">lambda</span> x: <span class="number">1</span>/(<span class="number">1</span>+np.exp(-x))</span><br><span class="line">ds = <span class="keyword">lambda</span> x: np.exp(-x)/(<span class="number">1</span>+np.exp(-x))**<span class="number">2</span></span><br><span class="line">plt.subplot(<span class="number">121</span>)</span><br><span class="line">plt.plot(x, s(x))</span><br><span class="line">plt.title(<span class="string">'sigmoid'</span>)</span><br><span class="line">plt.subplot(<span class="number">122</span>)</span><br><span class="line">plt.plot(x, ds(x))</span><br><span class="line">plt.title(<span class="string">'ds'</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure></p>
+<p><img src="/2020/01/15/gradient-vanishing-or-exploding/sigmoid.png" alt="sigmoid and its gradient curve"></p>
+<p>可以发现sigmoid函数的最大梯度值$\sigma’(x)$在0点取得， $\sigma’(0)$ = 1/4, 而网络权重初始化时一般能保证$|w| &lt; 1$,所以这样就使因子$\delta_i$小于1， 对于太深的网络层参数的偏导数趋近于0， 即$\Delta w_p = 0$, 而梯度下降法的迭代公式是: $w^{t+1}_p = w^{t}_p - \eta\Delta w_p$, 也就是说这是更新不动参数，称之为梯度消失了。</p>
+<p>如果网络初始化不合适的话，可能随着迭代次数的增大，权重$w_i, i=p,\cdots,k$一直增长的很大，这时候就可能导致因子$\delta_i$太大，从而溢出，也就是网络训练过程中会出现 <code>nan</code> 的原因。</p>
+<h3 id="避免梯度消失和梯度爆炸的方法"><a href="#避免梯度消失和梯度爆炸的方法" class="headerlink" title="避免梯度消失和梯度爆炸的方法"></a>避免梯度消失和梯度爆炸的方法</h3><p>对症下药：</p>
+<ol>
+<li><p>使用其他的激活函数，比如<code>ReLU</code>函数:</p>
+<script type="math/tex; mode=display">
+ ReLU(x) = \begin{cases}
+ x,      \text{    if } x>0;\\
+ 0,      \text{    else}
+ \end{cases}.</script><p> 可以发现，对于ReLU函数，其正值部分的偏导为常数1，因此连乘对其没影响，缓解了梯度消失现象。</p>
+</li>
+<li><p>梯度截断/正则。 既然梯度过大可能导致权重更新过大进而导致梯度爆炸，那就对梯度进行截断，避免权重突然变得很大。梯度阶段还能避免每次更新步长太大收敛不稳定。</p>
+</li>
+<li><p>微调。我们也提到权重的初始化也有可能导致梯度消失或爆炸，那么在预训练权重上进行微调有助于选择合适的权重参数，避免梯度消失或爆炸。</p>
+</li>
+<li><p>跨层连接。 即ResNet结构, 梯度消失和爆炸是由于层数太多，导致乘数因子个数太多，那么通过跨层连接能够减小每一层的最小深度。</p>
+</li>
+<li><p>BatchNorm。 批量归一化的目的是让每一层的输入拉到相似的分布区间内，避免有些层分布区间太大，导致激活函数的导数趋于0.</p>
+</li>
+<li><p>LSTM结构。 LSTM结构通过多种门能够保留更长的历史信息，反过来误差反传时也能保存更多的误差信息，我觉得这个和跨层连接的原理是相同的，只是具体实施的时候不同，LSTM会对误差进行变换后前传，而skip-connectiion直接跨层反传的就是误差。</p>
+</li>
+</ol>
     </div>
   </div>
   
@@ -237,7 +266,7 @@
         
           本文作者 : zhouzongwei <br>
         
-        原文链接 : <a href>http://yoursite.com/2019/06/26/rviz-points-and-lines/</a><br>
+        原文链接 : <a href>http://yoursite.com/2020/01/15/gradient-vanishing-or-exploding/</a><br>
         版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
         </blockquote>
       </div>
@@ -294,27 +323,6 @@
     <div class="article-meta pull-left">
       <span>
         
-          <i class="iconfont icon-06tags"></i>标签: 
-          
-          <span class="span--tag">
-            <a href="/tags/rviz/">
-              #rviz
-            </a>
-          </span>
-          
-          <span class="span--tag">
-            <a href="/tags/points-and-lines/">
-              #points and lines
-            </a>
-          </span>
-          
-          <span class="span--tag">
-            <a href="/tags/python/">
-              #python
-            </a>
-          </span>
-          
-        
       </span>
     </div>
     <div class="article-meta pull-right">
@@ -335,15 +343,9 @@
       <div class="nav-pre">
         <i class="iconfont icon-prev"></i>
         上一篇:
-        <a href="/2019/06/26/rviz-interactive-markers/" target="_self">工具使用-rviz 中可交互的markers（InteractiveMarker）</a>
+        <a href="/2019/12/03/MultiTaskLearning/" target="_self">Multi-Task Learning Using Uncertainty to Weigh Losses for Scene Geometry and Semantics</a>
       </div>
     
-    
-      <div class="nav-next">
-        下一篇:
-        <a href="/2019/06/26/rviz-sending-basic-shapes/" target="_self">工具使用-ROS在rviz中的应用实例 （python 版 basic shapes）</a>
-        <i class="iconfont icon-next"></i>
-      </div>
     
   </nav>
 

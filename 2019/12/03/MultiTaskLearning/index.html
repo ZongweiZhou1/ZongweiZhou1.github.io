@@ -8,12 +8,12 @@
   
   
   
-  <title>工具使用-如何使用ROS在RViz中显示Markers（python版 points and lines 示例） | YixiaoZhou&#39;s blog</title>
+  <title>Multi-Task Learning Using Uncertainty to Weigh Losses for Scene Geometry and Semantics | YixiaoZhou&#39;s blog</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   
-    <meta name="keywords" content="rviz,points and lines,python,">
+    <meta name="keywords" content="Multi-Task Learning, auto balance the weights of losses,">
   
 
   <script>
@@ -189,17 +189,17 @@
 
 <div class="post">
   <h1 class="article-title">
-    <span>工具使用-如何使用ROS在RViz中显示Markers（python版 points and lines 示例）</span>
+    <span>Multi-Task Learning Using Uncertainty to Weigh Losses for Scene Geometry and Semantics</span>
   </h1>
   <div class="article-top-meta">
     <span>
       发布 : 
-      2019-06-26
+      2019-12-03
     </span>
     
     
       <span>
-        浏览 : <span class="article-timer" data-identity="rviz-points-and-lines"></span>
+        浏览 : <span class="article-timer" data-identity="MultiTaskLearning"></span>
       </span>
     
   </div>
@@ -208,25 +208,47 @@
 
   <div class="article-content">
     <div class="markdown-body">
-      <h4 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h4><p>我们先来看看<code>Marker</code> 中定义了那些类型：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rosmsg show visualization_msgs/Marker</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>uint8 ARROW=0<br>uint8 CUBE=1<br>uint8 SPHERE=2<br>uint8 CYLINDER=3<br>uint8 LINE_STRIP=4<br>uint8 LINE_LIST=5<br>uint8 CUBE_LIST=6<br>uint8 SPHERE_LIST=7<br>uint8 POINTS=8</p>
-<p>% 上面声明了9种类型</p>
-<p>uint8 TEXT_VIEW_FACING=9<br>uint8 MESH_RESOURCE=10<br>uint8 TRIANGLE_LIST=11<br>uint8 ADD=0<br>uint8 MODIFY=0<br>uint8 DELETE=2<br>uint8 DELETEALL=3<br>std_msgs/Header header<br>uint32 seq<br>time stamp<br>string frame_id<br>string ns<br>int32 id<br>int32 type<br>int32 action<br>geometry_msgs/Pose pose  # pose包含的属性<br>geometry_msgs/Point position<br> float64 x<br> float64 y<br> float64 z<br>geometry_msgs/Quaternion orientation<br> float64 x<br> float64 y<br> float64 z<br> float64 w<br>geometry_msgs/Vector3 scale<br>float64 x<br>float64 y<br>float64 z<br>std_msgs/ColorRGBA color<br>float32 r<br>float32 g<br>float32 b<br>float32 a<br>duration lifetime<br>bool frame_locked<br>geometry_msgs/Point[] points  # 对应一个list<br>float64 x<br>float64 y<br>float64 z<br>std_msgs/ColorRGBA[] colors<br>float32 r<br>float32 g<br>float32 b<br>float32 a<br>string text<br>string mesh_resource<br>bool mesh_use_embedded_materials</p>
-</blockquote>
-<p>当type=POINTS时， points中的每一个点对应改为之上画一个点， type=LINE_STRIP时，表示poinits中任意两个相邻的点存在连线， type=LINE_LIST中的points内点不会将线连在一起，于是相邻点连线，但不存在共享定点的连线，比如第0个点和第1个点连线，第2个点和第3个点连线。</p>
-<h4 id="Publisher-Node"><a href="#Publisher-Node" class="headerlink" title="Publisher Node"></a>Publisher Node</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">roscd using_markers/scripts</span><br><span class="line">vim points_and_lines.py</span><br></pre></td></tr></table></figure>
-<p><code>points_and_lines.py</code>的内容：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">import</span> rospy</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> visualization_msgs.msg <span class="keyword">import</span> Marker</span><br><span class="line"><span class="keyword">from</span> geometry_msgs.msg <span class="keyword">import</span> Point</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    rospy.init_node(<span class="string">"points_and_lines"</span>, anonymous=<span class="literal">True</span>)</span><br><span class="line">    pub = rospy.Publisher(<span class="string">"visualization_marker"</span>, Marker, queue_size=<span class="number">10</span>)</span><br><span class="line">    rate = rospy.Rate(<span class="number">30</span>)</span><br><span class="line">    f = <span class="number">0.0</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">not</span> rospy.is_shutdown():</span><br><span class="line">        types = [Marker.POINTS, Marker.LINE_STRIP, Marker.LINE_LIST]</span><br><span class="line">        markers = [Marker() <span class="keyword">for</span> _ <span class="keyword">in</span> [<span class="string">'points'</span>, <span class="string">'line_strip'</span>, <span class="string">'line_list'</span>]]</span><br><span class="line">        <span class="keyword">for</span> i, m <span class="keyword">in</span> enumerate(markers):  <span class="comment"># 分别处理不同的marker </span></span><br><span class="line">            m.header.frame_id = <span class="string">'/my_frame'</span></span><br><span class="line">            m.header.stamp = rospy.Time.now()</span><br><span class="line">            m.ns = <span class="string">'points_and_lines'</span></span><br><span class="line">            m.pose.orientation.w = <span class="number">1.0</span></span><br><span class="line">            m.action = Marker.ADD</span><br><span class="line">            m.id = i</span><br><span class="line">            m.type = types[i]</span><br><span class="line">            m.color.a = <span class="number">1.0</span></span><br><span class="line">            <span class="keyword">if</span> i == <span class="number">0</span>: <span class="comment"># point</span></span><br><span class="line">                m.scale.x = <span class="number">0.2</span></span><br><span class="line">                m.scale.y = <span class="number">0.2</span></span><br><span class="line">                m.color.g = <span class="number">1.0</span></span><br><span class="line">            <span class="keyword">elif</span> i == <span class="number">1</span>:  <span class="comment"># line_strip</span></span><br><span class="line">                m.scale.x = <span class="number">0.1</span></span><br><span class="line">                m.color.b = <span class="number">1.0</span></span><br><span class="line">            <span class="keyword">elif</span> i == <span class="number">2</span>:</span><br><span class="line">                m.scale.x = <span class="number">0.1</span></span><br><span class="line">                m.color.r = <span class="number">1.0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">100</span>):  <span class="comment"># 给每一个marker添加points</span></span><br><span class="line">            y = <span class="number">5</span> * np.sin(f + i/<span class="number">100.0</span> * <span class="number">2</span> * np.pi)</span><br><span class="line">            z = <span class="number">5</span> * np.cos(f + i/<span class="number">100.0</span> * <span class="number">2</span> * np.pi)</span><br><span class="line">            p = Point(i<span class="number">-50</span>, y, z)</span><br><span class="line">            markers[<span class="number">0</span>].points.append(p)</span><br><span class="line">            markers[<span class="number">1</span>].points.append(p)</span><br><span class="line">            markers[<span class="number">2</span>].points.extend([p, Point(i<span class="number">-50</span>, y, z+<span class="number">1</span>)])</span><br><span class="line">        <span class="keyword">for</span> m <span class="keyword">in</span> markers:</span><br><span class="line">            pub.publish(m)</span><br><span class="line">        rate.sleep()</span><br><span class="line">        f += <span class="number">0.04</span></span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> __name__==<span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
-<p>好像相对于上篇文章内容并没有添加新的东西。主要就是不同类型中points列表的设置。</p>
-<h4 id="Building-and-Viewing"><a href="#Building-and-Viewing" class="headerlink" title="Building and Viewing"></a>Building and Viewing</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ～/catkin_ws</span></span><br><span class="line">catkin_make</span><br><span class="line">. devel/setup.bash</span><br></pre></td></tr></table></figure>
-<p>两个终端：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rosrun using_markers points_and_lines.py</span><br></pre></td></tr></table></figure>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rosrun rviz rviz</span><br></pre></td></tr></table></figure>
-<p>然后在rviz的左边栏将<code>Fixed Frame</code> 值改为 <code>/my_frame</code></p>
-<p>左下角添加<code>Add</code> msg的类型<code>Marker</code>， 然后就能看到结果了。</p>
-<p><img src="/2019/06/26/rviz-points-and-lines/rviz_points_and_lines_result.png" alt="points_and_lines_results"></p>
+      <p>这篇文章主要提出了一种针对于多任务学习中多种损失如何自动调整每个损失权重的方法，文中为了验证自动权重调整的有效性，给出了一种多任务学习模型，同时实现scene segmentation、instance segmentation和depth prediction。</p>
+<p><img src="/2019/12/03/MultiTaskLearning/Figure1.png" alt="Multi-task deep learning"></p>
+<!-- >>more<< -->
+<h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>大量的深度学习任务中包含多个回归和分类目标。本文观察到整个多任务系统的性能与损失函数中每个任务的损失权重息息相关。而手动调节这些权重是件费力的事情，导致多任务学习实际应用中难以推广。本文提出一种多任务学习的基本方法，能够通过考虑每个任务的同方差不确定性来自动调节每个任务损失的权重。该方法使同时学习不同尺度和度量空间的回归和分类任务成为可能。本文在逐像素深度估计、场景和实例分割的联合任务上验证了方法的有效性。更让人惊讶的是，我们发现该模型能够自主学习权重，而且比单独每个任务的性能都好。</p>
+<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>多任务学习的目的是希望通过一个共享模型同时学习多个目标从而提升学习效率和预测精度。多任务学习在计算机视觉、自然语言处理和语音识别领域都有很广泛的应用。</p>
+<p>​    我们(本文作者，下同)以计算机视觉中的视觉场景理解为切入点来探讨多任务学习。场景理解任务需要同时理解场景的几何以及语义信息。场景理解涉及到多种不同单位和尺度的回归和分类问题，形成一种有代表性的多任务学习问题。对于像场景理解这种应用在机器人系统中时对速度要求很高，因此多任务学习就很有必要。多个任务集成在单一模型能能够减轻计算从而达到实时运行。</p>
+<p>​    之前大多数多任务学习采用朴素的损失加权和，这些权重相等或者手工调节。但我们证明了模型性能与每个任务损失权重的选择息息相关。人工去选择最优的参数耗时耗力。我们还注意到每个任务的最优权重与度量尺度以及最终任务的噪声量级有关。</p>
+<p>​    本文提出一种利用同方差不确定性同时学习多个目标的方法。我们将同方差不确定性解释为任务依赖权重并证明了如何推到联合的多任务损失，能够自动学习到如何平衡回归和分类损失的权重。我们方法能够学到一个最有的权重，相对于单独每个人的性能都更好。</p>
+<p>​    具体而言，我们在场景的几何和语义学习问题的三个任务中证明了方法的有效性。首先我们需要学习像素水平的目标分类，即场景分割；其次，我们还进行了实例分割，该任务需要对图像中的每一个个体都产生一个独立的掩码。该任务比场景分割更难，因为她不仅需要估计每一个像素的类别还需要估计该像素属于哪一个个体。同时他也比目标检测更难，目标检测只需预测目标的标定框。最后，我们模型还会预测每个像素的深度。密集深度网络已经被证明可以用于有监督或无监督的深度识别，但是得到一种泛化性很好的深度估计网络却很难。本文通过语义标签和多任务学习能够提升每个人物的性能。</p>
+<p>​    在已有的文中，深度回归，场景分割和实例分割一般都是通过单独的网络实现然后组成一个场景理解的系统。给定一张图像，我们的系统是第一个能够同时产生场景分割、深度密集估计和实例分割结果的方法。尽管其他视觉模型也会用到多任务学习，我们展示了如何同时学习场景和几何信息。将这三个任务结合起来既能减轻计算量又能保证每个任务的输出一致性。最后我们展示了通过多任务的共享表示能够提升多个指标性能，使得模型更加有效。</p>
+<p>文章共享点：</p>
+<ul>
+<li>全新且重要的多任务学习方法，利用同方差不确定性同时学习多种不同度量和尺度的分类和回归问题。</li>
+<li>场景分割、实例分割和深度回归的联合框架</li>
+<li>证明了多任务学习中权重的重要性，以及如何去获得更好的性能。</li>
+</ul>
+<h3 id="同方差不确定性的多任务学习"><a href="#同方差不确定性的多任务学习" class="headerlink" title="同方差不确定性的多任务学习"></a>同方差不确定性的多任务学习</h3><p>多任务学习关系的问题是如何优化包含多个目标的模型。最朴素的方法是对每个损失进行线性加权：</p>
+<script type="math/tex; mode=display">
+L_{total} = \sum_i w_iL_i</script><p>该方法是目前的主流方法，但是有一个问题存在。首先如图2所示，性能对于权重的选择比较敏感。这些权重超参经常需要花费大把时间去调试。因此需要找到一个更方便的方法找到最优的参数。</p>
+<p><img src="/2019/12/03/MultiTaskLearning/Figure2.png" alt="Figure2"></p>
+<p>更详细而言，我们假设一个网络去预测输入图像中每一个像素的场景类别以及深度。在图2中，每个图的两个边界表示单独训练每个人物，其曲线表示每个任务的性能随着权重$w$的变化。可以发现在一些最优的权重下，联合网络比单独训练效果更好。单独训练如图中边界所示。在最优值附近时往往有一些任务性能变差。然后大量任务中寻找最优的权重参数都是费时费力的。图2中同样的给出了回归任务中的相似结果。</p>
+<h4 id="同方差不确定性作为任务依赖不确定性"><a href="#同方差不确定性作为任务依赖不确定性" class="headerlink" title="同方差不确定性作为任务依赖不确定性"></a>同方差不确定性作为任务依赖不确定性</h4><p>在贝叶斯建模中，一般有两种主要类型的不确定性可以建模</p>
+<ul>
+<li>认知不确定性。即训练数据不足导致模型能力的不确定性，一般可以通过增加的训练数据缓解</li>
+<li>偶然不确定性。已有的数据不能解释的一些信息带来的不确定性。通过所有变量的精度提升能够缓解</li>
+</ul>
+<p>偶然不确定性可以再分为两个子类：</p>
+<ul>
+<li>数据依赖不确定性，即异方差不确定性，该不确定性取决于数据数据，由模型输出表示</li>
+<li>任务依赖不确定性，即同方差不确定性，这种不确定性针对于不同的数据是相同的，但是不同的任务是不同的，因此也被描述为任务依赖不确定性。</li>
+</ul>
+<p>注：一般构建模型后，对于任意样本模型输出和最理想的输出都是有差距的，而这种差距称为数据依赖的不确定性。而任务依赖不确定性是指每个任务中数据不确定性是差不多的，但不同的任务之间可能存在不同。</p>
+<p>在多任务场景中，任务不确定性刻画了任务之间相对的可信度，反映了回归和分类任务中内在的不确定性。同样任务依赖不确定性也与任务的表示和度量单位有关。我们提出可以使用同方差不确定性作为多任务学习中加权不同损失的基础。</p>
+<h4 id="多任务的似然"><a href="#多任务的似然" class="headerlink" title="多任务的似然"></a>多任务的似然</h4><p>本节通过最大化具有同方差不确定性的高斯似然来推导多任务损失函数。使用$f^W(x)$表示神经网络的输出，定义如下的概率模型。对于回归任务可以将似然函数定义为以输出为均值的高斯分布：</p>
+<script type="math/tex; mode=display">
+p(y|f^W(x)) = N(f^W(x), \sigma^2)</script><p>对于分类任务，一般将网络的输出经过一个softmax函数压缩一下，然后从概率向量中进行采样：</p>
+<script type="math/tex; mode=display">
+p(y|f^W(x)) = softmax(f^W(x))</script><p>针对于多个模型输出，我们一般将各个输出因子化，于是得到下面的多任务似然函数：</p>
+<script type="math/tex; mode=display">
+p(y_1,...,y_K|f^W(x)) = p(y_1|f^W(x))...p(y_k|f^W(x))</script><p>在最大化似然函数的过程中，我们最大化对数似然函数。比如回归问题：</p>
+
     </div>
   </div>
   
@@ -237,7 +259,7 @@
         
           本文作者 : zhouzongwei <br>
         
-        原文链接 : <a href>http://yoursite.com/2019/06/26/rviz-points-and-lines/</a><br>
+        原文链接 : <a href>http://yoursite.com/2019/12/03/MultiTaskLearning/</a><br>
         版权声明 : 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！
         </blockquote>
       </div>
@@ -297,20 +319,8 @@
           <i class="iconfont icon-06tags"></i>标签: 
           
           <span class="span--tag">
-            <a href="/tags/rviz/">
-              #rviz
-            </a>
-          </span>
-          
-          <span class="span--tag">
-            <a href="/tags/points-and-lines/">
-              #points and lines
-            </a>
-          </span>
-          
-          <span class="span--tag">
-            <a href="/tags/python/">
-              #python
+            <a href="/tags/Multi-Task-Learning-auto-balance-the-weights-of-losses/">
+              #Multi-Task Learning, auto balance the weights of losses
             </a>
           </span>
           
@@ -335,13 +345,13 @@
       <div class="nav-pre">
         <i class="iconfont icon-prev"></i>
         上一篇:
-        <a href="/2019/06/26/rviz-interactive-markers/" target="_self">工具使用-rviz 中可交互的markers（InteractiveMarker）</a>
+        <a href="/2019/08/26/interview-questions-1/" target="_self">笔试题总结 (1)</a>
       </div>
     
     
       <div class="nav-next">
         下一篇:
-        <a href="/2019/06/26/rviz-sending-basic-shapes/" target="_self">工具使用-ROS在rviz中的应用实例 （python 版 basic shapes）</a>
+        <a href="/2020/01/15/gradient-vanishing-or-exploding/" target="_self">gradient vanishing or exploding</a>
         <i class="iconfont icon-next"></i>
       </div>
     
